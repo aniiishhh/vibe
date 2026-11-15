@@ -2,7 +2,7 @@
 
 A shared chat for classmates, friends and teammates, with an AI participant you can mention as **@Vibe**.
 
-Milestone 1 implements Cognito accounts, parties, link and QR invitations, persistent chat, AppSync refresh notifications and Bedrock replies. Personal memory, course research and shared tasks follow in later milestones.
+Milestone 1 implements Cognito accounts, parties, link and QR invitations, persistent chat, AppSync refresh notifications and Bedrock replies. Milestone 2 adds personal memory, learning and sharing controls, Supermemory sync and memory-aware replies. Course research and shared tasks follow in later milestones.
 
 ## Local development
 

@@ -39,16 +39,18 @@ Acceptance requires two independent browsers in one party exchanging messages, r
 
 ## Milestone 2 — memory
 
-- [ ] Verify Supermemory add/search/replace/delete using isolated synthetic documents.
-- [ ] Manual private points, edits, deletion and sharing approval.
-- [ ] Automatic extraction of self-authored facts with visible candidates.
-- [ ] Version-aware sync to party, private and shared namespaces.
-- [ ] Memory panel with sources, expiry, correction and processing state.
-- [ ] Per-party shared preference control.
-- [ ] Retrieval filtered against current canonical records.
-- [ ] Tombstones and revision checks prevent stale jobs restoring deleted or corrected facts.
-- [ ] Retry per-document deletion failures, including still-processing documents, until provider cleanup is confirmed.
-- [ ] Bounded profile previews and owner Markdown export.
+Implemented and deployed from `anish/implementation` with user authorization. TypeScript, 21 targeted backend tests, production build and CDK synthesis passed. Live checks covered learning, approved cross-party reuse, an immediate correction, canonical deletion and provider cleanup. A cleanup retry delay was fixed and verified through a targeted normal queue scenario. The entire multi-party script was not rerun after that focused fix. See `STATUS.md` for evidence, setup and Milestone 3 continuation.
+
+- [x] Verify Supermemory add/search/replace/delete using isolated synthetic documents.
+- [x] Manual private points, edits, deletion and sharing approval.
+- [x] Automatic extraction of self-authored facts with visible candidates.
+- [x] Version-aware sync to party, private and shared namespaces.
+- [x] Memory panel with sources, expiry, correction and processing state.
+- [x] Per-party shared preference control.
+- [x] Retrieval filtered against current canonical records.
+- [x] Tombstones and revision checks prevent stale jobs restoring deleted or corrected facts.
+- [x] Retry per-document deletion failures, including still-processing documents, until provider cleanup is confirmed.
+- [x] Bounded profile previews and owner Markdown export.
 
 Acceptance requires learning in party A, approved reuse in party B and a correction governing the next answer. Test stale search, contradictory history and private source metadata.
 

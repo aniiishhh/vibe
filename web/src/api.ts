@@ -2,11 +2,16 @@ import { fetchAuthSession } from 'aws-amplify/auth';
 import type {
   AgentRun,
   Invite,
+  CreateMemoryInput,
+  MemoryFact,
+  MemoryList,
   Member,
   MessagePage,
+  PartyFact,
   Party,
   Profile,
   SendResult,
+  UpdateMemoryInput,
 } from '@vibe/shared';
 import type { RuntimeConfig } from './runtime';
 
@@ -70,6 +75,24 @@ export function createApi(config: RuntimeConfig) {
 
   return {
     getProfile: () => request<Profile>('/me'),
+    updateProfile: (body: { name?: string; learningEnabled?: boolean }) => request<Profile>('/me', {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    }),
+    getMemories: () => request<MemoryList>('/me/memories'),
+    createMemory: (body: CreateMemoryInput) => request<MemoryFact>('/me/memories', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+    updateMemory: (memoryId: string, body: UpdateMemoryInput) => request<MemoryFact>(`/me/memories/${encodeURIComponent(memoryId)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+    deleteMemory: (memoryId: string, version: number) => request<MemoryFact>(`/me/memories/${encodeURIComponent(memoryId)}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ version }),
+    }),
+    exportMemories: () => request<string>('/me/memories/export'),
     listParties: () => request<{ parties: Party[] }>('/parties'),
     createParty: (body: { name: string; goal: string }) => request<Party>('/parties', {
       method: 'POST',
@@ -77,6 +100,11 @@ export function createApi(config: RuntimeConfig) {
     }),
     getParty: (partyId: string) => request<Party>(`/parties/${encodeURIComponent(partyId)}`),
     getMembers: (partyId: string) => request<{ members: Member[] }>(`/parties/${encodeURIComponent(partyId)}/members`),
+    updatePartyMemorySharing: (partyId: string, useSharedMemory: boolean) => request<Member>(
+      `/parties/${encodeURIComponent(partyId)}/membership`,
+      { method: 'PATCH', body: JSON.stringify({ useSharedMemory }) },
+    ),
+    getPartyFacts: (partyId: string) => request<{ facts: PartyFact[] }>(`/parties/${encodeURIComponent(partyId)}/facts`),
     removeMember: (partyId: string, userId: string) => request<void>(
       `/parties/${encodeURIComponent(partyId)}/members/${encodeURIComponent(userId)}`,
       { method: 'DELETE' },

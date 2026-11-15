@@ -121,6 +121,25 @@ export class VibeStack extends Stack {
       removalPolicy: RemovalPolicy.RETAIN,
     });
 
+    const memoryDlq = new sqs.Queue(this, 'MemoryDeadLetterQueue', {
+      queueName: `vibe-${STAGE}-memory-dlq.fifo`,
+      fifo: true,
+      retentionPeriod: Duration.days(14),
+      encryption: sqs.QueueEncryption.SQS_MANAGED,
+      removalPolicy: RemovalPolicy.RETAIN,
+    });
+    const memoryQueue = new sqs.Queue(this, 'MemoryQueue', {
+      queueName: `vibe-${STAGE}-memory.fifo`,
+      fifo: true,
+      contentBasedDeduplication: false,
+      visibilityTimeout: Duration.seconds(540),
+      retentionPeriod: Duration.days(4),
+      encryption: sqs.QueueEncryption.SQS_MANAGED,
+      deadLetterQueue: { queue: memoryDlq, maxReceiveCount: 5 },
+      removalPolicy: RemovalPolicy.RETAIN,
+    });
+    const supermemoryParameterName = `/vibe/${STAGE}/supermemory-api-key`;
+
     const apiFunction = this.createNodeFunction('ApiFunction', 'api', 'handler.ts', 30, 512, {
       TABLE_NAME: table.tableName,
     });
@@ -128,11 +147,13 @@ export class VibeStack extends Stack {
       TABLE_NAME: table.tableName,
       MODEL_ID,
       FALLBACK_MODEL_ID,
+      SUPERMEMORY_PARAMETER_NAME: supermemoryParameterName,
       METERED_FEATURES_ENABLED: 'true',
     });
     const dispatcherFunction = this.createNodeFunction('DispatcherFunction', 'dispatcher', 'dispatcher.ts', 60, 512, {
       TABLE_NAME: table.tableName,
       AGENT_QUEUE_URL: agentQueue.queueUrl,
+      MEMORY_QUEUE_URL: memoryQueue.queueUrl,
     });
     const subscriptionFunction = this.createNodeFunction(
       'SubscriptionFunction',
@@ -142,6 +163,15 @@ export class VibeStack extends Stack {
       256,
       { TABLE_NAME: table.tableName },
     );
+
+    const memoryFunction = this.createNodeFunction('MemoryFunction', 'memory', 'memory-worker.ts', 90, 1024, {
+      TABLE_NAME: table.tableName,
+      MEMORY_QUEUE_URL: memoryQueue.queueUrl,
+      MODEL_ID,
+      SUPERMEMORY_PARAMETER_NAME: supermemoryParameterName,
+      METERED_FEATURES_ENABLED: 'true',
+    });
+    memoryFunction.addEnvironment('APP_STAGE', STAGE);
 
     apiFunction.addEnvironment('APP_STAGE', STAGE);
     agentFunction.addEnvironment('APP_STAGE', STAGE);
@@ -155,7 +185,7 @@ export class VibeStack extends Stack {
       'dynamodb:DeleteItem',
       'dynamodb:ConditionCheckItem',
     ];
-    for (const fn of [apiFunction, agentFunction]) {
+    for (const fn of [apiFunction, agentFunction, memoryFunction]) {
       fn.addToRolePolicy(
         new iam.PolicyStatement({
           actions: baseTableDataActions,
@@ -205,6 +235,32 @@ export class VibeStack extends Stack {
         ],
       }),
     );
+    memoryFunction.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['bedrock:InvokeModel'],
+      resources: [`arn:${Stack.of(this).partition}:bedrock:${Stack.of(this).region}::foundation-model/${MODEL_ID}`],
+    }));
+    const supermemoryParameterArn = Stack.of(this).formatArn({
+      service: 'ssm', resource: 'parameter', resourceName: supermemoryParameterName.slice(1),
+    });
+    for (const fn of [agentFunction, memoryFunction]) {
+      fn.addToRolePolicy(new iam.PolicyStatement({
+        actions: ['ssm:GetParameter'], resources: [supermemoryParameterArn],
+      }));
+      fn.addToRolePolicy(new iam.PolicyStatement({
+        actions: ['kms:Decrypt'], resources: ['*'],
+        conditions: {
+          StringEquals: {
+            'kms:ViaService': `ssm.${Stack.of(this).region}.amazonaws.com`,
+            'kms:EncryptionContext:PARAMETER_ARN': supermemoryParameterArn,
+          },
+        },
+      }));
+    }
+    memoryQueue.grantSendMessages(dispatcherFunction);
+    memoryFunction.addEventSource(new lambdaEventSources.SqsEventSource(memoryQueue, {
+      batchSize: 1, reportBatchItemFailures: true, maxConcurrency: 2,
+    }));
+
     const eventApi = new appsync.CfnApi(this, 'EventsApi', {
       name: `vibe-${STAGE}-events`,
       eventConfig: {
@@ -441,6 +497,8 @@ export class VibeStack extends Stack {
     new CfnOutput(this, 'UserPoolClientId', { value: userPoolClient.userPoolClientId });
     new CfnOutput(this, 'DynamoTableName', { value: table.tableName });
     new CfnOutput(this, 'AgentQueueUrl', { value: agentQueue.queueUrl });
+    new CfnOutput(this, 'MemoryQueueUrl', { value: memoryQueue.queueUrl });
+    new CfnOutput(this, 'SupermemoryParameterName', { value: supermemoryParameterName });
     new CfnOutput(this, 'EventsHttpEndpoint', {
       value: `https://${eventApi.attrDnsHttp}/event`,
     });

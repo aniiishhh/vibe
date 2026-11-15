@@ -10,7 +10,7 @@ import { db, getItem, key, tableName, type Item } from './store.js';
 
 interface OutboxRecord extends Item {
   effectId: string;
-  type: 'REFRESH' | 'AGENT_RUN';
+  type: 'REFRESH' | 'AGENT_RUN' | 'MEMORY_SYNC' | 'MEMORY_EXTRACT' | 'PARTY_SYNC';
   partyId: string;
   payload: Record<string, unknown>;
   status: 'PENDING' | 'DELIVERED';
@@ -82,6 +82,54 @@ async function enqueueAgent(record: OutboxRecord): Promise<void> {
   }));
 }
 
+async function enqueueMemory(record: OutboxRecord): Promise<void> {
+  const type = record.type;
+  let body: Record<string, unknown>;
+  let groupId: string;
+  if (type === 'MEMORY_SYNC') {
+    const ownerId = String(record.payload.ownerId ?? record.partyId);
+    const factId = record.payload.factId;
+    const version = record.payload.version;
+    if (!ownerId || typeof factId !== 'string' || !factId || !Number.isInteger(version) || Number(version) < 1) {
+      throw new Error('Invalid MEMORY_SYNC outbox payload');
+    }
+    body = { effectId: record.effectId, type, ownerId, factId, version };
+    groupId = ownerId;
+  } else if (type === 'MEMORY_EXTRACT') {
+    const partyId = String(record.payload.partyId ?? record.partyId);
+    const triggerMessageId = record.payload.triggerMessageId;
+    const expectedRevision = record.payload.expectedRevision;
+    if (!partyId || typeof triggerMessageId !== 'string' || !triggerMessageId ||
+        !Number.isInteger(expectedRevision) || Number(expectedRevision) < 0) {
+      throw new Error('Invalid MEMORY_EXTRACT outbox payload');
+    }
+    body = {
+      effectId: record.effectId,
+      type,
+      partyId,
+      triggerMessageId,
+      force: record.payload.force === true,
+      expectedRevision,
+    };
+    groupId = partyId;
+  } else {
+    const partyId = String(record.payload.partyId ?? record.partyId);
+    const messageId = record.payload.messageId;
+    if (!partyId || typeof messageId !== 'string' || !messageId) {
+      throw new Error('Invalid PARTY_SYNC outbox payload');
+    }
+    body = { effectId: record.effectId, type, partyId, messageId };
+    groupId = partyId;
+  }
+
+  await sqs.send(new SendMessageCommand({
+    QueueUrl: assertRequiredEnv('MEMORY_QUEUE_URL'),
+    MessageBody: JSON.stringify(body),
+    MessageGroupId: groupId,
+    MessageDeduplicationId: record.effectId,
+  }));
+}
+
 async function markDelivered(record: OutboxRecord): Promise<void> {
   await db.send(new UpdateCommand({
     TableName: tableName(),
@@ -127,6 +175,9 @@ async function dispatchEffect(effectId: string): Promise<void> {
   try {
     if (record.type === 'REFRESH') await publishRefresh(record);
     else if (record.type === 'AGENT_RUN') await enqueueAgent(record);
+    else if (record.type === 'MEMORY_SYNC' || record.type === 'MEMORY_EXTRACT' || record.type === 'PARTY_SYNC') {
+      await enqueueMemory(record);
+    }
     else throw new Error('Unknown outbox effect type');
     await markDelivered(record);
   } catch (error) {

@@ -19,7 +19,10 @@ import {
   makeOutboxItem,
   membershipCheck,
   membershipItem,
+  memoryExtractOutboxItem,
   notFound,
+  partySyncOutboxItem,
+  partyMembershipRevisionUpdate,
   queryItems,
   refreshOutboxItem,
   requireParty,
@@ -33,12 +36,24 @@ import {
   type JwtClaims,
 } from './store.js';
 import { isVibeMention, memberRemovalPermission } from './domain.js';
+import {
+  createMemory,
+  deleteMemory,
+  exportMemories,
+  getMemories,
+  getPartyMemoryFacts,
+  updateMemory,
+  updatePartyMemorySharing,
+} from './memory-routes.js';
 
 const partyInput = z.object({
   name: z.string().trim().min(1).max(80),
   goal: z.string().trim().min(1).max(1_000),
 });
-const profileInput = z.object({ name: z.string().trim().min(1).max(80) });
+const profileInput = z.object({
+  name: z.string().trim().min(1).max(80).optional(),
+  learningEnabled: z.boolean().optional(),
+}).refine((value) => value.name !== undefined || value.learningEnabled !== undefined);
 const messageInput = z.object({
   text: z.string().trim().min(1).max(4_000),
   clientId: z.uuid(),
@@ -166,6 +181,7 @@ async function createParty(claims: JwtClaims, event: APIGatewayProxyEventV2WithJ
   const partyItem: Item = {
     ...key(`PARTY#${partyId}`, 'META'),
     entityType: 'PARTY',
+    membershipRevision: 0,
     ...party,
   };
   const ownerMembership = membershipItem(partyId, claims.sub, profile.name, createdAt, 'owner');
@@ -245,6 +261,7 @@ async function removeMember(partyId: string, targetId: string, claims: JwtClaims
         ConditionExpression: 'attribute_exists(PK)',
       },
     },
+    partyMembershipRevisionUpdate(partyId, Number(party.membershipRevision ?? 0)),
     { Put: { TableName: tableName(), Item: refresh, ConditionExpression: 'attribute_not_exists(PK)' } },
   );
   try {
@@ -253,6 +270,7 @@ async function removeMember(partyId: string, targetId: string, claims: JwtClaims
     if (isTransactionCanceled(error)) {
       if (!await getItem(`PARTY#${partyId}`, `MEMBER#${claims.sub}`)) throw forbidden();
       if (!await getItem(`PARTY#${partyId}`, `MEMBER#${targetId}`)) throw notFound('Party member not found.');
+      throw new AppError(409, 'MEMBERSHIP_CONFLICT', 'Party membership changed in another session. Reload and try again.');
     }
     throw error;
   }
@@ -323,6 +341,7 @@ async function joinInvite(token: string, claims: JwtClaims): Promise<Party> {
           ConditionExpression: 'attribute_not_exists(PK)',
         },
       },
+      partyMembershipRevisionUpdate(partyId, Number(partyItem.membershipRevision ?? 0)),
       {
         Put: { TableName: tableName(), Item: refresh, ConditionExpression: 'attribute_not_exists(PK)' },
       },
@@ -334,6 +353,7 @@ async function joinInvite(token: string, claims: JwtClaims): Promise<Party> {
       if (!currentInvite || typeof currentInvite.expiresAt !== 'string' || Date.parse(currentInvite.expiresAt) <= Date.now()) {
         throw new AppError(410, 'INVITE_EXPIRED', 'This invite has expired.');
       }
+      throw new AppError(409, 'MEMBERSHIP_CONFLICT', 'Party membership changed in another session. Reload and try again.');
     }
     throw error;
   }
@@ -404,8 +424,13 @@ async function sendMessage(partyId: string, claims: JwtClaims, event: APIGateway
     ...key(`PARTY#${partyId}`, `MSG#${messageId}`),
     entityType: 'MESSAGE',
     ...message,
+    memoryRevisionAtCreation: Number(profile.memoryRevision ?? 0),
   };
   const refresh = refreshOutboxItem(partyId);
+  const partySync = partySyncOutboxItem(partyId, messageId);
+  const memoryExtract = profile.learningEnabled === true
+    ? memoryExtractOutboxItem(partyId, messageId, mentioned, Number(profile.memoryRevision ?? 0))
+    : undefined;
   const transaction: NonNullable<TransactWriteCommandInput['TransactItems']> = [
     membershipCheck(partyId, claims.sub),
     { Put: { TableName: tableName(), Item: messageItem, ConditionExpression: 'attribute_not_exists(PK)' } },
@@ -425,6 +450,8 @@ async function sendMessage(partyId: string, claims: JwtClaims, event: APIGateway
       },
     },
     { Put: { TableName: tableName(), Item: refresh, ConditionExpression: 'attribute_not_exists(PK)' } },
+    { Put: { TableName: tableName(), Item: partySync, ConditionExpression: 'attribute_not_exists(PK)' } },
+    ...(memoryExtract ? [{ Put: { TableName: tableName(), Item: memoryExtract, ConditionExpression: 'attribute_not_exists(PK)' } }] : []),
   ];
   if (mentioned) {
     const run: AgentRun = result.run!;
@@ -481,20 +508,54 @@ async function getRun(partyId: string, runId: string, userId: string): Promise<A
 async function updateProfile(claims: JwtClaims, event: APIGatewayProxyEventV2WithJWTAuthorizer) {
   const input = parseBody(event, profileInput);
   const previous = await getOrCreateProfile(claims);
-  const response = await db.send(new UpdateCommand({
-    TableName: tableName(),
-    Key: key(`USER#${claims.sub}`, 'PROFILE'),
-    UpdateExpression: 'SET id = :id, email = :email, #name = :name, updatedAt = :now',
-    ExpressionAttributeNames: { '#name': 'name' },
-    ExpressionAttributeValues: {
-      ':id': claims.sub,
-      ':email': previous.email,
-      ':name': input.name,
-      ':now': new Date().toISOString(),
-    },
-    ReturnValues: 'ALL_NEW',
-  }));
-  return toProfile(response.Attributes ?? { id: claims.sub, email: previous.email, name: input.name });
+  const names: Record<string, string> = {};
+  const values: Record<string, unknown> = {
+    ':id': claims.sub,
+    ':email': previous.email,
+    ':now': new Date().toISOString(),
+  };
+  const sets = ['id = :id', 'email = :email', 'updatedAt = :now'];
+  if (input.name !== undefined) {
+    names['#name'] = 'name';
+    values[':name'] = input.name;
+    sets.push('#name = :name');
+  }
+  const learningChanged = input.learningEnabled !== undefined && input.learningEnabled !== previous.learningEnabled;
+  if (input.learningEnabled !== undefined) {
+    names['#learningEnabled'] = 'learningEnabled';
+    names['#memoryRevision'] = 'memoryRevision';
+    values[':learningEnabled'] = input.learningEnabled;
+    values[':expectedRevision'] = Number(previous.memoryRevision ?? 0);
+    sets.push('#learningEnabled = :learningEnabled');
+  }
+  if (learningChanged) {
+    values[':zero'] = 0;
+    values[':one'] = 1;
+    sets.push('#memoryRevision = if_not_exists(#memoryRevision, :zero) + :one');
+  }
+  const compareMemoryRevision = input.learningEnabled !== undefined;
+  try {
+    const result = await db.send(new UpdateCommand({
+      TableName: tableName(),
+      Key: key(`USER#${claims.sub}`, 'PROFILE'),
+      UpdateExpression: `SET ${sets.join(', ')}`,
+      ...(compareMemoryRevision ? { ConditionExpression: '#memoryRevision = :expectedRevision' } : {}),
+      ExpressionAttributeNames: names,
+      ExpressionAttributeValues: values,
+      ReturnValues: 'ALL_NEW',
+    }));
+    return toProfile(result.Attributes ?? {
+      id: claims.sub,
+      email: previous.email,
+      name: input.name ?? previous.name,
+      learningEnabled: input.learningEnabled ?? previous.learningEnabled,
+    });
+  } catch (error) {
+    if (compareMemoryRevision && error instanceof Error && error.name === 'ConditionalCheckFailedException') {
+      throw new AppError(409, 'MEMORY_CONFLICT', 'Your learning setting changed in another session. Reload it and try again.');
+    }
+    throw error;
+  }
 }
 
 async function route(event: APIGatewayProxyEventV2WithJWTAuthorizer, claims: JwtClaims): Promise<APIGatewayProxyStructuredResultV2> {
@@ -510,6 +571,21 @@ async function route(event: APIGatewayProxyEventV2WithJWTAuthorizer, claims: Jwt
   if (parts.length === 1 && parts[0] === 'me' && method === 'PUT') {
     return response(200, await updateProfile(claims, event));
   }
+  if (parts[0] === 'me' && parts[1] === 'memories' && parts.length === 2 && method === 'GET') {
+    return response(200, await getMemories(claims));
+  }
+  if (parts[0] === 'me' && parts[1] === 'memories' && parts[2] === 'export' && parts.length === 3 && method === 'GET') {
+    return response(200, await exportMemories(claims));
+  }
+  if (parts[0] === 'me' && parts[1] === 'memories' && parts.length === 2 && method === 'POST') {
+    return response(201, await createMemory(claims, event));
+  }
+  if (parts[0] === 'me' && parts[1] === 'memories' && parts.length === 3 && method === 'PATCH') {
+    return response(200, await updateMemory(claims, parts[2]!, event));
+  }
+  if (parts[0] === 'me' && parts[1] === 'memories' && parts.length === 3 && method === 'DELETE') {
+    return response(200, await deleteMemory(claims, parts[2]!, event));
+  }
   if (parts.length === 1 && parts[0] === 'parties' && method === 'GET') {
     return response(200, await listParties(claims.sub));
   }
@@ -521,6 +597,12 @@ async function route(event: APIGatewayProxyEventV2WithJWTAuthorizer, claims: Jwt
   }
   if (parts[0] === 'parties' && parts[2] === 'members' && parts.length === 3 && method === 'GET') {
     return response(200, await listMembers(parts[1]!, claims.sub));
+  }
+  if (parts[0] === 'parties' && parts[2] === 'membership' && parts.length === 3 && method === 'PATCH') {
+    return response(200, await updatePartyMemorySharing(parts[1]!, claims, event));
+  }
+  if (parts[0] === 'parties' && parts[2] === 'facts' && parts.length === 3 && method === 'GET') {
+    return response(200, await getPartyMemoryFacts(parts[1]!, claims.sub));
   }
   if (parts[0] === 'parties' && parts[2] === 'members' && parts.length === 4 && method === 'DELETE') {
     await removeMember(parts[1]!, parts[3]!, claims);

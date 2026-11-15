@@ -146,7 +146,7 @@ Supermemory creates derived memories from ingested documents. Profile bucket sum
 
 ### Automatic accumulation and manual edits
 
-At the next @Vibe request, or after ten unprocessed human messages, enqueue bounded extraction work for those messages. Runs are deduplicated by source boundary. Extract each speaker's own explicit durable statements with message IDs. A third-party claim cannot write another person's profile. Vibe-created prose and web pages cannot establish a personal preference.
+The Milestone 2 implementation enqueues bounded extraction work for each author on their @Vibe request or after ten pending messages from that author. Runs are deduplicated by source boundary. Extract each speaker's own explicit durable statements with message IDs. A third-party claim cannot write another person's profile. Vibe-created prose and web pages cannot establish a personal preference.
 
 The owner enables automatic learning during onboarding. Learned facts begin as candidates visible in the private memory view. Approval promotes a fact to the shared namespace. A manually added point can be saved private or approved for reuse. Per-party sharing defaults off.
 

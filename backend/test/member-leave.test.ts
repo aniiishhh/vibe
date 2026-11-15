@@ -10,6 +10,9 @@ const storeMocks = vi.hoisted(() => ({
     ConditionCheck: { Key: { PK: `PARTY#${partyId}`, SK: `MEMBER#${userId}` } },
   })),
   refreshOutboxItem: vi.fn(() => ({ PK: 'OUTBOX#change', SK: 'META' })),
+  partyMembershipRevisionUpdate: vi.fn((partyId: string, expectedRevision: number) => ({
+    Update: { Key: { PK: `PARTY#${partyId}`, SK: 'META' }, expectedRevision },
+  })),
   getOrCreateProfile: vi.fn(),
   isTransactionCanceled: vi.fn(() => false),
   forbidden: () => new Error('forbidden'),
@@ -59,11 +62,12 @@ describe('member self-leave transaction', () => {
     const actions = storeMocks.transact.mock.calls[0]?.[0] as unknown as Array<Record<string, any>>;
 
     expect(result?.statusCode).toBe(204);
-    expect(actions).toHaveLength(2);
+    expect(actions).toHaveLength(3);
     expect(actions.some((action) => 'ConditionCheck' in action)).toBe(false);
     expect(actions.find((action) => 'Delete' in action)?.Delete?.Key).toEqual({
       PK: 'PARTY#party',
       SK: 'MEMBER#member',
     });
+    expect(actions.some((action) => action.Update?.Key?.SK === 'META')).toBe(true);
   });
 });

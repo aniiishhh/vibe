@@ -10,13 +10,14 @@ import { Amplify } from 'aws-amplify';
 import { events } from 'aws-amplify/api';
 import { confirmSignUp, resendSignUpCode, signIn, signUp } from 'aws-amplify/auth';
 import {
-  AlertCircle, ArrowDown, ArrowLeft, Check, CheckCircle2, ChevronDown, CircleHelp, Copy, Link2,
+  AlertCircle, ArrowDown, ArrowLeft, Brain, Check, CheckCircle2, ChevronDown, CircleHelp, Copy, Link2,
   LoaderCircle, LogOut, Menu, MessageCircle, Plus, QrCode, RefreshCw, Send, Sparkles,
   Users, X,
 } from 'lucide-react';
-import type { AgentRun, Member, Message, Party, Profile, SendResult } from '@vibe/shared';
+import type { AgentRun, Member, Message, Party, PartyFact, Profile, SendResult } from '@vibe/shared';
 import { AuthProvider, useAuth } from './auth';
 import { ApiRequestError, createApi, errorMessage, type VibeApi } from './api';
+import { MemoryPage } from './MemoryPage';
 import { deriveRealtimeEndpoint, type RuntimeConfig } from './runtime';
 import type { RuntimeConfigResult } from './runtime';
 
@@ -99,6 +100,7 @@ export function App({ config }: { config: RuntimeConfig }) {
               <Route element={<ProtectedRoute />}>
                 <Route element={<WorkspaceShell />}>
                   <Route index element={<WorkspaceHome />} />
+                  <Route path="memory" element={<MemoryPage api={api} />} />
                   <Route path="parties/:partyId" element={<PartyRoute config={config} />} />
                 </Route>
               </Route>
@@ -203,6 +205,7 @@ function Sidebar({
   onSignOut: () => Promise<void>;
   onRetryProfile: () => void;
 }) {
+  const location = useLocation();
   return (
     <aside className={`sidebar${open ? ' sidebar-open' : ''}`} aria-label="Main navigation">
       <div className="sidebar-top">
@@ -226,6 +229,11 @@ function Sidebar({
           </Link>
         ))}
         {parties.length === 0 && <p className="sidebar-empty">Your parties will show up here.</p>}
+      </nav>
+      <nav className="account-nav" aria-label="Personal settings">
+        <Link className={`account-nav-link${location.pathname === '/memory' ? ' account-nav-active' : ''}`} to="/memory" aria-current={location.pathname === '/memory' ? 'page' : undefined} onClick={onClose}>
+          <Brain size={16} /><span>Personal memory</span>
+        </Link>
       </nav>
       <div className="sidebar-bottom">
         {profileError && <div className="profile-load-error"><span>Profile unavailable</span><button type="button" onClick={onRetryProfile}>Retry</button></div>}
@@ -530,6 +538,7 @@ function PartyPage({ config }: { config: RuntimeConfig }) {
     void queryClient.invalidateQueries({ queryKey: ['messages', partyId] });
     void queryClient.invalidateQueries({ queryKey: ['party', partyId] });
     void queryClient.invalidateQueries({ queryKey: ['members', partyId] });
+    void queryClient.invalidateQueries({ queryKey: ['party-facts', partyId] });
     void queryClient.invalidateQueries({ queryKey: ['parties'] });
   };
 
@@ -599,6 +608,7 @@ function PartyPage({ config }: { config: RuntimeConfig }) {
         onInvite={() => setInviteOpen(true)}
         onRetryMembers={() => void membersQuery.refetch()}
       />
+      <PartyFactsPanel party={partyQuery.data} members={membersQuery.data ?? []} />
       <ChatPanel
         party={partyQuery.data}
         currentUserId={user?.id ?? ''}
@@ -649,10 +659,89 @@ function PartyHeader({
           <span className="sync-dot" />
           <span>{eventsState === 'live' ? 'Live' : eventsState === 'connecting' ? 'Connecting' : 'Syncing'}</span>
         </div>
+        <MemorySharingControl partyId={party.id} member={members.find((item) => item.userId === currentUserId)} loading={membersLoading} failed={membersError} />
         <MemberRoster members={members} loading={membersLoading} failed={membersError} currentUserId={currentUserId} partyId={party.id} onRetry={onRetryMembers} />
         <button className="button button-secondary invite-button" type="button" onClick={onInvite}><Link2 size={16} /> Invite</button>
       </div>
     </header>
+  );
+}
+
+function MemorySharingControl({ partyId, member, loading, failed }: {
+  partyId: string;
+  member?: Member;
+  loading: boolean;
+  failed: boolean;
+}) {
+  const api = useApi();
+  const queryClient = useQueryClient();
+  const [error, setError] = useState('');
+  const sharingEnabled = member?.useSharedMemory === true;
+  const mutation = useMutation({
+    mutationFn: (useSharedMemory: boolean) => api.updatePartyMemorySharing(partyId, useSharedMemory),
+    onSuccess: async (updatedMember) => {
+      setError('');
+      queryClient.setQueryData<Member[]>(['members', partyId], (members = []) => members.map((item) => item.userId === updatedMember.userId ? updatedMember : item));
+      await queryClient.invalidateQueries({ queryKey: ['members', partyId] });
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+    onError: (caught) => {
+      setError(caught instanceof ApiRequestError && caught.status === 409
+        ? 'This setting changed elsewhere. Reload the current setting before trying again.'
+        : errorMessage(caught, 'This party setting could not be changed.'));
+      if (caught instanceof ApiRequestError && caught.status === 409) void queryClient.invalidateQueries({ queryKey: ['members', partyId] });
+    },
+  });
+
+  if (loading) return <span className="sharing-skeleton skeleton" aria-label="Loading party preference setting" />;
+  if (failed || !member) return <span className="sharing-unavailable">Sharing setting unavailable</span>;
+
+  return (
+    <div className="party-sharing">
+      <button
+        className={`share-switch${sharingEnabled ? ' share-switch-on' : ''}`}
+        type="button"
+        role="switch"
+        aria-checked={sharingEnabled}
+        aria-label="Use my shared preferences in this party"
+        disabled={mutation.isPending}
+        onClick={() => { setError(''); mutation.mutate(!sharingEnabled); }}
+      >
+        <span className="share-switch-track"><span className="share-switch-thumb" /></span>
+      </button>
+      <span className="party-sharing-label">Use my shared preferences</span>
+      {mutation.isPending && <span className="sharing-saving" aria-live="polite">Saving…</span>}
+      {error && <span className="sharing-error" role="alert">{error}</span>}
+    </div>
+  );
+}
+
+function PartyFactsPanel({ party, members }: { party: Party; members: Member[] }) {
+  const api = useApi();
+  const [open, setOpen] = useState(false);
+  const factsQuery = useQuery({
+    queryKey: ['party-facts', party.id],
+    queryFn: async () => (await api.getPartyFacts(party.id)).facts,
+    enabled: open,
+  });
+
+  return (
+    <section className={`party-facts${open ? ' party-facts-open' : ''}`}>
+      <button className="party-facts-toggle" type="button" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+        <span><Brain size={15} /> Party memory</span><span className="party-facts-subtitle">Shared notes from this conversation</span><ChevronDown size={15} />
+      </button>
+      {open && <div className="party-facts-body">
+        <p className="party-facts-goal"><strong>Party goal</strong> {party.goal}</p>
+        {factsQuery.isPending ? <div className="popover-loading"><LoaderCircle className="spin" size={15} /> Loading party memory</div> : factsQuery.isError ? <div className="party-facts-error" role="alert"><span>{errorMessage(factsQuery.error, 'Party memory could not be loaded.')}</span><button className="text-button" type="button" onClick={() => void factsQuery.refetch()}>Retry</button></div> : factsQuery.data.length === 0 ? <p className="party-facts-empty">No shared facts have been saved for this party yet.</p> : (
+          <ul className="party-facts-list">
+            {factsQuery.data.map((fact) => {
+              const speaker = members.find((member) => member.userId === fact.speakerId)?.name ?? 'Party member';
+              return <li key={fact.id}><div><strong>{speaker}</strong><p>{fact.text}</p></div>{fact.sourceMessageIds[0] && <Link to={`/parties/${encodeURIComponent(party.id)}#message-${encodeURIComponent(fact.sourceMessageIds[0])}`}>Source</Link>}</li>;
+            })}
+          </ul>
+        )}
+      </div>}
+    </section>
   );
 }
 
@@ -996,7 +1085,7 @@ function MessageRow({ message, isSelf, run }: { message: Message; isSelf: boolea
   const statusText = run?.status === 'queued' ? 'Vibe is in the queue…' : run?.status === 'thinking' ? 'Vibe is thinking…' : '';
   const time = formatTime(message.createdAt);
   return (
-    <article className={`message-row${isSelf ? ' message-self' : ''}${isAssistant ? ' message-assistant' : ''}`}>
+    <article id={`message-${message.id}`} className={`message-row${isSelf ? ' message-self' : ''}${isAssistant ? ' message-assistant' : ''}`}>
       {(!isSelf || isAssistant) && <span className={`message-avatar${isAssistant ? ' message-avatar-vibe' : ''}`} aria-hidden="true">{isAssistant ? 'v' : <Avatar name={message.authorName} size="small" />}</span>}
       <div className="message-column">
         <div className="message-meta"><strong>{isAssistant ? 'Vibe' : isSelf ? 'You' : message.authorName}</strong><time dateTime={message.createdAt}>{time}</time></div>

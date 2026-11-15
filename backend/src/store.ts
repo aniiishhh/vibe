@@ -140,6 +140,7 @@ export function membershipItem(
     name,
     joinedAt,
     role,
+    useSharedMemory: false,
     GSI1PK: `USER#${userId}`,
     GSI1SK: `PARTY#${joinedAt}#${partyId}`,
   };
@@ -151,6 +152,8 @@ export function toMember(item: Item): Member {
     name: String(item.name),
     joinedAt: String(item.joinedAt),
     role: item.role === 'owner' ? 'owner' : 'member',
+    useSharedMemory: item.useSharedMemory === true,
+    ...(typeof item.memoryRevision === 'number' ? { memoryRevision: item.memoryRevision } : {}),
   };
 }
 
@@ -169,6 +172,8 @@ export function toProfile(item: Item): Profile {
     id: String(item.id),
     name: String(item.name),
     email: String(item.email ?? ''),
+    learningEnabled: item.learningEnabled === true,
+    memoryRevision: Number(item.memoryRevision ?? 0),
   };
 }
 
@@ -211,12 +216,18 @@ export async function getOrCreateProfile(claims: JwtClaims): Promise<Profile> {
       TableName: tableName(),
       Key: key(`USER#${claims.sub}`, 'PROFILE'),
       UpdateExpression:
-        'SET id = :id, email = :email, #name = if_not_exists(#name, :fallback), updatedAt = :now',
-      ExpressionAttributeNames: { '#name': 'name' },
+        'SET id = :id, email = :email, #name = if_not_exists(#name, :fallback), #learningEnabled = if_not_exists(#learningEnabled, :learningEnabled), #memoryRevision = if_not_exists(#memoryRevision, :zero), updatedAt = :now',
+      ExpressionAttributeNames: {
+        '#name': 'name',
+        '#learningEnabled': 'learningEnabled',
+        '#memoryRevision': 'memoryRevision',
+      },
       ExpressionAttributeValues: {
         ':id': claims.sub,
         ':email': typeof claims.email === 'string' ? claims.email : '',
         ':fallback': fallbackName(claims),
+        ':learningEnabled': false,
+        ':zero': 0,
         ':now': now,
       },
       ReturnValues: 'ALL_NEW',
@@ -234,7 +245,7 @@ export async function requireParty(partyId: string, userId: string): Promise<Par
 }
 
 export function makeOutboxItem(
-  type: 'REFRESH' | 'AGENT_RUN',
+  type: 'REFRESH' | 'AGENT_RUN' | 'MEMORY_SYNC' | 'MEMORY_EXTRACT' | 'PARTY_SYNC',
   partyId: string,
   payload: Record<string, unknown>,
 ): Item {
@@ -259,6 +270,41 @@ export function makeOutboxItem(
 export function refreshOutboxItem(partyId: string): Item {
   const changeId = ulid();
   return makeOutboxItem('REFRESH', partyId, { changeId });
+}
+
+export function memorySyncOutboxItem(ownerId: string, factId: string, version: number): Item {
+  return makeOutboxItem('MEMORY_SYNC', ownerId, { ownerId, factId, version });
+}
+
+export function memoryExtractOutboxItem(
+  partyId: string,
+  triggerMessageId: string,
+  force: boolean,
+  expectedRevision: number,
+): Item {
+  return makeOutboxItem('MEMORY_EXTRACT', partyId, {
+    partyId,
+    triggerMessageId,
+    force,
+    expectedRevision,
+  });
+}
+
+export function partySyncOutboxItem(partyId: string, messageId: string): Item {
+  return makeOutboxItem('PARTY_SYNC', partyId, { partyId, messageId });
+}
+
+export function partyMembershipRevisionUpdate(partyId: string, expectedRevision: number) {
+  return {
+    Update: {
+      TableName: tableName(),
+      Key: key(`PARTY#${partyId}`, 'META'),
+      UpdateExpression: 'SET #membershipRevision = if_not_exists(#membershipRevision, :zero) + :one',
+      ConditionExpression: 'attribute_exists(PK) AND (attribute_not_exists(#membershipRevision) OR #membershipRevision = :expected)',
+      ExpressionAttributeNames: { '#membershipRevision': 'membershipRevision' },
+      ExpressionAttributeValues: { ':zero': 0, ':one': 1, ':expected': expectedRevision },
+    },
+  };
 }
 
 export function isTransactionCanceled(error: unknown): boolean {
