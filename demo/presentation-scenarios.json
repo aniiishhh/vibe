@@ -1,0 +1,39 @@
+{
+  "description": "Fictional student cast and human dialogue; assistant replies are generated live and retained unchanged.",
+  "cast": {
+    "maya": {"name":"Maya Patel","memories":[["academics","I am interested in applied machine learning."],["preference","I prefer hands-on projects over exam-heavy classes."],["dietary","I am vegetarian."]]},
+    "jordan": {"name":"Jordan Brooks","memories":[["academics","I am interested in backend systems."],["general","I am comfortable building APIs and AWS-backed applications."],["travel","I prefer predictable travel costs and a clear budget."]]},
+    "priya": {"name":"Priya Shah","memories":[["academics","I am interested in human-centered design."],["preference","I prefer a manageable workload."],["travel","I enjoy museums and relaxed sightseeing."]]},
+    "leo": {"name":"Leo Martinez","memories":[["academics","I am interested in computer vision."],["travel","I enjoy photography."],["general","I prefer contributing frontend work on team projects."]]}
+  },
+  "parties": {
+    "classes": {"name":"The Tuesday Survivors","goal":"Find one Spring 2027 ASU Tempe 400-level CSE elective that four friends can take together, balancing their interests, schedules and workload.","mode":"focused","admins":["jordan"],"opening":[
+      ["maya","can we finally take one elective together next semester 😭 Spring 2027, Tempe, 400-level CSE. ideally in person"],
+      ["jordan","yeah i'm down. something useful though, not just whatever has an empty seat"],
+      ["priya","same, but please not one of those 3-credit classes that secretly becomes your entire life"],
+      ["leo","something visual or project based would be fun. i wanna actually make something"],
+      ["maya","schedule-wise i'm busy Tues/Thurs 9 to noon"],
+      ["jordan","MWF before 10 is blocked for me"],
+      ["priya","Mondays and Wednesdays 1–4 pm are out for me"],
+      ["leo","and no Friday after 4 for me pls. all Arizona time btw"],
+      ["maya","@Vibe what would you pick for us? maybe 2 or 3 options. can you check if the actual class times work for everyone?"]
+    ]},
+    "trip": {"name":"Out of Office, Finally","goal":"Plan a relaxed two-night San Diego getaway from Phoenix on November 27–29, 2026, with good food, photo stops and a realistic shared budget.","mode":"friendly","admins":["priya"],"opening":[
+      ["maya","ok after all that class planning i need to see the ocean. San Diego Nov 27–29? leave Phoenix Friday morning, back Sunday night"],
+      ["jordan","i'm in if we can keep it around $350 each. like EVERYTHING included, not $350 and then surprise hotel fees lol"],
+      ["priya","yes but can we do one big thing a day? i don't wanna turn a weekend away into another timetable"],
+      ["leo","sold. i can drive part of the way and find photo spots. someone else has to control the playlist though"],
+      ["maya","we'd share rooms to keep it cheaper. not looking for anything fancy, just somewhere decent"],
+      ["priya","@Vibe what kind of weekend would you suggest for us? give us two ways to do it, and be honest if that budget is too optimistic"]
+    ]},
+    "hackathon": {"name":"What Can We Ship?","goal":"Choose and research a small student-focused hackathon prototype that fits four friends' skills, a four-hour build window and a clear working demo.","mode":"banter","admins":["jordan"],"opening":[
+      ["jordan","alright team, four hours for a prototype. we need to pick something before we spend three of them picking something"],
+      ["maya","my only rule is the AI should actually help someone do a thing. no chatbot glued to a login page pls"],
+      ["priya","and one clear flow. i'd rather have one thing that makes sense than 12 buttons that don't"],
+      ["leo","i can do frontend. preferably before the last 20 minutes this time 💀"],
+      ["jordan","two rough directions: a campus borrowing thing for club equipment, or something that helps new club members figure out where to start"],
+      ["maya","both could be useful. i can handle the agent side if we keep it small"],
+      ["jordan","@Vibe help us narrow this down? give us three ideas that fit the team and four hours. what's the smallest thing we could actually show working?"]
+    ]}
+  }
+}

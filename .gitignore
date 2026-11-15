@@ -51,3 +51,6 @@ cdk.out/
 .playwright-cli/
 output/playwright/
 web/public/config.json
+
+# Private presentation-demo state and login credentials
+.demo/

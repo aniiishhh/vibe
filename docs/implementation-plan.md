@@ -229,3 +229,7 @@ The first usable checkpoint is Milestone 1. Memory and course research form the 
 | Provider deletion partially fails | Canonical deletion takes effect immediately and cleanup remains pending until retried |
 
 Use targeted Vitest checks for these state and permission failures, the existing pytest suite for retrieval contracts, and Playwright for independent-user browser flows.
+
+## Presentation-fixture preparation (November 15)
+
+Prepared on `bhavesh/implementation` from latest upstream `8d3cea4`. The user's latest instruction explicitly authorized online demo testing and pushing this branch, superseding the earlier local-only restriction. Three saved fictional student conversations now contain 54 real app messages, 12 completed Haiku 4.5 replies and six accepted tasks. No application code or deployment changed. The resumable seeder preserves actual assistant responses and timestamps, uses source-returned class information, checks account/model/author identities and keeps credentials ignored. The class chat includes an explicitly historical Fall 2026 syllabus; the trip includes vegetarian preferences, cited restaurant suggestions and a temporary budget change; the hackathon includes sourced competitor research and four assigned tasks. Travel estimates and model judgments remain unverified. See `docs/demo/presentation-guide.md`. This presentation preparation does not change milestone acceptance status.

@@ -2,6 +2,14 @@
 
 Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementation`.
 
+## Presentation demo conversations — November 15
+
+Prepared on `bhavesh/implementation`, based on latest `origin/anish/implementation` at `8d3cea4`, in isolated `.worktrees/bhavesh-implementation`. The user explicitly authorized online population and pushing this branch, superseding the earlier local-only restriction. Root submission drafts were preserved. No application source or deployed infrastructure changed.
+
+Four fictional students (Maya Patel, Jordan Brooks, Priya Shah and Leo Martinez) now share three persisted parties: classes, San Diego trip and hackathon brainstorming. The app contains 54 messages including 12 completed real Haiku 4.5 replies, with no failed runs, and six accepted tasks (1 class, 1 trip, 4 hackathon). Model IDs were checked against the saved inference action records. Class options came from retrieved evidence; a final follow-up obtained a Fall 2026 Jia Zou syllabus and explicitly flagged historical applicability. Restaurant and competitor follow-ups include citations. Unsourced travel budget estimates remain unverified; these are staged demo conversations, not validated booking quotes or a multi-person usability study.
+
+Created four synthetic confirmed Cognito accounts without sending emails, twelve owner-approved personal memory points, per-party sharing opt-ins, and the three parties. Personal background learning is off for these fixtures. Each assigned task was accepted through its assigned account's authenticated API. Private credentials/checkpoints are ignored under `.demo/` (directory 0700, files 0600). See `docs/demo/presentation-guide.md` for party links, reproduction and observed limitations. Validation is limited to seeder syntax/fixtures, saved app messages/runs/tasks and author identity checks; application code was unchanged, so no broad regression suite or deployment was repeated.
+
 ## Semantic party-theme selection deployed
 
 The latest user request replaces keyword matching with semantic selection from the party name and goal. New parties make one bounded Haiku Converse request during creation and persist a validated theme ID plus model/fallback provenance. All members receive the same saved automatic theme for backgrounds and Pip. The API role gains the same scoped Haiku inference-profile/destination permissions used by the workers. Requests allow at most 32 output tokens, one SDK attempt and an eight-second abort signal. If classification fails, creation saves Everyday with visible fallback status. Admins can choose/retry a theme from Details for existing parties. An explicit reclassification failure preserves the previous saved selection.
