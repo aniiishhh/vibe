@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Message } from '@vibe/shared';
-import { boundedConversation, isVibeMention, leaseIsActive, memberRemovalPermission } from '../src/domain.js';
+import { boundedConversation, memoryQueryForTurn, isVibeMention, leaseIsActive, memberRemovalPermission } from '../src/domain.js';
 
 describe('agent request boundaries', () => {
   it('recognizes an explicit @Vibe mention without matching email addresses', () => {
@@ -23,6 +23,19 @@ describe('agent request boundaries', () => {
     expect(context.at(-1)?.content).toContain('Student 44');
     expect(context.length).toBeLessThanOrEqual(40);
     expect(context.reduce((total, message) => total + message.content.length, 0)).toBeLessThanOrEqual(12_000);
+  });
+
+  it('keeps the current narrow question first and excludes earlier assistant recaps from retrieval', () => {
+    const request = 'How is Professor Sample for CSE 475?';
+    const history = [
+      {role:'user',authorName:'Alice',text:'Find classes for our whole group.'},
+      {role:'assistant',authorName:'Vibe',text:'Unrelated database and circuits recap. '.repeat(100)},
+      {role:'user',authorName:'Alice',text:request},
+    ] as Message[];
+    const query=memoryQueryForTurn(request,history);
+    expect(query.startsWith(request)).toBe(true);
+    expect(query).not.toContain('Unrelated database and circuits recap');
+    expect(query.length).toBeLessThanOrEqual(1200);
   });
 
   it('does not let a duplicate worker treat an active lease as expired', () => {

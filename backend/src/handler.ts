@@ -1,3 +1,5 @@
+import { ownerProfile } from './owner-profile.js';
+import { createPartyNote, changePartyNote, createPartyNoteInput, editPartyNoteInput, deletePartyNoteInput } from './party-notes.js';
 import { createHash, randomBytes } from 'node:crypto';
 import type {
   APIGatewayProxyEventV2WithJWTAuthorizer,
@@ -129,6 +131,8 @@ function mapMessage(item: Item): Message {
     text: String(item.text),
     createdAt: String(item.createdAt),
     ...(typeof item.runId === 'string' ? { runId: item.runId } : {}),
+    ...(Array.isArray(item.citations) ? {citations:item.citations as NonNullable<Message['citations']>} : {}),
+    ...(Array.isArray(item.researchWarnings) ? {researchWarnings:item.researchWarnings as string[]} : {}),
   };
 }
 
@@ -393,6 +397,7 @@ async function sendMessage(partyId: string, claims: JwtClaims, event: APIGateway
   const previous = await getItem(String(clientKey.PK), String(clientKey.SK));
   if (previous && previous.result && typeof previous.result === 'object') return previous.result as SendResult;
 
+  const partyMeta = await getItem(`PARTY#${partyId}`, 'META');
   const profile = await getOrCreateProfile(claims);
   const messageId = ulid();
   const requestTime = new Date();
@@ -425,6 +430,7 @@ async function sendMessage(partyId: string, claims: JwtClaims, event: APIGateway
     entityType: 'MESSAGE',
     ...message,
     memoryRevisionAtCreation: Number(profile.memoryRevision ?? 0),
+    notesEpochAtCreation: Number(partyMeta?.notesEpoch ?? 0),
   };
   const refresh = refreshOutboxItem(partyId);
   const partySync = partySyncOutboxItem(partyId, messageId);
@@ -454,6 +460,7 @@ async function sendMessage(partyId: string, claims: JwtClaims, event: APIGateway
     ...(memoryExtract ? [{ Put: { TableName: tableName(), Item: memoryExtract, ConditionExpression: 'attribute_not_exists(PK)' } }] : []),
   ];
   if (mentioned) {
+    transaction.push({ Put: { TableName: tableName(), Item: makeOutboxItem('PARTY_NOTES', partyId, { partyId, messageId }), ConditionExpression: 'attribute_not_exists(PK)' } });
     const run: AgentRun = result.run!;
     const runItem: Item = {
       ...key(`PARTY#${partyId}`, `RUN#${run.id}`),
@@ -571,6 +578,7 @@ async function route(event: APIGatewayProxyEventV2WithJWTAuthorizer, claims: Jwt
   if (parts.length === 1 && parts[0] === 'me' && method === 'PUT') {
     return response(200, await updateProfile(claims, event));
   }
+  if (parts[0] === 'me' && parts[1] === 'memory-profile' && parts.length === 2 && method === 'GET') return response(200, await ownerProfile(claims.sub));
   if (parts[0] === 'me' && parts[1] === 'memories' && parts.length === 2 && method === 'GET') {
     return response(200, await getMemories(claims));
   }
@@ -600,6 +608,12 @@ async function route(event: APIGatewayProxyEventV2WithJWTAuthorizer, claims: Jwt
   }
   if (parts[0] === 'parties' && parts[2] === 'membership' && parts.length === 3 && method === 'PATCH') {
     return response(200, await updatePartyMemorySharing(parts[1]!, claims, event));
+  }
+  if (parts[0] === 'parties' && parts[2] === 'facts' && parts.length === 3 && method === 'POST') {
+    return response(201, await createPartyNote(parts[1]!, claims.sub, parseBody(event, createPartyNoteInput)));
+  }
+  if (parts[0] === 'parties' && parts[2] === 'facts' && parts.length === 4 && (method === 'PATCH' || method === 'DELETE')) {
+    return response(200, await changePartyNote(parts[1]!, claims.sub, parts[3]!, method === 'DELETE' ? parseBody(event, deletePartyNoteInput) : parseBody(event, editPartyNoteInput), method === 'DELETE'));
   }
   if (parts[0] === 'parties' && parts[2] === 'facts' && parts.length === 3 && method === 'GET') {
     return response(200, await getPartyMemoryFacts(parts[1]!, claims.sub));

@@ -1,3 +1,4 @@
+import type { PartyNoteKind } from '@vibe/shared';
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { createContext, useContext } from 'react';
 import { QueryClient, QueryClientProvider, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -716,33 +717,71 @@ function MemorySharingControl({ partyId, member, loading, failed }: {
   );
 }
 
+const noteKinds: PartyNoteKind[] = ['decision', 'suggestion', 'constraint', 'question', 'disagreement'];
+
 function PartyFactsPanel({ party, members }: { party: Party; members: Member[] }) {
   const api = useApi();
+  const client = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [text, setText] = useState('');
+  const [kind, setKind] = useState<PartyNoteKind>('suggestion');
   const factsQuery = useQuery({
     queryKey: ['party-facts', party.id],
     queryFn: async () => (await api.getPartyFacts(party.id)).facts,
     enabled: open,
+    refetchInterval: open ? 10_000 : false,
   });
-
+  const refresh = () => client.invalidateQueries({ queryKey: ['party-facts', party.id] });
+  const create = useMutation({
+    mutationFn: () => api.createPartyFact(party.id, { text: text.trim(), kind }),
+    onSuccess: async () => { setText(''); await refresh(); },
+  });
   return (
     <section className={`party-facts${open ? ' party-facts-open' : ''}`}>
-      <button className="party-facts-toggle" type="button" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+      <button className="party-facts-toggle" type="button" aria-expanded={open} onClick={() => setOpen(value => !value)}>
         <span><Brain size={15} /> Party memory</span><span className="party-facts-subtitle">Shared notes from this conversation</span><ChevronDown size={15} />
       </button>
       {open && <div className="party-facts-body">
         <p className="party-facts-goal"><strong>Party goal</strong> {party.goal}</p>
-        {factsQuery.isPending ? <div className="popover-loading"><LoaderCircle className="spin" size={15} /> Loading party memory</div> : factsQuery.isError ? <div className="party-facts-error" role="alert"><span>{errorMessage(factsQuery.error, 'Party memory could not be loaded.')}</span><button className="text-button" type="button" onClick={() => void factsQuery.refetch()}>Retry</button></div> : factsQuery.data.length === 0 ? <p className="party-facts-empty">No shared facts have been saved for this party yet.</p> : (
-          <ul className="party-facts-list">
-            {factsQuery.data.map((fact) => {
-              const speaker = members.find((member) => member.userId === fact.speakerId)?.name ?? 'Party member';
-              return <li key={fact.id}><div><strong>{speaker}</strong><p>{fact.text}</p></div>{fact.sourceMessageIds[0] && <Link to={`/parties/${encodeURIComponent(party.id)}#message-${encodeURIComponent(fact.sourceMessageIds[0])}`}>Source</Link>}</li>;
-            })}
-          </ul>
+        <p>Ask @Vibe to capture decisions and open questions from recent discussion. Automatic notes can need correction; You control your own preferences. Shared automatic notes can be corrected by the party owner; manual notes by their author.</p>
+        {factsQuery.isPending ? <p>Loading party memory…</p> : factsQuery.isError ? <div role="alert">{errorMessage(factsQuery.error)} <button type="button" onClick={() => void factsQuery.refetch()}>Retry</button></div> : !factsQuery.data.length ? <p>No shared notes yet.</p> : (
+          <ul className="party-facts-list">{factsQuery.data.filter(fact => !fact.subjectId).map(fact => <PartyNoteRow key={fact.id} fact={fact} partyId={party.id} members={members} partyOwnerId={party.ownerId} refresh={refresh} />)}{[...new Set(factsQuery.data.flatMap(fact => fact.subjectId ? [fact.subjectId] : []))].map(subjectId => <li key={subjectId}><div><h3>{factsQuery.data.find(fact => fact.subjectId === subjectId)?.subjectName ?? 'Participant'} · preferences for this party</h3><ul>{factsQuery.data.filter(fact => fact.subjectId === subjectId).map(fact => <PartyNoteRow key={fact.id} fact={fact} partyId={party.id} members={members} partyOwnerId={party.ownerId} refresh={refresh} />)}</ul></div></li>)}</ul>
         )}
+        <form className="party-note-form" onSubmit={event => { event.preventDefault(); create.mutate(); }}>
+          <label>New party note<textarea maxLength={500} required value={text} onChange={event => setText(event.target.value)} /></label>
+          <label>Type<select value={kind} onChange={event => setKind(event.target.value as PartyNoteKind)}>{noteKinds.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
+          <button className="button button-secondary" type="submit" disabled={create.isPending || !text.trim()}>{create.isPending ? 'Saving…' : 'Add note'}</button>
+          {create.isError && <p role="alert">{errorMessage(create.error)}</p>}
+        </form>
       </div>}
     </section>
   );
+}
+
+function PartyNoteRow({ fact, partyId, members, partyOwnerId, refresh }: { partyOwnerId: string; fact: PartyFact; partyId: string; members: Member[]; refresh: () => Promise<unknown> }) {
+  const api = useApi();
+  const [editing, setEditing] = useState(false);
+  const viewerId = useAuth().user?.id;
+  const canEdit = viewerId === (fact.subjectId ?? (fact.source === 'manual' ? fact.speakerId : partyOwnerId));
+  const [text, setText] = useState(fact.text);
+  const [kind, setKind] = useState<PartyNoteKind>(fact.kind ?? 'suggestion');
+  const [version, setVersion] = useState(fact.version ?? 1);
+  const save = useMutation({ mutationFn: () => api.updatePartyFact(partyId, fact.id, { text, kind, version }), onSuccess: async () => { setEditing(false); await refresh(); } });
+  const remove = useMutation({ mutationFn: () => api.deletePartyFact(partyId, fact.id, fact.version ?? 1), onSuccess: refresh });
+  const error = save.error ?? remove.error;
+  return <li><div>
+    <strong>{fact.subjectName ? `${fact.topic ?? 'preferences'}` : fact.kind ?? 'suggestion'}</strong>
+    {editing ? <form className="party-note-form" onSubmit={event => { event.preventDefault(); save.mutate(); }}>
+      <label>Note text<textarea required maxLength={500} value={text} onChange={event => setText(event.target.value)} /></label>
+      <label>Type<select value={kind} onChange={event => setKind(event.target.value as PartyNoteKind)}>{fact.subjectId && <option value="preference">Preference</option>}{noteKinds.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
+      <button type="submit" disabled={save.isPending || !text.trim()}>Save correction</button>
+      <button type="button" onClick={() => { setEditing(false); save.reset(); }}>Cancel</button>
+    </form> : <p>{fact.text}</p>}
+    <small>{fact.source === 'conversation' ? 'From discussion' : 'Member recorded'} · v{fact.version ?? 1}{fact.lastEditorId ? ` · Last corrected by ${members.find(member => member.userId === fact.lastEditorId)?.name ?? 'a member'}` : ''} · <time dateTime={fact.updatedAt ?? fact.createdAt}>{new Date(fact.updatedAt ?? fact.createdAt).toLocaleString()}</time></small>
+    <div className="party-note-actions">{fact.sourceMessageIds.map((id, index) => <Link key={id} to={`/parties/${encodeURIComponent(partyId)}#message-${encodeURIComponent(id)}`}>Source {index + 1}</Link>)}</div>
+    {!editing && canEdit && <div className="party-note-actions"><button type="button" disabled={remove.isPending} onClick={() => { setText(fact.text); setKind(fact.kind ?? 'suggestion'); setVersion(fact.version ?? 1); save.reset(); setEditing(true); }}>Edit</button><button type="button" disabled={remove.isPending} onClick={() => remove.mutate()}>{remove.isPending ? 'Removing…' : 'Remove'}</button></div>}
+    {error && <p role="alert">{errorMessage(error)} <button type="button" onClick={() => { setEditing(false); save.reset(); remove.reset(); void refresh(); }}>Reload notes</button></p>}
+  </div></li>;
 }
 
 function MemberRoster({ members, loading, failed, currentUserId, partyId, onRetry }: {
@@ -1092,6 +1131,8 @@ function MessageRow({ message, isSelf, run }: { message: Message; isSelf: boolea
         <div className="message-bubble">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{message.text}</ReactMarkdown>
         </div>
+        {message.citations?.length ? <details><summary>Sources ({message.citations.length})</summary><ul>{message.citations.map(source => <li key={source.id}><a href={source.url} target="_blank" rel="noopener noreferrer">[{source.id}] {new URL(source.url).hostname}</a> · {new Date(source.retrievedAt).toLocaleString()}</li>)}</ul></details> : null}
+        {[...new Set(message.researchWarnings ?? [])].map((warning,index) => <p className="research-warning" role="status" key={index}>{warning}</p>)}
         {statusText && <p className="run-status"><LoaderCircle className="spin" size={13} /> {statusText}</p>}
         {run?.status === 'failed' && <p className="run-failure"><AlertCircle size={14} /><span>Vibe couldn’t finish{run.error ? `: ${run.error}` : '.'}</span></p>}
         {run?.status === 'cancelled' && <p className="run-cancelled">Vibe’s response was cancelled.</p>}

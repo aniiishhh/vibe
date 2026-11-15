@@ -382,3 +382,11 @@ a { color: inherit; text-underline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+.party-note-form { display: grid; gap: .65rem; margin-top: .8rem; }
+.party-note-form label { display: grid; gap: .3rem; }
+.party-note-form textarea, .party-note-form select { width: 100%; max-width: 100%; padding: .5rem; color: inherit; background: var(--surface, #fff); border: 1px solid #cbd5e1; border-radius: .4rem; }
+.party-note-form textarea { min-height: 5rem; resize: vertical; }
+.party-note-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .5rem; }
+
+.research-warning { color: #805b1b; font-size: .85rem; margin-top: .5rem; }

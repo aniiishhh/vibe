@@ -1,13 +1,29 @@
 {
-  "name": "vibe", "private": true, "version": "0.1.0", "type": "module",
-  "workspaces": ["shared", "backend", "web", "infra"],
+  "name": "vibe",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "shared",
+    "backend",
+    "web",
+    "infra"
+  ],
   "scripts": {
     "dev": "npm run dev -w web",
     "build": "npm run build -w web",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test -w backend",
-    "synth": "npm run synth -w infra"
+    "synth": "npm run synth -w infra",
+    "build:research": "python3 scripts/build-research.py",
+    "test:research": ".venv/bin/python -m pytest research/test -q"
   },
-  "engines": {"node": ">=24"},
-  "devDependencies": {"typescript": "^5.9.3", "tsx": "^4.20.6", "@types/node": "^24.10.0"}
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "tsx": "^4.20.6",
+    "@types/node": "^24.10.0"
+  }
 }

@@ -77,7 +77,21 @@ export function toMemoryFact(item: Item): MemoryFact {
 }
 
 function toPartyFact(item: Item): PartyFact {
+  const speakers = strings(item.speakerIds);
+  const legacy = !item.subjectId && /^(one|a) member\b/i.test(String(item.text)) && speakers.length === 1;
+  const subjectId = typeof item.subjectId === 'string' ? item.subjectId : legacy ? speakers[0] : undefined;
+  const topic = String(item.topic ?? (/morning|afternoon|evening|before|after|PM|AM/.test(String(item.text)) ? 'schedule' : 'interests'));
   return {
+    ...(subjectId ? { subjectId, subjectName: String(item.subjectName ?? 'Participant'), topic } : {}),
+    ...(typeof item.subjectId === "string" ? { subjectId: item.subjectId, subjectName: String(item.subjectName ?? "Participant"), topic: String(item.topic ?? "other") } : {}),
+    version: Number(item.version ?? 1),
+    kind: subjectId ? "preference" : item.kind as PartyFact["kind"] ?? "suggestion",
+    updatedAt: String(item.updatedAt ?? item.createdAt),
+    updatedBy: String(item.updatedBy ?? item.speakerId),
+    ...(typeof item.lastEditorId === "string" ? {lastEditorId:item.lastEditorId} : {}),
+    source: item.source === "conversation" ? "conversation" : "manual",
+    speakerIds: strings(item.speakerIds),
+    ...(typeof item.expiresAt === "string" ? { expiresAt: item.expiresAt } : {}),
     id: String(item.id),
     text: String(item.text),
     speakerId: String(item.speakerId),
@@ -172,11 +186,17 @@ export async function listPartyFacts(partyId: string): Promise<PartyFact[]> {
     lastKey = page.LastEvaluatedKey;
   } while (lastKey);
   const now = Date.now();
-  return items
+  const facts = items
     .filter((item) => item.entityType === 'PARTY_FACT' && item.deleted !== true)
     .filter((item) => typeof item.expiresAt !== 'string' || Date.parse(item.expiresAt) > now)
-    .map(toPartyFact)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    .map(toPartyFact).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const currentTopics = new Set(facts.filter(fact => fact.subjectId && fact.id.startsWith('p_')).map(fact => `${fact.subjectId}:${fact.topic}`));
+  return Promise.all(facts.filter(fact => !fact.subjectId || fact.id.startsWith('p_') || !currentTopics.has(`${fact.subjectId}:${fact.topic}`)).map(async fact => {
+    if (!fact.subjectId) return fact;
+    const member = await getItem(`PARTY#${partyId}`, `MEMBER#${fact.subjectId}`);
+    const name = String(member?.name ?? fact.subjectName ?? 'Participant');
+    return {...fact, subjectName: name, text: fact.text.replace(/^(one|a) member\b/i, name)};
+  }));
 }
 
 function normalizedText(text: string): string {

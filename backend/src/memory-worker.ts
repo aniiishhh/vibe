@@ -1,3 +1,5 @@
+import { DEFAULT_MODEL_ID } from '@vibe/shared';
+import { extractPartyNotes } from './party-note-extraction.js';
 import { BedrockRuntimeClient, ConverseCommand, type ConverseCommandOutput } from '@aws-sdk/client-bedrock-runtime';
 import { ChangeMessageVisibilityCommand, SQSClient } from '@aws-sdk/client-sqs';
 import { QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
@@ -16,6 +18,7 @@ import {
   partyNamespace,
   privateNamespace,
   putMemoryDocument,
+  getSupermemoryClient,
   sharedNamespace,
 } from './memory-provider.js';
 import { db, getItem, key, makeOutboxItem, tableName, transact, type Item } from './store.js';
@@ -23,6 +26,7 @@ import { db, getItem, key, makeOutboxItem, tableName, transact, type Item } from
 type MemoryJob =
   | { effectId: string; type: 'MEMORY_SYNC'; ownerId: string; factId: string; version: number }
   | { effectId: string; type: 'MEMORY_EXTRACT'; partyId: string; triggerMessageId: string; force: boolean; expectedRevision: number }
+  | { effectId: string; type: 'PARTY_NOTES'; partyId: string; messageId: string }
   | { effectId: string; type: 'PARTY_SYNC'; partyId: string; messageId: string };
 
 const bedrock = new BedrockRuntimeClient({
@@ -59,7 +63,7 @@ function parseJob(record: SQSRecord): MemoryJob {
     }
     return value as MemoryJob;
   }
-  if (value.type === 'PARTY_SYNC') {
+  if (value.type === 'PARTY_SYNC' || value.type === 'PARTY_NOTES') {
     if (typeof value.partyId !== 'string' || !value.partyId || typeof value.messageId !== 'string' || !value.messageId) {
       throw new Error('Invalid party sync message');
     }
@@ -93,7 +97,7 @@ async function extractFacts(messages: Item[]): Promise<ReturnType<typeof parseEx
   const prompt = selected.map((message) =>
     JSON.stringify({ messageId: String(message.id), text: String(message.text).slice(0, 2_000) }),
   ).join('\n');
-  const modelId = process.env.MODEL_ID || 'deepseek.v3.2';
+  const modelId = process.env.MODEL_ID || DEFAULT_MODEL_ID;
   const deadlineAt = Date.now() + 60_000;
   let validationError: unknown;
   for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -250,6 +254,10 @@ async function syncFact(job: Extract<MemoryJob, { type: 'MEMORY_SYNC' }>): Promi
         deleteTrackedVersionRange(job.ownerId, fact.id, fact.version, privateNs, 'privateCleanupThrough', fact.version),
         deleteTrackedVersionRange(job.ownerId, fact.id, fact.version, sharedNs, 'sharedCleanupThrough', fact.version),
       ]);
+    }
+    if (active) {
+      const client = await getSupermemoryClient();
+      await client.profiles.setBuckets(privateNs, { buckets: { academics:'Academic interests and class preferences', travel:'Travel preferences', communication:'Communication and explanation preferences' } });
     }
     await setSyncState(job.ownerId, job.factId, job.version, 'synced');
   } catch (error) {
@@ -415,6 +423,11 @@ async function extractForMessage(
 }
 
 async function processJob(job: MemoryJob): Promise<void> {
+  if (job.type === 'PARTY_NOTES') {
+    const trigger = await getItem(`PARTY#${job.partyId}`, `MSG#${job.messageId}`);
+    if (trigger) await extractPartyNotes(job.partyId, trigger, command => bedrock.send(command, { abortSignal: AbortSignal.timeout(25_000) }));
+    return;
+  }
   if (job.type === 'MEMORY_SYNC') return syncFact(job);
   if (job.type === 'MEMORY_EXTRACT') return extractForMessage(job);
   if (job.type === 'PARTY_SYNC') return syncPartyMessage(job);

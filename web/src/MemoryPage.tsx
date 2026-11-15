@@ -18,6 +18,7 @@ export function MemoryPage({ api }: { api: VibeApi }) {
       memory.syncState === 'pending' || memory.syncState === 'processing' || memory.syncState === 'deleting',
     ) ? 5_000 : false,
   });
+  const ownerPreview = useQuery({ queryKey:['owner-profile', memoriesQuery.data?.memoryRevision], queryFn:api.getOwnerProfile, enabled:memoriesQuery.isSuccess });
   const [search, setSearch] = useState('');
   const [adding, setAdding] = useState(false);
   const [createError, setCreateError] = useState('');
@@ -147,6 +148,13 @@ export function MemoryPage({ api }: { api: VibeApi }) {
           <div className="profile-preview-text" aria-label={`Profile preview, up to ${MAX_PREVIEW_LENGTH} characters`}>{preview}{hasMorePreview ? '…' : ''}</div>
         ) : <div className="profile-preview-empty">No reusable profile summary yet. Approved memory points will appear here when available.</div>}
         {profileQuery.isError && <p className="preview-unavailable">Your learning setting could not load. Retry to change it.</p>}
+      </section>
+
+      <section className="profile-preview-section"><h2>Your categorized profile</h2><button type="button" disabled={ownerPreview.isFetching} onClick={() => void ownerPreview.refetch()}>Refresh profile</button><p>Owner-only preview of current points. Private and candidate points stay outside group context until approved and shared.</p>
+        {ownerPreview.isError ? <button type="button" onClick={() => void ownerPreview.refetch()}>Retry preview</button> : <p>Provider summary status: {ownerPreview.data?.providerStatus ?? 'loading'}. Current saved points are shown below.</p>}
+        {ownerPreview.data?.buckets.map(bucket => <div key={bucket.category}><h3>{bucket.category}</h3><ul>{bucket.points.map(point => <li key={point.id}><a href={`#memory-${point.id}`}>{point.text}</a> · {point.approval}</li>)}</ul></div>)}
+        {ownerPreview.data && <p>Checked {new Date(ownerPreview.data.checkedAt).toLocaleString()}</p>}
+        {ownerPreview.data?.truncated && <p>More points are available in the full list below.</p>}
       </section>
 
       <section className="memory-facts-section" aria-labelledby="facts-title">
@@ -279,7 +287,7 @@ function MemoryFactRow({ api, fact, ownerId }: { api: VibeApi; fact: MemoryFact;
   };
 
   return (
-    <article className={`memory-fact-row${isDeleted ? ' memory-fact-deleted' : ''}`}>
+    <article id={`memory-${fact.id}`} className={`memory-fact-row${isDeleted ? ' memory-fact-deleted' : ''}`}>
       <div className="memory-fact-heading">
         <span className="memory-category">{fact.category || 'Uncategorized'}</span>
         <span className={`approval-status approval-${fact.approval}`}>{fact.approval === 'approved' ? 'Approved for reuse' : fact.approval === 'candidate' ? 'Needs your review' : 'Private'}</span>

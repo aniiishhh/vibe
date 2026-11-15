@@ -47,3 +47,9 @@ export function boundedConversation(messages: Message[]): ContextMessage[] {
   }
   return selected;
 }
+
+/** Retrieval starts with this turn; older assistant recaps must not become the query. */
+export function memoryQueryForTurn(request: string, history: Message[]): string {
+  const context = history.filter(message => message.role === 'user' && message.text !== request).slice(-3);
+  return [request.slice(0, 650), ...context.map(message => `${message.authorName}: ${message.text.slice(0, 160)}`)].join('\n').slice(0, 1200);
+}

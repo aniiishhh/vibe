@@ -10,7 +10,7 @@ import { db, getItem, key, tableName, type Item } from './store.js';
 
 interface OutboxRecord extends Item {
   effectId: string;
-  type: 'REFRESH' | 'AGENT_RUN' | 'MEMORY_SYNC' | 'MEMORY_EXTRACT' | 'PARTY_SYNC';
+  type: 'REFRESH' | 'AGENT_RUN' | 'MEMORY_SYNC' | 'MEMORY_EXTRACT' | 'PARTY_SYNC' | 'PARTY_NOTES';
   partyId: string;
   payload: Record<string, unknown>;
   status: 'PENDING' | 'DELIVERED';
@@ -119,7 +119,7 @@ async function enqueueMemory(record: OutboxRecord): Promise<void> {
       throw new Error('Invalid PARTY_SYNC outbox payload');
     }
     body = { effectId: record.effectId, type, partyId, messageId };
-    groupId = partyId;
+    groupId = type === 'PARTY_NOTES' ? `notes-${partyId}` : partyId;
   }
 
   await sqs.send(new SendMessageCommand({
@@ -175,7 +175,7 @@ async function dispatchEffect(effectId: string): Promise<void> {
   try {
     if (record.type === 'REFRESH') await publishRefresh(record);
     else if (record.type === 'AGENT_RUN') await enqueueAgent(record);
-    else if (record.type === 'MEMORY_SYNC' || record.type === 'MEMORY_EXTRACT' || record.type === 'PARTY_SYNC') {
+    else if (record.type === 'MEMORY_SYNC' || record.type === 'MEMORY_EXTRACT' || record.type === 'PARTY_SYNC' || record.type === 'PARTY_NOTES') {
       await enqueueMemory(record);
     }
     else throw new Error('Unknown outbox effect type');

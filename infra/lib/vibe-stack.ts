@@ -1,3 +1,4 @@
+import { DEFAULT_MODEL_ID } from '@vibe/shared';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -33,8 +34,11 @@ import type { Construct } from 'constructs';
 
 const PROJECT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const STAGE = 'dev';
-const MODEL_ID = 'deepseek.v3.2';
-const FALLBACK_MODEL_ID = 'minimax.minimax-m2.5';
+// New accounts may have only ten concurrent executions and cannot reserve capacity.
+const LOW_QUOTA = process.env.VIBE_LOW_QUOTA === 'true';
+const MODEL_ID = DEFAULT_MODEL_ID;
+// Keep Haiku evaluation attributable; no silent fallback to a different model.
+const FALLBACK_MODEL_ID = '';
 
 export class VibeStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps) {
@@ -140,13 +144,24 @@ export class VibeStack extends Stack {
     });
     const supermemoryParameterName = `/vibe/${STAGE}/supermemory-api-key`;
 
+    const researchFunction = new lambda.Function(this, 'ResearchFunction', {
+      functionName:`vibe-${STAGE}-research`, runtime:lambda.Runtime.PYTHON_3_12,
+      architecture:lambda.Architecture.X86_64, handler:'handler.handler',
+      code:lambda.Code.fromAsset(resolve(PROJECT_ROOT,'research/dist')),
+      timeout:Duration.seconds(90),memorySize:512,
+      logGroup:new logs.LogGroup(this,'ResearchLogs',{logGroupName:`/aws/lambda/vibe-${STAGE}-research`,retention:logs.RetentionDays.TWO_WEEKS,removalPolicy:RemovalPolicy.RETAIN}),
+    });
+    const tinyfishParameterName=`/vibe/${STAGE}/tinyfish-api-key`;
     const apiFunction = this.createNodeFunction('ApiFunction', 'api', 'handler.ts', 30, 512, {
       TABLE_NAME: table.tableName,
+      SUPERMEMORY_PARAMETER_NAME: supermemoryParameterName,
     });
     const agentFunction = this.createNodeFunction('AgentFunction', 'agent', 'agent.ts', 150, 1024, {
       TABLE_NAME: table.tableName,
       MODEL_ID,
       FALLBACK_MODEL_ID,
+      RESEARCH_FUNCTION_NAME:researchFunction.functionName,
+      TINYFISH_PARAMETER_NAME:tinyfishParameterName,
       SUPERMEMORY_PARAMETER_NAME: supermemoryParameterName,
       METERED_FEATURES_ENABLED: 'true',
     });
@@ -225,24 +240,25 @@ export class VibeStack extends Stack {
       }),
     );
     agentQueue.grantConsumeMessages(agentFunction);
+    researchFunction.grantInvoke(agentFunction);
+    const tinyfishArn=Stack.of(this).formatArn({service:'ssm',resource:'parameter',resourceName:tinyfishParameterName.slice(1)});
+    agentFunction.addToRolePolicy(new iam.PolicyStatement({actions:['ssm:GetParameter'],resources:[tinyfishArn]}));
+    agentFunction.addToRolePolicy(new iam.PolicyStatement({actions:['kms:Decrypt'],resources:['*'],conditions:{StringEquals:{'kms:ViaService':`ssm.${Stack.of(this).region}.amazonaws.com`,'kms:EncryptionContext:PARAMETER_ARN':tinyfishArn}}}));
 
-    agentFunction.addToRolePolicy(
-      new iam.PolicyStatement({
-        actions: ['bedrock:InvokeModel'],
-        resources: [
-          `arn:${Stack.of(this).partition}:bedrock:${Stack.of(this).region}::foundation-model/${MODEL_ID}`,
-          `arn:${Stack.of(this).partition}:bedrock:${Stack.of(this).region}::foundation-model/${FALLBACK_MODEL_ID}`,
-        ],
-      }),
-    );
-    memoryFunction.addToRolePolicy(new iam.PolicyStatement({
-      actions: ['bedrock:InvokeModel'],
-      resources: [`arn:${Stack.of(this).partition}:bedrock:${Stack.of(this).region}::foundation-model/${MODEL_ID}`],
-    }));
+
+    // Verified Haiku US inference-profile destinations: Ohio, Virginia, Oregon.
+    const inferenceProfileArn = `arn:${Stack.of(this).partition}:bedrock:${Stack.of(this).region}:${Stack.of(this).account}:inference-profile/${MODEL_ID}`;
+    const destinationModels = ['us-east-1','us-east-2','us-west-2'].map(region =>
+      `arn:${Stack.of(this).partition}:bedrock:${region}::foundation-model/${MODEL_ID.slice(3)}`);
+    for (const fn of [agentFunction,memoryFunction]) {
+      fn.addToRolePolicy(new iam.PolicyStatement({actions:['bedrock:InvokeModel'],resources:[inferenceProfileArn]}));
+      fn.addToRolePolicy(new iam.PolicyStatement({actions:['bedrock:InvokeModel'],resources:destinationModels,
+        conditions:{StringEquals:{'bedrock:InferenceProfileArn':inferenceProfileArn}}}));
+    }
     const supermemoryParameterArn = Stack.of(this).formatArn({
       service: 'ssm', resource: 'parameter', resourceName: supermemoryParameterName.slice(1),
     });
-    for (const fn of [agentFunction, memoryFunction]) {
+    for (const fn of [apiFunction, agentFunction, memoryFunction]) {
       fn.addToRolePolicy(new iam.PolicyStatement({
         actions: ['ssm:GetParameter'], resources: [supermemoryParameterArn],
       }));
@@ -334,7 +350,7 @@ export class VibeStack extends Stack {
       new lambdaEventSources.SqsEventSource(agentQueue, {
         batchSize: 1,
         reportBatchItemFailures: true,
-        maxConcurrency: 5,
+        maxConcurrency: LOW_QUOTA ? 2 : 5,
       }),
     );
 
@@ -541,7 +557,7 @@ export class VibeStack extends Stack {
       architecture: lambda.Architecture.ARM_64,
       timeout: Duration.seconds(timeoutSeconds),
       memorySize,
-      reservedConcurrentExecutions: suffix === 'agent' ? 5 : undefined,
+      reservedConcurrentExecutions: suffix === 'agent' && !LOW_QUOTA ? 5 : undefined,
       logGroup,
       role,
       environment: {

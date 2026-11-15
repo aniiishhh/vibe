@@ -5,8 +5,8 @@ const app = new App();
 
 new VibeStack(app, 'Vibe-dev', {
   env: {
-    account: '851725603471',
-    region: 'us-east-2',
+    account: process.env.VIBE_AWS_ACCOUNT ?? '851725603471',
+    region: process.env.VIBE_AWS_REGION ?? 'us-east-2',
   },
   stackName: 'Vibe-dev',
 });

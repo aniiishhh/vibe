@@ -6,6 +6,19 @@ Prepared for review on November 14, 2026. Event notes record a November 15, 2026
 
 The user approved Milestone 1 application implementation on November 14, 2026. Deployment needs the chosen AWS account, region and allowance. Global tool installation needs approval. Configure credentials through ignored local files or provider consoles.
 
+## November 15 handoff status
+
+The user approved pushing completed **3A, 3C and 3D** to `anish/implementation` while explicitly keeping **3B open**. Milestone 3 as a whole is **partially complete**, not fully accepted. Anish can continue from this checkpoint, but must account for 3B when developing contextual/background learning in Milestone 4. The detailed Milestone 4A/4B/4C plan from Anish's `3e25592` is preserved below.
+
+| Part | Implementation | Verification / remaining work |
+| --- | --- | --- |
+| 3A party memory | Implemented and deployed | Earlier two-user/browser checks passed; latest Haiku behavior remains for manual retesting. |
+| 3B broader personal learning | **Open** | English gate, author-triggered extraction and broader learning/consolidation work remain; checklist below is authoritative. |
+| 3C owner profiles and memory selection | Implemented and deployed | Canonical/privacy/correction checks passed; derived provider prose remains withheld when unverifiable, broad semantic quality remains unevaluated. |
+| 3D research | Implemented and deployed | Class/RMP/web source probes and focused regressions passed; latest expanded filters/syllabus/review behavior awaits manual acceptance. Interactive TinyAgent work is conditional on a demonstrated need. |
+
+Current app: https://d1ia555vbcj8k2.cloudfront.net, shared account 851725603471, Ohio, Haiku 4.5. Final checks: 56 backend tests, 10 adapter tests, typechecks, production build and strict synthesis passed. Live recommendation scenarios were not restarted after the user chose manual testing. See [handoff](milestone-3-handoff.md) and [current status](../STATUS.md).
+
 ## Milestone 0 — configuration
 
 - [x] Approve product and architecture for Milestone 1 implementation (user authorized November 14, 2026).
@@ -60,14 +73,14 @@ This milestone includes the remaining memory improvements identified after Miles
 
 ### 3A — structured party memory
 
-The current party-memory panel reads structured facts, but no application writer populates those records. Conversation indexing already provides a separate historical retrieval path.
+Originally verified in Bhavesh’s private account (`782610231983`, Ohio); now also deployed to the shared account `851725603471` with Haiku. The private checkpoint is retained separately. The original 3A live scenario passed; the November 15 user-reported preference/concurrency cases are now fixed and have passed the memory portion of the combined verification. Final research/browser application assertions passed; fixture cleanup required scoped recovery. See `STATUS.md` for current deployment and checks.
 
-- [ ] Add bounded extraction of party decisions, shared constraints, unresolved questions and relevant goal updates from attributed human conversation.
-- [ ] Persist versioned `PARTY_FACT` records through the existing DynamoDB/outbox path and populate the party-memory panel. Include source message IDs, timestamps, speaker attribution and optional expiry.
-- [ ] Distinguish suggestions, confirmed decisions and unresolved disagreements using the supporting conversation. Preserve uncertainty when agreement is missing.
-- [ ] Let current members correct or remove party notes with optimistic version checks and visible provenance. Corrections must invalidate stale summaries and retrieved source spans.
-- [ ] Deduplicate retries and repeated statements. A delayed extraction must preserve a newer member correction or deletion.
-- [ ] Keep notes scoped to their party. Recheck source access when opening message links, including when another party has identical membership.
+- [x] Implement bounded mention-triggered extraction (up to twenty recent messages; model quality checked in one live synthetic scenario) of party decisions, shared constraints, unresolved questions and relevant goal updates from attributed human conversation.
+- [x] Persist versioned `PARTY_FACT` records through the existing DynamoDB/outbox path and populate the party-memory panel. Include source message IDs, timestamps, speaker attribution and optional expiry.
+- [x] Distinguish suggestions, confirmed decisions and unresolved disagreements using the supporting conversation (confirmed decision/question live scenario passed; broader disagreement quality still needs evaluation). Preserve uncertainty when agreement is missing.
+- [x] Let preference owners, manual-note authors and the party owner for automatic shared notes correct or remove their respective notes with optimistic version checks and visible provenance. Corrections must invalidate stale summaries and retrieved source spans.
+- [x] Deduplicate retries and exact normalized shared statements; merge party-scoped preferences by authenticated author/topic with bounded model summaries and provenance. Broader shared-note paraphrase consolidation remains pending. A delayed extraction must preserve a newer member correction or deletion.
+- [x] Keep notes scoped to their party. Recheck source access when opening message links, including when another party has identical membership.
 
 Acceptance requires a discussion that produces a visible sourced decision and an unresolved question, persistence across reload, a correction governing the next answer, and rejection of reads from a different party.
 
@@ -86,39 +99,65 @@ Acceptance requires equivalent preferences expressed in different wording, one d
 
 ### 3C — richer profiles and better memory selection
 
-The current compact preview is rendered from canonical approved points. Supermemory profile buckets are available in the selected API but are not integrated into the UI.
+Implemented owner-only categorized canonical previews plus filtered Supermemory bucket/profile reads, freshness states and supporting points. Provider abstractions with unverifiable inputs are withheld, so the preview stays canonical during indexing delays. Group context never consumes aggregate private summaries. Backend checks include old canonical relevance across class/trip/hackathon queries, private/expired exclusion, conflicting constraint preservation and oversized scope rejection. The combined live owner-preview isolation/edit check has passed; final application assertions passed; cleanup recovery is documented in STATUS.md.
 
-- [ ] Integrate Supermemory profiles/buckets for compact owner-facing summaries, organized around useful categories such as academics, travel and communication.
-- [ ] Display processing/freshness state and let the owner inspect the supporting canonical points. Keep previews bounded and retain the full points view and Markdown export.
-- [ ] Invalidate cached previews when their input facts are corrected, deleted, expired or have approval revoked. Handle delayed provider summaries explicitly.
-- [ ] Keep group-answer context limited to current, approved facts from opted-in members. Aggregate owner summaries can contain private facts, so validate their complete input set before any group reuse.
-- [ ] Improve selection using semantic relevance, current canonical versions and important constraints. Retain the immediate-correction fallback during provider indexing delays.
-- [ ] Handle conflicting preferences, expired constraints and oversized context explicitly. Request clarification or narrower scope when required information exceeds the context budget.
-- [ ] Check retrieval across class planning, trip planning and hackathon brainstorming, including an older relevant fact outside the recent-chat window. Record omissions and observed limits.
+- [x] Integrate Supermemory profiles/buckets for compact owner-facing summaries, organized around useful categories such as academics, travel and communication.
+- [x] Display processing/freshness state and let the owner inspect the supporting canonical points. Keep previews bounded and retain the full points view and Markdown export.
+- [x] Invalidate cached previews when their input facts are corrected, deleted, expired or have approval revoked. Handle delayed provider summaries explicitly.
+- [x] Keep group-answer context limited to current, approved facts from opted-in members. Aggregate owner summaries can contain private facts, so validate their complete input set before any group reuse.
+- [x] Improve selection using semantic relevance, current canonical versions and important constraints. Retain the immediate-correction fallback during provider indexing delays.
+- [x] Handle conflicting preferences, expired constraints and oversized context explicitly. Request clarification or narrower scope when required information exceeds the context budget.
+- [x] Check retrieval across class planning, trip planning and hackathon brainstorming, including an older relevant canonical fact outside the recent-chat window. Focused mocked-provider checks passed; broad live semantic ranking quality remains unevaluated.
 
 Acceptance requires a concise owner preview that updates after an edit, private points staying outside group context, retrieval of an older relevant fact, and a correction governing the next answer despite stale provider results. Include conflicting and expired preferences in the focused checks.
 
 ### 3D — class and general research tools
 
-- [ ] Inspect the Python environment, run its existing offline retrieval suite and one bounded ASU/RMP live smoke scenario.
-- [ ] Record source revision, license/provenance and attribution for reused modules.
-- [ ] Package approved SameClass modules behind typed IAM-invoked Python tools.
-- [ ] Add the bounded agent tool loop, persist model tool requests before execution, validate arguments and preserve action IDs on retries.
-- [ ] Search classes, inspect course details and resolve professor identities.
-- [ ] Retrieve bounded reviews and syllabus evidence with historical labels.
-- [ ] Deterministically compare normalized schedules and preserve unknowns.
-- [ ] Connect TinyFish Search/Fetch with citation IDs and freshness metadata.
-- [ ] Combine research evidence with current party constraints and permitted personal preferences. Keep retrieved instructions outside application authority.
-- [ ] Display partial results and source failures.
-- [ ] Add an asynchronous browser research job for a demonstrated interaction need.
+Implemented and deployed; final combined live application assertions passed; cleanup recovery is documented in STATUS.md. ASU lookup, RMP source resolution/reviews and TinyFish Search/Fetch have passed bounded source probes. Public syllabus lookup returned not_found for the checked offering; successful syllabus text extraction is not claimed.
 
-Acceptance requires real class research and a sourced compatibility explanation for two students, plus a general trip or brainstorming question through the same app. The research flow must honor a corrected preference and current sharing settings.
+- [x] Inspect the Python environment, run its existing offline retrieval suite and one bounded ASU/RMP live smoke scenario.
+- [x] Record source revision, license/provenance and attribution for reused modules.
+- [x] Package approved SameClass modules behind typed IAM-invoked Python tools.
+- [x] Add the bounded agent tool loop, persist model tool requests before execution, validate arguments and preserve action IDs on retries.
+- [x] Search classes, inspect course details and resolve professor identities. Follow-up adds real level/keyword discovery, course deduplication and malformed tool-markup rejection; Haiku/team-account deployment completed; behavior will be manually evaluated by the user. Class search/discovery expose allowlisted keywords, instructor names, campus/delivery, days/dates, session, units/college and open/honors filters. Course tools accept semester names/year with deterministic ASU-code conversion; the agent asks for a semester/year only when missing or ambiguous.
+- [x] Retrieve bounded general/course-specific reviews with pagination, sample metrics and separate overall ratings; restore automatic multi-term same/different-professor syllabus fallback with source labels. Professor questions are scoped to the current request; review retrieval prioritizes a supplied course code and explicitly distinguishes other-course samples and overall metrics.
+- [x] Deterministically compare normalized schedules and preserve unknowns.
+- [x] Connect TinyFish Search/Fetch with citation IDs and freshness metadata.
+- [x] Combine research evidence with current party constraints and permitted personal preferences. Keep retrieved instructions outside application authority.
+- [x] Display partial results and source failures.
+- [ ] Conditional follow-up: add an asynchronous browser research job when a source demonstrates an interaction need. Current tested sources work through Search/Fetch and typed retrieval; no browser interaction requirement has been observed.
+
+Acceptance requires real class research and a sourced compatibility explanation for two students, plus a general trip or brainstorming question through the same app. The earlier integrated source/browser checkpoint passed on the prior model; latest shared Haiku follow-ups remain for manual acceptance. The research flow must honor a corrected preference and current sharing settings.
 
 ### Delivery and verification
 
 Start with the structured party-note write path and extraction ownership safeguards. Improve profiles/retrieval while integrating the research tools. Use focused regression checks for the specific failures above, then one bounded multi-party live scenario covering memory and research together. Record implemented work, observed behavior and remaining gaps in the status report. Recheck the final browser flow after fixes to close the verification gap carried from Milestone 2.
 
-## Milestone 4 — plans and modes
+## Milestone 4 — contextual participation, background learning, plans and modes
+
+### 4A — understand short replies using surrounding conversation
+
+- [ ] Give extraction a bounded, chronologically ordered window containing the relevant proposal and surrounding messages from multiple speakers. Carry stable author IDs, message IDs, party ID, timestamps and available reply-to links. Start with the existing 40-message / 12,000-character context budget.
+- [ ] Resolve short responses such as “That sounds fun, I’m in” against the specific activity or proposal they answer. Prefer explicit reply links; use nearby context only when the reference is unambiguous.
+- [ ] Record participation as a party-scoped fact linking the participant’s own response to the proposal’s source messages. Preserve suggested, confirmed and unresolved states, plus corrections or withdrawal.
+- [ ] Keep durable personal learning tied to evidence the subject authored about themselves. A one-time agreement to join an activity establishes participation in that plan; creating a reusable interest requires explicit durable evidence and the existing candidate/approval flow.
+- [ ] Use other speakers’ messages to resolve context while preserving profile ownership. Respect learning controls, current membership, source access, correction versions and tombstones.
+- [ ] When several proposals could fit, or the referenced proposal falls outside accessible context, retain an unresolved reference and surface the need for clarification. Keep task acceptance bound to the authenticated acceptance workflow and the actual task scope.
+
+Acceptance requires a conversation where A proposes camping and B replies “I’m in,” producing a sourced participation record for B. Also check two competing proposals, an explicit reply to an older proposal, a quoted agreement, a withdrawal and a removed member. Personal memory should gain a camping preference only when B supplies explicit durable evidence and permits the corresponding learning/sharing steps.
+
+### 4B — learn from quieter users without mentions
+
+- [ ] Add a time-based trigger alongside mentions and message-count triggers. When a human message is saved, maintain a queryable per-party pending-work marker and per-author extraction cursors.
+- [ ] As an initial configurable policy, make work eligible after two minutes of party inactivity and discover it on a five-minute scheduled tick. Reuse the recovery schedule where practical. Document the resulting scheduling delay separately from provider processing time.
+- [ ] At the first eligible tick, enqueue bounded contextual extraction for pending contributions, including learning-enabled authors with fewer than ten messages. Include the surrounding conversation needed by 4A and retain continuation cursors for additional batches.
+- [ ] Recheck each author’s learning setting, current membership and memory revision when the job starts and before candidate writes. Preserve the existing private-candidate, owner-approval and per-party sharing controls.
+- [ ] Deduplicate timer, mention and message-count jobs against their covered source boundaries. A delayed job must preserve later edits, deletions and withdrawals. Schedule remaining work after a partial batch and stop scheduling when the backlog is drained.
+- [ ] Bound background model work with a configurable initial limit of one timer-triggered batch per party per five minutes, the existing batch/context limits, metered-feature switch and persisted usage controls. Skip model calls for empty or already-covered work. Keep extraction silent in the chat while exposing processing/errors in the memory UI.
+
+Acceptance requires an opted-in user to contribute two eligible statements, never tag @Vibe and remain below ten messages. After the configured idle period and scheduled tick, private candidates should appear. Check learning disabled, no new messages, duplicate ticks overlapping a mention, a multi-batch backlog, membership removal and a correction/deletion while work is queued. Record observed candidate latency and model-call counts.
+
+### 4C — shared tasks, modes and email
 
 - [ ] Persist proposed tasks and versioned edit proposals.
 - [ ] Members accept, claim, decline and complete their own assignments.
@@ -127,7 +166,7 @@ Start with the structured party-note write path and extraction ownership safegua
 - [ ] Focused, Friendly and Banter tone settings.
 - [ ] Application-sent email through SES when sender and delivery access are ready.
 
-Acceptance requires task persistence after reload, participant acceptance and rejection of unauthorized state transitions.
+Acceptance requires task persistence after reload, participant acceptance and rejection of unauthorized state transitions. Complete the contextual participation and quiet-user background-learning acceptance scenarios above as part of this milestone.
 
 ## Milestone 5 — demonstration and submission
 

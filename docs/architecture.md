@@ -309,3 +309,9 @@ Research evidence, cost scenarios and verification status are in `technical-rese
 Memory and task mutation tools receive server-bound caller, party and run context. The model supplies validated task or fact content. User approval and acceptance come from authenticated UI actions. Error responses carry stable `code`, user-readable `message`, `requestId` and retry eligibility. Version conflicts return current state without silently overwriting it.
 
 Current user membership and preferences are read for every resumed job. Public research may be cached separately, while any synthesis containing personal context stays party-scoped. Account credentials and provider keys are absent from browser bundles and tool-result payloads.
+
+## November 15 Haiku migration checkpoint
+
+The user selected `us.anthropic.claude-haiku-4-5-20251001-v1:0` to replace DeepSeek, with different-model fallback disabled during evaluation. Application and extraction defaults now share that ID. CDK grants the exact inference profile plus its verified US destination foundation models, conditioned on that profile. Native structured tool calls remain application-mediated; textual tool XML cannot become a finished answer. Open-ended recommendations first discover actual level-filtered ASU offerings and group sections by course.
+
+Development is moving back to account 851725603471 through the new `vibe-team` IAM session. The private account is retained separately. Haiku readiness passed and the shared stack deployed successfully. Both model workers are Active with the requested model. The user elected to manually test behavior; a broad recommendation-quality pass is not claimed. See STATUS.md for live access/deployment outcomes; earlier model-audit statements above describe their original checkpoint.

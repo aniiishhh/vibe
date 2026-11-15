@@ -245,7 +245,7 @@ export async function requireParty(partyId: string, userId: string): Promise<Par
 }
 
 export function makeOutboxItem(
-  type: 'REFRESH' | 'AGENT_RUN' | 'MEMORY_SYNC' | 'MEMORY_EXTRACT' | 'PARTY_SYNC',
+  type: 'REFRESH' | 'AGENT_RUN' | 'MEMORY_SYNC' | 'MEMORY_EXTRACT' | 'PARTY_SYNC' | 'PARTY_NOTES',
   partyId: string,
   payload: Record<string, unknown>,
 ): Item {

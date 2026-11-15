@@ -8,6 +8,7 @@ import type {
   Member,
   MessagePage,
   PartyFact,
+  PartyNoteKind,
   Party,
   Profile,
   SendResult,
@@ -104,6 +105,10 @@ export function createApi(config: RuntimeConfig) {
       `/parties/${encodeURIComponent(partyId)}/membership`,
       { method: 'PATCH', body: JSON.stringify({ useSharedMemory }) },
     ),
+    createPartyFact: (partyId: string, input: { text: string; kind: PartyNoteKind }) => request<PartyFact>(`/parties/${encodeURIComponent(partyId)}/facts`, { method: 'POST', body: JSON.stringify(input) }),
+    updatePartyFact: (partyId: string, factId: string, input: { version: number; text: string; kind: PartyNoteKind }) => request<PartyFact>(`/parties/${encodeURIComponent(partyId)}/facts/${encodeURIComponent(factId)}`, { method: 'PATCH', body: JSON.stringify(input) }),
+    deletePartyFact: (partyId: string, factId: string, version: number) => request<PartyFact>(`/parties/${encodeURIComponent(partyId)}/facts/${encodeURIComponent(factId)}`, { method: 'DELETE', body: JSON.stringify({ version }) }),
+    getOwnerProfile: () => request<{revision:number; providerStatus:string; checkedAt:string; truncated:boolean; buckets:Array<{category:string; points:Array<{id:string;text:string;approval:string}>}>}>('/me/memory-profile'),
     getPartyFacts: (partyId: string) => request<{ facts: PartyFact[] }>(`/parties/${encodeURIComponent(partyId)}/facts`),
     removeMember: (partyId: string, userId: string) => request<void>(
       `/parties/${encodeURIComponent(partyId)}/members/${encodeURIComponent(userId)}`,
