@@ -6,6 +6,12 @@ Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementatio
 
 **Milestone 3 is implemented and deployed** on the shared app from `anish/implementation`. The user authorized completion and deployment on November 15. A bounded two-user live Haiku scenario passed the remaining 3B acceptance checks, general TinyFish research and ASU class research. Milestone 4 is also implemented/deployed and verified below. Milestone 5, including the requested `anish/ui` integration, is next. See [the completion report](docs/results/milestone-3-completion-2026-11-15.md) for exact coverage and limits.
 
+### Milestone 5 UI integration in progress
+
+The user authorized integrating `anish/ui`, adapting existing components to its theme, deploying the result and creating a professional README with website screenshots and the supplied AWS diagram. Other Milestone 5 work is deferred. Milestone 4 was committed/pushed as `c622f3b` before integration.
+
+The redesign is merged from `5971cd76de3f6c0c72e6f81975da962017e64754`. Current collaboration controls are being reconciled into its details panel. Reply links, citations, editable/versioned notes and participation, task actions, modes, SES status and private owner previews are retained. Memory and mascot modules load separately, static message rows are memoized, and hidden/disabled mascot polling is suppressed. A local desktop/390px preview render passed without browser exceptions. Live deployed verification and README screenshots are pending.
+
 ### November 15 Milestone 4 completion
 
 The user authorized full Milestone 4 implementation, deployment and bounded verification. `Vibe-dev` reached UPDATE_COMPLETE after the 11:22 UTC update. API, agent, dispatcher, memory and research functions are Active/Successful. This update deployed API/agent/dispatcher/memory packages and frontend assets, expanded the source-message stream filter and scoped dispatcher/SES permissions, and reused the enabled five-minute recovery schedule. Existing account, Ohio endpoints, Haiku model and provider secrets serve this milestone.

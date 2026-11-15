@@ -1,30 +1,25 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ConversationMode, Member, Party, PartyTask, TaskInput } from '@vibe/shared';
-import { ChevronDown, ListTodo } from 'lucide-react';
 import { errorMessage, type VibeApi } from './api';
 
 export function PartyTasks({ api, party, members, viewerId }: { api: VibeApi; party: Party; members: Member[]; viewerId: string }) {
-  const [open, setOpen] = useState(false);
   const client = useQueryClient();
-  const tasks = useQuery({ queryKey: ['tasks', party.id], queryFn: () => api.getTasks(party.id), enabled: open, refetchInterval: open ? 10000 : false });
+  const tasks = useQuery({ queryKey: ['tasks', party.id], queryFn: () => api.getTasks(party.id), refetchInterval: 10000 });
   const refresh = () => client.invalidateQueries({ queryKey: ['tasks', party.id] });
   const [adding, setAdding] = useState(false);
   const create = useMutation({ mutationFn: ({proposal,actionId}: {proposal:TaskInput;actionId:string}) => api.proposeTask(party.id, proposal, actionId), onSuccess: async () => { setAdding(false); await refresh(); } });
   const mode = useMutation({ mutationFn: (value: ConversationMode) => api.updatePartyMode(party.id, value, party.settingsVersion ?? 0), onSuccess: () => client.invalidateQueries({ queryKey: ['party', party.id] }) });
-  return <section className={`party-facts${open ? ' party-facts-open' : ''}`}>
-    <button className="party-facts-toggle" type="button" aria-expanded={open} onClick={() => setOpen(value => !value)}><span><ListTodo size={15} /> Tasks and Vibe mode</span><ChevronDown size={15} /></button>
-    {open && <div className="party-facts-body">
+  return <div className="party-tools">
       <label>Vibe mode <select aria-label="Vibe mode" value={party.mode ?? 'friendly'} disabled={viewerId !== party.ownerId || mode.isPending} onChange={event => mode.mutate(event.target.value as ConversationMode)}><option value="focused">Focused</option><option value="friendly">Friendly</option><option value="banter">Banter</option></select></label>
       {mode.isError && <p role="alert">{errorMessage(mode.error)} <button type="button" onClick={() => void client.invalidateQueries({queryKey:['party',party.id]})}>Reload settings</button></p>}
       {tasks.isPending ? <p>Loading tasks…</p> : tasks.isError ? <p role="alert">{errorMessage(tasks.error)} <button onClick={() => void tasks.refetch()}>Retry</button></p> : <>
         {!tasks.data?.tasks.length && <p>No tasks yet. Propose one here or ask @Vibe to create a task.</p>}
-        <ul className="party-facts-list">{tasks.data?.tasks.map(task => <TaskRow key={task.id} task={task} members={members} viewerId={viewerId} partyOwnerId={party.ownerId} api={api} refresh={refresh} />)}</ul>
+        <ul className="facts-list task-list">{tasks.data?.tasks.map(task => <TaskRow key={task.id} task={task} members={members} viewerId={viewerId} partyOwnerId={party.ownerId} api={api} refresh={refresh} />)}</ul>
       </>}
       {adding ? <TaskForm members={members} pending={create.isPending} onSave={(proposal,actionId) => create.mutate({proposal,actionId})} onCancel={() => setAdding(false)} /> : <button className="button button-secondary" type="button" onClick={() => setAdding(true)}>Propose task</button>}
       {create.isError && <p role="alert">{errorMessage(create.error)}</p>}
-    </div>}
-  </section>;
+  </div>;
 }
 function TaskRow({ task, members, viewerId, partyOwnerId, api, refresh }: { task: PartyTask; members: Member[]; viewerId: string; partyOwnerId: string; api: VibeApi; refresh: () => Promise<unknown> }) {
   const [editing, setEditing] = useState(false);

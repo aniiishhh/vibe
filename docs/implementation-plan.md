@@ -173,6 +173,9 @@ Acceptance requires task persistence after reload, participant acceptance and re
 
 ## Milestone 5 — demonstration and submission
 
+On November 15 the user authorized only UI integration/deployment and a professional README with website images and the supplied AWS architecture diagram. Other tasks below remain deferred. Integration follows the `anish/ui` theme and mascot, with current collaboration behavior preserved.
+
+
 - [ ] Integrate the existing `anish/ui` branch as the UI/mascot source. Preserve its mascot, themes, backdrops, mentions and interactions while wiring the current memory, research, participation, tasks, modes and invitation APIs. Resolve frontend overlap against the latest implementation branch and deploy the integrated interface. Use the branch's components and styling for this integration. Reviewed source revision is `5971cd76de3f6c0c72e6f81975da962017e64754`; fetch the latest branch before merging. Preserve Milestone 4 reply links, participation controls, task acceptance/revisions, mode settings and email status when reconciling frontend overlap.
 
 

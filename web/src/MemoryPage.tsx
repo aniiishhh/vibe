@@ -1,9 +1,10 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Download, Plus, Search, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { Download, Plus, Search, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { CreateMemoryInput, MemoryFact, UpdateMemoryInput } from '@vibe/shared';
 import { ApiRequestError, errorMessage, type VibeApi } from './api';
+import { ShellNavButtons } from './shell';
 import './memory.css';
 
 const MAX_PREVIEW_LENGTH = 1_500;
@@ -96,10 +97,11 @@ export function MemoryPage({ api }: { api: VibeApi }) {
 
   return (
     <main className="memory-page">
+      <div className="page-topbar"><ShellNavButtons /></div>
       <header className="memory-page-header">
         <div>
           <h1>Personal memory</h1>
-          <p>Review what Vibe remembers about you and choose what can travel between parties.</p>
+          <p>What Vibe knows about you, and what it can use in your parties.</p>
         </div>
         <button
           className="button button-secondary memory-export"
@@ -118,11 +120,10 @@ export function MemoryPage({ api }: { api: VibeApi }) {
 
       <section className="learning-setting" aria-labelledby="learning-title">
         <div className="learning-setting-copy">
-          <div className="learning-icon"><Sparkles size={18} /></div>
           <div>
             <h2 id="learning-title">Learn from my messages</h2>
             <p>When this is on, Vibe can turn your own messages into private review candidates. Nothing is shared until you approve it and opt in for a party.</p>
-            {learningEnabled && memoriesQuery.data?.extractionState === 'pending' && <p role="status">Messages are waiting for an @Vibe mention or a batch of ten of your messages.</p>}
+            {learningEnabled && memoriesQuery.data?.extractionState === 'pending' && <p role="status">Messages are waiting for an @Vibe mention, ten-message batch or idle-learning pass.</p>}
             {learningEnabled && memoriesQuery.data?.extractionState === 'processing' && <p role="status">Reviewing your messages for private memory candidates…</p>}
             {learningEnabled && memoriesQuery.data?.extractionState === 'error' && <p role="status">Memory extraction encountered an error. Queued retries run automatically. A new @Vibe mention can retry pending messages.</p>}
             {learningError && <p className="inline-error learning-error" role="alert">{learningError}</p>}
@@ -144,12 +145,12 @@ export function MemoryPage({ api }: { api: VibeApi }) {
 
       <section className="profile-preview-section" aria-labelledby="preview-title">
         <div className="section-title-row">
-          <div><h2 id="preview-title">Profile preview</h2><p>A compact view of approved details that may be relevant in a party where you opt in.</p></div>
+          <div><h2 id="preview-title">Profile preview</h2><p>The approved points Vibe can use in parties where you turned memory on.</p></div>
           {profileQuery.isError && <button className="text-button" type="button" onClick={() => void profileQuery.refetch()}>Retry profile</button>}
         </div>
         {memoriesQuery.isPending ? <div className="preview-skeleton"><span className="skeleton skeleton-line" /><span className="skeleton skeleton-line" /><span className="skeleton skeleton-line short" /></div> : memoriesQuery.isError ? <p className="preview-unavailable">Your profile preview is unavailable until memories load.</p> : preview ? (
           <div className="profile-preview-text" aria-label={`Profile preview, up to ${MAX_PREVIEW_LENGTH} characters`}>{preview}{hasMorePreview ? '…' : ''}</div>
-        ) : <div className="profile-preview-empty">No reusable profile summary yet. Approved memory points will appear here when available.</div>}
+        ) : <div className="profile-preview-empty">Nothing approved yet. Approve a memory point below and it shows up here.</div>}
         {profileQuery.isError && <p className="preview-unavailable">Your learning setting could not load. Retry to change it.</p>}
       </section>
 
@@ -162,7 +163,7 @@ export function MemoryPage({ api }: { api: VibeApi }) {
 
       <section className="memory-facts-section" aria-labelledby="facts-title">
         <div className="section-title-row memory-facts-heading">
-          <div><h2 id="facts-title">Your memory points</h2><p>Manual notes and candidates from your own messages stay private until you approve reuse.</p></div>
+          <div><h2 id="facts-title">Your memory points</h2><p>Points you added and suggestions from your messages. Private until you approve them.</p></div>
           {!adding && <button className="button button-primary" type="button" onClick={() => { setAdding(true); setCreateError(''); }}><Plus size={16} /> Add a point</button>}
         </div>
 
@@ -190,7 +191,7 @@ export function MemoryPage({ api }: { api: VibeApi }) {
             {filteredMemories.map((memory) => <MemoryFactRow key={memory.id} api={api} fact={memory} ownerId={profileQuery.data?.id} />)}
           </div>
         ) : memories.length === 0 ? (
-          <div className="memory-empty"><ShieldCheck size={21} /><h3>Your memory is yours to shape.</h3><p>Add a point yourself or turn on learning to review private candidates from your own messages.</p>{!adding && <button className="text-button" type="button" onClick={() => setAdding(true)}><Plus size={14} /> Add your first point</button>}</div>
+          <div className="memory-empty"><h3>No memory points yet</h3><p>Add one yourself, like “I prefer morning classes”, or turn on learning above.</p>{!adding && <button className="text-button" type="button" onClick={() => setAdding(true)}><Plus size={14} /> Add your first point</button>}</div>
         ) : <p className="memory-no-results">No memory points match “{search}”.</p>}
       </section>
     </main>
