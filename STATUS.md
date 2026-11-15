@@ -2,11 +2,15 @@
 
 Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementation`.
 
-## Semantic party-theme selection in progress
+## Semantic party-theme selection deployed
 
 The latest user request replaces keyword matching with semantic selection from the party name and goal. New parties make one bounded Haiku Converse request during creation and persist a validated theme ID plus model/fallback provenance. All members receive the same saved automatic theme for backgrounds and Pip. The API role gains the same scoped Haiku inference-profile/destination permissions used by the workers. Requests allow at most 32 output tokens, one SDK attempt and an eight-second abort signal. If classification fails, creation saves Everyday with visible fallback status. Admins can choose/retry a theme from Details for existing parties. An explicit reclassification failure preserves the previous saved selection.
 
-The frontend keyword lists/scorer were removed. Unsaved/older parties display Everyday until an admin selects their theme. Personal overrides still apply over the saved automatic theme. Creation shows a choosing-theme state. 86 backend checks, workspace types, build, strict synthesis, reviewed CDK diff and UI detector passed. Deployment and a bounded live semantic check are pending.
+The frontend keyword lists/scorer were removed. Unsaved/older parties display Everyday until an admin selects their theme. Personal overrides still apply over the saved automatic theme. Creation shows a choosing-theme state. 86 backend checks, workspace types, build, strict synthesis, reviewed CDK diff and UI detector passed. Deployed to shared account 851725603471 / us-east-2 with the verified default profile. Stack UPDATE_COMPLETE, API Active/Successful, and the public homepage references the latest production bundle. The update changed API model permissions/environment, API/agent/dispatcher/memory assets and frontend assets. A final API-only deployment refined the activity-vs-logistics classification instruction.
+
+Bounded deployed-Lambda checks used real Haiku and DynamoDB with isolated synthetic claims. A misleading “Launch party” name with an eigenvector/proof-learning goal selected Studies, persisted and reached another member. Non-admin reclassification was rejected. A legacy-shaped Spanish nature outing was initially classified Travel, prompting a semantic instruction clarification. The final deployed prompt classified that same forest/stars/trails goal as Outdoors and persisted it. The final creation took 1,764 ms including Lambda/database work. These are observed examples, with broader classification quality unmeasured. Three model calls were made across both checkpoints. All eleven temporary canonical fixture rows were removed, with no messages/provider memory created. The authenticated browser creation wizard was not repeated. Initial implementation checkpoint is `92fe627`.
+
+On another device use the shared deployment instructions below. The API needs MODEL_ID and the documented scoped Bedrock inference-profile and US destination-model permissions. Theme fields are additive and require no database migration. Existing parties receive semantic selection through the admin Details action.
 
 ## Party management and mascot update deployed
 

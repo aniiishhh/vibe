@@ -21,7 +21,7 @@ Current app: https://d1ia555vbcj8k2.cloudfront.net, shared account 851725603471,
 
 ## Additional requested semantic party themes
 
-Replace the frontend keyword classifier with bounded Bedrock Haiku selection during party creation. Persist one allowlisted theme and its model/fallback source for the shared background and matching mascot accessories. Retain personal background overrides. Older parties use Everyday until an admin invokes semantic selection in Details. Provide visible neutral fallback on creation failure and preserve the prior theme on a failed explicit reclassification. API model access follows the existing scoped Haiku inference profile. Local checks passed, deployment and live verification are recorded in STATUS.md.
+Replace the frontend keyword classifier with bounded Bedrock Haiku selection during party creation. Persist one allowlisted theme and its model/fallback source for the shared background and matching mascot accessories. Retain personal background overrides. Older parties use Everyday until an admin invokes semantic selection in Details. Provide visible neutral fallback on creation failure and preserve the prior theme on a failed explicit reclassification. API model access follows the existing scoped Haiku inference profile. Implemented/deployed with 86 backend checks, types/build/synthesis/diff and UI detector passing. Bounded live checks verified a misleading English name with a learning goal, saved shared selection, admin-only reclassification and final Spanish Outdoors selection after refining the travel/outdoors boundary. Broader classification quality remains unevaluated. Deployment and exact evidence are recorded in STATUS.md.
 
 ## Additional requested party management and mascot update
 
