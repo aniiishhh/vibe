@@ -2,7 +2,7 @@
 
 ## Current state
 
-November 15, 2026. The user authorized connecting `vibe-chat.us`, managed through Porkbun, to the shared Vibe deployment. ACM certificate verification is pending. CloudFront domain attachment and DNS cutover have yet to run. The app remains available at https://d1ia555vbcj8k2.cloudfront.net.
+November 15, 2026. The user authorized connecting `vibe-chat.us`, managed through Porkbun, to the shared Vibe deployment. The Porkbun validation CNAME is publicly visible and ACM reports `ISSUED`. Persistent domain/certificate context is configured. The shared stack reached `UPDATE_COMPLETE` and CloudFront reports `Deployed`. API invitation URLs now use `https://vibe-chat.us`. DNS cutover is pending. The app remains available at https://d1ia555vbcj8k2.cloudfront.net.
 
 | Setting | Value |
 | --- | --- |
@@ -52,6 +52,10 @@ After the distribution reaches `Deployed` with the domain attached, add the foll
 | TTL | `600` |
 
 Replace conflicting apex parking/routing records. Preserve unrelated mail, verification and subdomain records. The selected hostname is `vibe-chat.us`. Adding `www.vibe-chat.us` requires certificate coverage and a CloudFront alias for that hostname.
+
+## Verification checkpoint
+
+Infrastructure types, strict synthesis and the focused CDK diff passed. Direct CloudFront routing with custom-hostname SNI passed HTTPS certificate verification, homepage HTTP 200, invite SPA HTTP 200 with matching app HTML, shared `/config.json`, and expected unauthenticated API HTTP 401. Public apex DNS still points at parking addresses. Public-domain routing and authenticated use remain to verify after cutover.
 
 ## 4. Verify and publish
 

@@ -21,7 +21,7 @@ Current app: https://d1ia555vbcj8k2.cloudfront.net, shared account 851725603471,
 
 ## Additional authorized domain setup
 
-Connect `vibe-chat.us` through Porkbun to the existing CloudFront distribution. Certificate requested, DNS ownership validation pending. After issuance, persist CDK domain/certificate context, deploy the distribution alias and canonical invitation URL, complete Porkbun apex routing, and verify HTTPS and application access. See [setup steps](aws/custom-domain.md) and [current status](../STATUS.md).
+Connect `vibe-chat.us` through Porkbun to the existing CloudFront distribution. Certificate issued, persistent CDK domain/certificate context configured, existing CloudFront alias/certificate and canonical invitation URL deployed. Stack UPDATE_COMPLETE and distribution Deployed. Direct custom-hostname HTTPS, SPA/config and API authentication-boundary checks passed. Porkbun apex routing and public-domain verification remain pending. See [setup steps](aws/custom-domain.md) and [current status](../STATUS.md).
 
 ## Milestone 0 — configuration
 

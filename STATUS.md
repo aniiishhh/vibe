@@ -2,9 +2,13 @@
 
 Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementation`.
 
-## Custom domain setup in progress
+## Custom domain AWS setup completed, DNS cutover pending
 
-The user authorized connecting **vibe-chat.us** through Porkbun on November 15. An ACM certificate was requested in us-east-1 and remains **PENDING_VALIDATION**. The Porkbun validation CNAME is awaiting user setup. CloudFront `E2CC4LLGDDIPFE` continues serving the existing hostname. Domain attachment, API invitation URL deployment and DNS cutover remain pending. Infrastructure support for paired domain/certificate context and a canonical invitation URL is prepared. Persistent context is intentionally added after certificate issuance. See [domain setup and exact DNS records](docs/aws/custom-domain.md) for the next steps and reproduction on another device.
+The user authorized connecting **vibe-chat.us** through Porkbun on November 15. The certificate validation CNAME is publicly visible and ACM reports **ISSUED** in us-east-1. The shared `Vibe-dev` stack reached **UPDATE_COMPLETE** and CloudFront `E2CC4LLGDDIPFE` reports **Deployed**, with `vibe-chat.us` attached and TLSv1.2_2025 configured. API `APP_URL` is now `https://vibe-chat.us` and its update succeeded. Persistent context in `infra/cdk.json` retains the domain/certificate on future deployments.
+
+Infrastructure typechecking, strict synthesis and reviewed CDK diff passed. Before DNS cutover, verified HTTPS using the custom hostname/SNI routed directly to the CloudFront endpoint. Certificate validation passed, homepage and invite SPA route returned 200 with identical app HTML, `/config.json` returned the shared settings with relative `/api`, and unauthenticated `/api/parties` returned the expected 401. Authenticated sign-in and actual email delivery were not repeated for this infrastructure change.
+
+**User action pending** — replace Porkbun root parking/routing with an ALIAS to `d1ia555vbcj8k2.cloudfront.net`. Public apex DNS still returned the parking addresses at the checkpoint. Public custom-domain access remains unverified until that change propagates. The existing CloudFront URL remains usable. See [exact DNS records and replication steps](docs/aws/custom-domain.md). After public HTTPS verification, update the README live link and the deployment summary below.
 
 ## Milestone state
 
