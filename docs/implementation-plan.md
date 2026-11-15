@@ -54,19 +54,69 @@ Implemented and deployed from `anish/implementation` with user authorization. Ty
 
 Acceptance requires learning in party A, approved reuse in party B and a correction governing the next answer. Test stale search, contradictory history and private source metadata.
 
-## Milestone 3 — class and general research
+## Milestone 3 — memory follow-ups, class and general research
+
+This milestone includes the remaining memory improvements identified after Milestone 2. The deployed personal-memory flow is the starting point. Complete the memory follow-ups alongside the research integration and record their verification separately in `STATUS.md`.
+
+### 3A — structured party memory
+
+The current party-memory panel reads structured facts, but no application writer populates those records. Conversation indexing already provides a separate historical retrieval path.
+
+- [ ] Add bounded extraction of party decisions, shared constraints, unresolved questions and relevant goal updates from attributed human conversation.
+- [ ] Persist versioned `PARTY_FACT` records through the existing DynamoDB/outbox path and populate the party-memory panel. Include source message IDs, timestamps, speaker attribution and optional expiry.
+- [ ] Distinguish suggestions, confirmed decisions and unresolved disagreements using the supporting conversation. Preserve uncertainty when agreement is missing.
+- [ ] Let current members correct or remove party notes with optimistic version checks and visible provenance. Corrections must invalidate stale summaries and retrieved source spans.
+- [ ] Deduplicate retries and repeated statements. A delayed extraction must preserve a newer member correction or deletion.
+- [ ] Keep notes scoped to their party. Recheck source access when opening message links, including when another party has identical membership.
+
+Acceptance requires a discussion that produces a visible sourced decision and an unresolved question, persistence across reload, a correction governing the next answer, and rejection of reads from a different party.
+
+### 3B — broader automatic personal learning
+
+The current extractor uses an English first-person filter and runs on an author's mention or ten pending messages from that author.
+
+- [ ] Replace the English-pronoun gate with bounded extraction that recognizes self-descriptions and paraphrases. Cover English variants and at least one non-English or mixed-language example, and document the languages actually checked.
+- [ ] Keep subject ownership bound to authenticated message authors and source IDs. Quoted text, third-party claims, agent replies and retrieved webpages must not establish another person's profile.
+- [ ] On an @Vibe request, process eligible pending contributions from learning-enabled party members using bounded per-author jobs. Preserve continuation cursors when a batch exceeds the work budget.
+- [ ] Preserve learning-off behavior, private candidate review, explicit sharing approval and per-party opt-in. Show pending extraction and failures where relevant in the memory UI.
+- [ ] Separate durable personal preferences from trip-specific budgets, temporary availability and party decisions. Preserve party scope and expiry for temporary constraints.
+- [ ] Consolidate repeated facts while retaining provenance. Protect owner edits and source-wide tombstones when extraction is retried or phrased differently.
+
+Acceptance requires equivalent preferences expressed in different wording, one documented non-English or mixed-language example, contributions from two authors, and correct handling of a quotation, third-party claim and temporary constraint. Learning-off and stale-job correction/deletion cases must continue to pass.
+
+### 3C — richer profiles and better memory selection
+
+The current compact preview is rendered from canonical approved points. Supermemory profile buckets are available in the selected API but are not integrated into the UI.
+
+- [ ] Integrate Supermemory profiles/buckets for compact owner-facing summaries, organized around useful categories such as academics, travel and communication.
+- [ ] Display processing/freshness state and let the owner inspect the supporting canonical points. Keep previews bounded and retain the full points view and Markdown export.
+- [ ] Invalidate cached previews when their input facts are corrected, deleted, expired or have approval revoked. Handle delayed provider summaries explicitly.
+- [ ] Keep group-answer context limited to current, approved facts from opted-in members. Aggregate owner summaries can contain private facts, so validate their complete input set before any group reuse.
+- [ ] Improve selection using semantic relevance, current canonical versions and important constraints. Retain the immediate-correction fallback during provider indexing delays.
+- [ ] Handle conflicting preferences, expired constraints and oversized context explicitly. Request clarification or narrower scope when required information exceeds the context budget.
+- [ ] Check retrieval across class planning, trip planning and hackathon brainstorming, including an older relevant fact outside the recent-chat window. Record omissions and observed limits.
+
+Acceptance requires a concise owner preview that updates after an edit, private points staying outside group context, retrieval of an older relevant fact, and a correction governing the next answer despite stale provider results. Include conflicting and expired preferences in the focused checks.
+
+### 3D — class and general research tools
 
 - [ ] Inspect the Python environment, run its existing offline retrieval suite and one bounded ASU/RMP live smoke scenario.
 - [ ] Record source revision, license/provenance and attribution for reused modules.
 - [ ] Package approved SameClass modules behind typed IAM-invoked Python tools.
+- [ ] Add the bounded agent tool loop, persist model tool requests before execution, validate arguments and preserve action IDs on retries.
 - [ ] Search classes, inspect course details and resolve professor identities.
 - [ ] Retrieve bounded reviews and syllabus evidence with historical labels.
 - [ ] Deterministically compare normalized schedules and preserve unknowns.
 - [ ] Connect TinyFish Search/Fetch with citation IDs and freshness metadata.
+- [ ] Combine research evidence with current party constraints and permitted personal preferences. Keep retrieved instructions outside application authority.
 - [ ] Display partial results and source failures.
 - [ ] Add an asynchronous browser research job for a demonstrated interaction need.
 
-Acceptance requires real class research and a sourced compatibility explanation for two students, plus a general trip or brainstorming question through the same app.
+Acceptance requires real class research and a sourced compatibility explanation for two students, plus a general trip or brainstorming question through the same app. The research flow must honor a corrected preference and current sharing settings.
+
+### Delivery and verification
+
+Start with the structured party-note write path and extraction ownership safeguards. Improve profiles/retrieval while integrating the research tools. Use focused regression checks for the specific failures above, then one bounded multi-party live scenario covering memory and research together. Record implemented work, observed behavior and remaining gaps in the status report. Recheck the final browser flow after fixes to close the verification gap carried from Milestone 2.
 
 ## Milestone 4 — plans and modes
 

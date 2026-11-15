@@ -4,7 +4,7 @@ Updated November 14, 2026, America/Phoenix. Working branch `anish/implementation
 
 ## Current checkpoint
 
-Milestones 1 and 2 are implemented and deployed on `anish/implementation`. Milestone 2 deployment was authorized by the user in this chat. CloudFormation `Vibe-dev` is `UPDATE_COMPLETE`. The latest successful CDK update includes memory ingestion, retrieval and the mobile export fix. Milestone 3, class and general research, is next. Milestones 3–5 remain pending.
+Milestones 1 and 2 are implemented and deployed on `anish/implementation`. Milestone 2 deployment was authorized by the user in this chat. CloudFormation `Vibe-dev` is `UPDATE_COMPLETE`. The latest successful CDK update includes memory ingestion, retrieval and the mobile export fix. Milestone 3, memory follow-ups plus class and general research, is next. Milestones 3–5 remain pending.
 
 The source in this branch includes the deployed application and the live-verification fixes. Infrastructure is declared in `infra/lib/vibe-stack.ts`. Public deployment settings are served at `/config.json`.
 
@@ -183,6 +183,6 @@ New backend modules are `memory-routes.ts`, `memory-store.ts`, `memory-provider.
 
 ## Continue with Milestone 3
 
-Read the Milestone 3 checklist in `docs/implementation-plan.md`. Obtain the separately managed `sameclass-track3/` repository on the teammate's device, inspect its Python environment and source attribution, run the existing focused offline tests and one bounded live ASU/RMP scenario, then package the approved retrieval clients behind the IAM-invoked Python tool adapter. Add deterministic schedule comparison and TinyFish Search/Fetch with source citations. Keep memory permissions and current chat behavior intact.
+Read the expanded Milestone 3 checklist in `docs/implementation-plan.md`. It now explicitly includes structured party-note creation and correction, broader personal extraction, owner-facing Supermemory profiles/buckets, improved retrieval and focused cross-domain checks. These additions are planned and remain unimplemented. Start with the party-note write path and extraction ownership safeguards, then integrate profiles/retrieval alongside research. Obtain the separately managed `sameclass-track3/` repository on the teammate's device, inspect its Python environment and source attribution, run the existing focused offline tests and one bounded live ASU/RMP scenario, then package the approved retrieval clients behind the IAM-invoked Python tool adapter. Add deterministic schedule comparison and TinyFish Search/Fetch with source citations. Keep memory permissions and current chat behavior intact.
 
 The current agent still performs a bounded conversational model call with memory context. General-purpose research tool execution and citations belong to Milestone 3. Provider profile buckets are not used by the current UI; the compact preview is rendered from canonical approved points.
