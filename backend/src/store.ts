@@ -7,7 +7,7 @@ import {
   UpdateCommand,
   type TransactWriteCommandInput,
 } from '@aws-sdk/lib-dynamodb';
-import type { AgentRun, Member, Party, Profile } from '@vibe/shared';
+import { PARTY_THEMES, type PartyTheme, type AgentRun, type Member, type Party, type Profile } from '@vibe/shared';
 import { ulid } from 'ulid';
 
 export type Item = Record<string, unknown>;
@@ -165,6 +165,8 @@ export function toParty(item: Item): Party {
     goal: String(item.goal),
     mode: item.mode === 'focused' || item.mode === 'banter' ? item.mode : 'friendly',
     settingsVersion: Number(item.settingsVersion ?? 0),
+    ...(PARTY_THEMES.includes(item.theme as PartyTheme) ? { theme: item.theme as PartyTheme } : {}),
+    ...(item.themeSource === 'model' || item.themeSource === 'fallback' ? { themeSource: item.themeSource } : {}),
     ownerId: String(item.ownerId),
     createdAt: String(item.createdAt),
   };

@@ -20,7 +20,7 @@ Vibe combines persistent group conversations, permission-aware personal memory a
 | General web research | TinyFish Search and Fetch supply public evidence with source links and retrieval timestamps. |
 | Party administration | Appoint multiple admins and manage membership. Admins control the Vibe mode and custom shared notes. |
 | Shared tasks | Propose assignments, claim or accept your own work, decline and complete tasks. Revisions require renewed acceptance. The agent can propose tasks through typed tools. |
-| A contextual interface | Party names and goals select a matching chat background and Pip's accessories. Light/dark/system themes, highlighted mentions and mascot controls follow the same visual language. |
+| A contextual interface | Haiku interprets the party name and goal to select a shared chat background and matching Pip accessories. Light/dark/system themes, highlighted mentions and mascot controls follow the same visual language. |
 
 ### Memory you can inspect
 

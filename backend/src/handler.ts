@@ -1,3 +1,4 @@
+import { selectPartyTheme } from './party-theme.js';
 import { allMembers, archiveParty, changeMember, requireAdmin } from './party-membership.js';
 import { ownerProfile } from './owner-profile.js';
 import { createPartyNote, changePartyNote, createPartyNoteInput, editPartyNoteInput, deletePartyNoteInput } from './party-notes.js';
@@ -184,9 +185,10 @@ function tokenHash(token: string): string {
 async function createParty(claims: JwtClaims, event: APIGatewayProxyEventV2WithJWTAuthorizer): Promise<Party> {
   const input = parseBody(event, partyInput);
   const profile = await getOrCreateProfile(claims);
+  const selection = await selectPartyTheme(input.name, input.goal);
   const partyId = ulid();
   const createdAt = new Date().toISOString();
-  const party: Party = { id: partyId, ...input, ownerId: claims.sub, createdAt };
+  const party: Party = { id: partyId, ...input, ...selection, ownerId: claims.sub, createdAt };
   const partyItem: Item = {
     ...key(`PARTY#${partyId}`, 'META'),
     entityType: 'PARTY',
@@ -561,6 +563,27 @@ async function route(event: APIGatewayProxyEventV2WithJWTAuthorizer, claims: Jwt
     if ((parts.length === 3 && method === 'POST') || (parts.length === 4 && method === 'PATCH')) {
       return response(parts.length === 3 ? 201 : 200, await mutateTask(parts[1], claims.sub, parseBody(event, z.unknown()), parts[3]));
     }
+  }
+  if (parts[0] === 'parties' && parts[1] && parts[2] === 'theme' && parts.length === 3 && method === 'POST') {
+    const partyId = parts[1];
+    await requireAdmin(partyId, claims.sub);
+    const party = await requireParty(partyId, claims.sub);
+    const selection = await selectPartyTheme(party.name, party.goal);
+    if (selection.themeSource === 'fallback') throw new AppError(503, 'THEME_UNAVAILABLE', 'Vibe could not choose a theme. Try again shortly.', true);
+    try {
+      await transact([
+        membershipCheck(partyId, claims.sub, true),
+        { Update: { TableName: tableName(), Key: key(`PARTY#${partyId}`, 'META'),
+          UpdateExpression: 'SET theme = :theme, themeSource = :source',
+          ConditionExpression: 'attribute_exists(PK)',
+          ExpressionAttributeValues: { ':theme': selection.theme, ':source': selection.themeSource } } },
+        { Put: { TableName: tableName(), Item: refreshOutboxItem(partyId) } },
+      ]);
+    } catch (error) {
+      if (isTransactionCanceled(error)) throw new AppError(409, 'SETTINGS_CONFLICT', 'Party membership changed. Reload and try again.');
+      throw error;
+    }
+    return response(200, await requireParty(partyId, claims.sub));
   }
   if (parts[0] === 'parties' && parts[1] && parts.length === 2 && method === 'PATCH') {
     const input = parseBody(event, z.object({ mode: z.enum(['focused','friendly','banter']), version: z.number().int().nonnegative() }).strict());

@@ -108,6 +108,7 @@ export function createApi(config: RuntimeConfig) {
       method: 'POST',
       body: JSON.stringify(body),
     }),
+    choosePartyTheme: (partyId: string) => request<Party>(`/parties/${encodeURIComponent(partyId)}/theme`, { method: 'POST' }),
     archiveParty: (partyId: string, archived: boolean) => request<Party>(`/parties/${encodeURIComponent(partyId)}/archive`, {
       method: 'PATCH', body: JSON.stringify({ archived }),
     }),

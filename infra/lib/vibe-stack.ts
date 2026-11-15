@@ -171,6 +171,7 @@ export class VibeStack extends Stack {
     const tinyfishParameterName=`/vibe/${STAGE}/tinyfish-api-key`;
     const apiFunction = this.createNodeFunction('ApiFunction', 'api', 'handler.ts', 30, 512, {
       TABLE_NAME: table.tableName,
+      MODEL_ID,
       SUPERMEMORY_PARAMETER_NAME: supermemoryParameterName,
       INVITE_SENDER_PARAMETER: `/vibe/${STAGE}/invite-sender`,
     });
@@ -275,7 +276,7 @@ export class VibeStack extends Stack {
     const inferenceProfileArn = `arn:${Stack.of(this).partition}:bedrock:${Stack.of(this).region}:${Stack.of(this).account}:inference-profile/${MODEL_ID}`;
     const destinationModels = ['us-east-1','us-east-2','us-west-2'].map(region =>
       `arn:${Stack.of(this).partition}:bedrock:${region}::foundation-model/${MODEL_ID.slice(3)}`);
-    for (const fn of [agentFunction,memoryFunction]) {
+    for (const fn of [apiFunction,agentFunction,memoryFunction]) {
       fn.addToRolePolicy(new iam.PolicyStatement({actions:['bedrock:InvokeModel'],resources:[inferenceProfileArn]}));
       fn.addToRolePolicy(new iam.PolicyStatement({actions:['bedrock:InvokeModel'],resources:destinationModels,
         conditions:{StringEquals:{'bedrock:InferenceProfileArn':inferenceProfileArn}}}));

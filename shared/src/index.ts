@@ -1,6 +1,8 @@
+export const PARTY_THEMES = ['travel', 'study', 'build', 'food', 'outdoors', 'celebrate', 'chill'] as const;
+export type PartyTheme = typeof PARTY_THEMES[number];
 export const DEFAULT_MODEL_ID = 'us.anthropic.claude-haiku-4-5-20251001-v1:0';
 export interface Profile { id: string; name: string; email: string; learningEnabled?: boolean; memoryRevision?: number }
-export interface Party { id: string; name: string; goal: string; ownerId: string; createdAt: string; mode?: ConversationMode; settingsVersion?: number; archived?: boolean }
+export interface Party { id: string; name: string; goal: string; ownerId: string; createdAt: string; mode?: ConversationMode; settingsVersion?: number; archived?: boolean; theme?: PartyTheme; themeSource?: 'model' | 'fallback' }
 export interface Member { userId: string; name: string; joinedAt: string; role: 'owner' | 'admin' | 'member'; useSharedMemory?: boolean; memoryRevision?: number }
 export type RunStatus = 'queued' | 'thinking' | 'completed' | 'failed' | 'cancelled';
 export interface Message { id: string; partyId: string; authorId: string; authorName: string; role: 'user' | 'assistant'; text: string; createdAt: string; replyToId?: string; runId?: string; citations?: Array<{id:string;url:string;retrievedAt:string}>; researchWarnings?: string[] }

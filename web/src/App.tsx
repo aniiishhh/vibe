@@ -449,9 +449,9 @@ function CreatePartyDialog({ open, preset, onOpenChange }: { open: boolean; pres
             <label className="field-label">Name<input className="text-input" autoFocus maxLength={80} required value={name} onChange={(event) => setName(event.target.value)} placeholder="Weekend in San Diego" /></label>
             <label className="field-label">Goal<textarea className="text-input text-area" maxLength={280} required rows={3} value={goal} onChange={(event) => setGoal(event.target.value)} placeholder="What should the group decide or get done?" /></label>
             <label className="field-label">Vibe mode<select className="text-input" value={mode} onChange={event => setMode(event.target.value as ConversationMode)}><option value="focused">Focused</option><option value="friendly">Friendly</option><option value="banter">Banter</option></select><span className="field-help">Admins can change this later.</span></label>
-            <div className="dialog-backdrop-hint"><BackdropSwatch id={definition.id} size={26} /><span>Background: <strong>{definition.label}</strong>, picked from the name and goal. You can change it later.</span></div>
+            <div className="dialog-backdrop-hint"><BackdropSwatch id={definition.id} size={26} /><span>Vibe will choose a background from your party’s name and goal when you create it.</span></div>
             {createMutation.isError && <p className="inline-error" role="alert">{errorMessage(createMutation.error, 'The party could not be created.')}</p>}
-            <div className="dialog-actions"><Dialog.Close asChild><button className="button button-secondary" type="button" disabled={createMutation.isPending}>Cancel</button></Dialog.Close><button className="button button-primary" type="submit" disabled={!name.trim() || !goal.trim() || createMutation.isPending}>{createMutation.isPending && <LoaderCircle className="spin" size={16} />} Create party</button></div>
+            <div className="dialog-actions"><Dialog.Close asChild><button className="button button-secondary" type="button" disabled={createMutation.isPending}>Cancel</button></Dialog.Close><button className="button button-primary" type="submit" disabled={!name.trim() || !goal.trim() || createMutation.isPending}>{createMutation.isPending && <LoaderCircle className="spin" size={16} />} {createMutation.isPending ? 'Choosing theme…' : 'Create party'}</button></div>
           </form>
         </Dialog.Content>
       </Dialog.Portal>
@@ -920,7 +920,7 @@ function PartyDetailsPanel({ open, party, members, membersLoading, membersError,
         </section>
         <section className="details-section">
           <h3>Background</h3>
-          <BackdropPicker party={party} />
+          <BackdropPicker party={party} canManage={members.some(member => member.userId === currentUserId && member.role !== 'member')} />
         </section>
       </div>
     </aside>
@@ -959,7 +959,17 @@ function PartyMembershipControls({ party, userId }: { party: Party; userId: stri
   </div>;
 }
 
-function BackdropPicker({ party }: { party: Party }) {
+function BackdropPicker({ party, canManage }: { party: Party; canManage: boolean }) {
+  const api = useApi();
+  const client = useQueryClient();
+  const choose = useMutation({
+    mutationFn: () => api.choosePartyTheme(party.id),
+    onSuccess: async updated => {
+      setBackdropOverride(party.id, null);
+      client.setQueryData(['party', party.id], updated);
+      await client.invalidateQueries({ queryKey: ['parties'] });
+    },
+  });
   const { definition, automatic, isAutomatic } = usePartyBackdrop(party);
   const automaticLabel = backdrops.find((item) => item.id === automatic)!.label;
   return (
@@ -974,7 +984,11 @@ function BackdropPicker({ party }: { party: Party }) {
           <span>{item.label}</span>
         </button>
       ))}
-      <p className="details-note">Saved on this device only.</p>
+      <p className="details-note">Background overrides are saved on this device.</p>
+      {party.themeSource === 'fallback' && <p className="details-note">Automatic selection was unavailable. Everyday is being used.</p>}
+      {!party.theme && <p className="details-note">This party has no saved automatic theme yet.</p>}
+      {canManage && <button className="button button-secondary" type="button" disabled={choose.isPending} onClick={() => choose.mutate()}>{choose.isPending ? 'Choosing theme…' : 'Choose theme with Vibe'}</button>}
+      {choose.isError && <p className="inline-error" role="alert">{errorMessage(choose.error)}</p>}
     </div>
   );
 }

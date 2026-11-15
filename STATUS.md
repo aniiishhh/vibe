@@ -2,6 +2,12 @@
 
 Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementation`.
 
+## Semantic party-theme selection in progress
+
+The latest user request replaces keyword matching with semantic selection from the party name and goal. New parties make one bounded Haiku Converse request during creation and persist a validated theme ID plus model/fallback provenance. All members receive the same saved automatic theme for backgrounds and Pip. The API role gains the same scoped Haiku inference-profile/destination permissions used by the workers. Requests allow at most 32 output tokens, one SDK attempt and an eight-second abort signal. If classification fails, creation saves Everyday with visible fallback status. Admins can choose/retry a theme from Details for existing parties. An explicit reclassification failure preserves the previous saved selection.
+
+The frontend keyword lists/scorer were removed. Unsaved/older parties display Everyday until an admin selects their theme. Personal overrides still apply over the saved automatic theme. Creation shows a choosing-theme state. 86 backend checks, workspace types, build, strict synthesis, reviewed CDK diff and UI detector passed. Deployment and a bounded live semantic check are pending.
+
 ## Party management and mascot update deployed
 
 November 15 user-requested update implements per-user archive/restore, self-leave, multiple admins with promote/demote/remove controls, admin-only Vibe mode changes and manual shared notes, creation-time mode selection and optional invitation setup. Existing owner memberships retain admin privileges. Membership-revision transactions prevent concurrent role/removal/join changes from abandoning a populated party. The last admin must appoint a successor before leaving a populated party. The last person leaving closes the empty party to old invitations. Personal preference/participation corrections remain subject-owned.
@@ -30,7 +36,7 @@ The user replaced the Porkbun root parking ALIAS with `d1ia555vbcj8k2.cloudfront
 
 The user authorized UI integration/deployment and a professional README with website images and the supplied AWS diagram. Other Milestone 5 work remains deferred. Milestone 4 was committed/pushed first as `c622f3b`. UI integration was committed/pushed as `6b1d25f`, demonstration-only removal as `bd0a2c7`, and the README/assets as `34ccb2f`.
 
-The current deployed frontend integrates `anish/ui` revision `5971cd76de3f6c0c72e6f81975da962017e64754`. Pip, mentions, light/dark/system themes, contextual backdrops and its details-panel layout are integrated with the live APIs. Title/goal keyword rules determine the automatic theme and matching mascot accessories, with an optional per-device background override. Canned parties/profiles/replies, simulated run timers, mock sign-in, preview switches and the mascot playground were removed from the application.
+The current deployed frontend integrates `anish/ui` revision `5971cd76de3f6c0c72e6f81975da962017e64754`. Pip, mentions, light/dark/system themes, contextual backdrops and its details-panel layout are integrated with the live APIs. The original title/goal keyword rules are superseded by the semantic selection update above. The saved automatic theme drives matching mascot accessories, with an optional per-device background override. Canned parties/profiles/replies, simulated run timers, mock sign-in, preview switches and the mascot playground were removed from the application.
 
 Reply/source links, citations, editable/versioned notes and participation, task actions, modes, SES availability, approved sharing and owner-only memory views remain connected to canonical state. The categorized owner preview follows the same theme. Source links load bounded older history when necessary.
 

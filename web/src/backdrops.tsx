@@ -1,5 +1,5 @@
 import { useId, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
-import type { Party } from '@vibe/shared';
+import type { Party, PartyTheme } from '@vibe/shared';
 
 /**
  * Minimal line-drawn chat backgrounds. Each party gets one automatically from its
@@ -7,13 +7,12 @@ import type { Party } from '@vibe/shared';
  * Every theme is built from four 24×24 icons, so the same drawings make the
  * tiled background, the sidebar thumbnail and the empty-chat illustration.
  */
-export type BackdropId = 'travel' | 'study' | 'build' | 'food' | 'outdoors' | 'celebrate' | 'chill';
+export type BackdropId = PartyTheme;
 
 interface BackdropDefinition {
   id: BackdropId;
   label: string;
   hue: number;
-  keywords: string[];
   icons: [ReactNode, ReactNode, ReactNode, ReactNode];
 }
 
@@ -24,7 +23,6 @@ export const backdrops: BackdropDefinition[] = [
     id: 'travel',
     label: 'Travel',
     hue: 220,
-    keywords: ['trip', 'travel', 'vacation', 'flight', 'beach', 'road', 'roadtrip', 'weekend', 'getaway', 'visit', 'tour', 'hotel', 'airbnb', 'cruise', 'abroad', 'spring break', 'san diego', 'vegas', 'europe', 'japan', 'mexico', 'city'],
     icons: [
       p('M3 11.5 20.5 4l-6 16.5-3.2-6.8L3 11.5Z M11.3 13.7 20.5 4'),
       p('M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z M12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z'),
@@ -36,7 +34,6 @@ export const backdrops: BackdropDefinition[] = [
     id: 'study',
     label: 'Studies',
     hue: 268,
-    keywords: ['class', 'classes', 'course', 'study', 'studying', 'exam', 'midterm', 'final', 'homework', 'hw', 'semester', 'lecture', 'professor', 'prof', 'asu', 'cse', 'math', 'physics', 'chem', 'biology', 'schedule', 'syllabus', 'quiz', 'assignment', 'school', 'college', 'university', 'notes', 'learn', 'research'],
     icons: [
       p('M3 5.6c3-1.2 6-1 9 1 3-2 6-2.2 9-1v13c-3-1.2-6-1-9 1-3-2-6-2.2-9-1v-13Z M12 6.6v13'),
       p('M2.5 9 12 4.5 21.5 9 12 13.5 2.5 9Z M6.5 11v4.8c3 2.4 8 2.4 11 0V11 M21.5 9v5'),
@@ -48,7 +45,6 @@ export const backdrops: BackdropDefinition[] = [
     id: 'build',
     label: 'Building',
     hue: 305,
-    keywords: ['hack', 'hackathon', 'project', 'code', 'coding', 'build', 'app', 'startup', 'demo', 'devpost', 'sunhacks', 'design', 'prototype', 'launch', 'team', 'idea', 'ideas', 'brainstorm', 'product', 'software', 'ai', 'ml', 'work', 'meeting', 'sprint'],
     icons: [
       p('M8 7.5 3.5 12 8 16.5 M16 7.5l4.5 4.5-4.5 4.5 M13.8 4.5l-3.6 15'),
       p('M5 5.5h14a1 1 0 0 1 1 1V16H4V6.5a1 1 0 0 1 1-1Z M2 19.5h20'),
@@ -60,7 +56,6 @@ export const backdrops: BackdropDefinition[] = [
     id: 'food',
     label: 'Food',
     hue: 42,
-    keywords: ['food', 'dinner', 'lunch', 'breakfast', 'brunch', 'restaurant', 'cook', 'cooking', 'recipe', 'eat', 'eating', 'meal', 'snack', 'pizza', 'coffee', 'cafe', 'boba', 'tacos', 'sushi', 'bbq', 'potluck', 'grocery', 'bake'],
     icons: [
       p('M3 11.5h18a9 9 0 0 1-18 0Z M8.5 8c-.8-1.2.8-2.3 0-3.5 M12 8c-.8-1.2.8-2.3 0-3.5 M15.5 8c-.8-1.2.8-2.3 0-3.5'),
       p('M4 8h12.5v5.5A5.5 5.5 0 0 1 11 19H9.5A5.5 5.5 0 0 1 4 13.5V8Z M16.5 10h1.8a2.6 2.6 0 0 1 0 5.2h-2.1 M7 4.5c-.5-.8.5-1.5 0-2.3 M11 4.5c-.5-.8.5-1.5 0-2.3'),
@@ -72,7 +67,6 @@ export const backdrops: BackdropDefinition[] = [
     id: 'outdoors',
     label: 'Outdoors',
     hue: 150,
-    keywords: ['camp', 'camping', 'hike', 'hiking', 'trail', 'outdoor', 'outdoors', 'park', 'national park', 'mountain', 'lake', 'gym', 'workout', 'fitness', 'run', 'running', 'soccer', 'basketball', 'sport', 'sports', 'bike', 'climb', 'climbing', 'ski', 'surf', 'picnic', 'garden', 'sedona'],
     icons: [
       p('M2 20 9 8l4.2 6.5 2.8-3.8L22 20H2Z'),
       p('M3 20.5 12 5l9 15.5H3Z M12 5v15.5 M9 20.5l3-5 3 5'),
@@ -84,7 +78,6 @@ export const backdrops: BackdropDefinition[] = [
     id: 'celebrate',
     label: 'Celebration',
     hue: 352,
-    keywords: ['party', 'birthday', 'bday', 'celebrate', 'celebration', 'concert', 'music', 'festival', 'event', 'wedding', 'game night', 'movie', 'movies', 'show', 'club', 'dance', 'friends', 'hangout', 'graduation', 'halloween', 'christmas', 'new year', 'gift'],
     icons: [
       p('M9 18V5.5l11-2V16 M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z M20 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'),
       p('M12 3a6 6 0 0 0-6 6c0 4 3 7.5 6 7.5s6-3.5 6-7.5a6 6 0 0 0-6-6Z M11 16.5l1-.1 1 .1-1 2-1-2Z M12 18.5c0 1.6-1.6 1.7-1.6 3'),
@@ -96,7 +89,6 @@ export const backdrops: BackdropDefinition[] = [
     id: 'chill',
     label: 'Everyday',
     hue: 192,
-    keywords: [],
     icons: [
       p('M5 4.5h14a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-5 4v-4.5A1.5 1.5 0 0 1 3.5 15V6A1.5 1.5 0 0 1 5 4.5Z'),
       p('M12 20s-7.5-4.6-7.5-10.2a4.2 4.2 0 0 1 7.5-2.6 4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20Z'),
@@ -108,23 +100,6 @@ export const backdrops: BackdropDefinition[] = [
 
 const byId = new Map(backdrops.map((item) => [item.id, item]));
 export const getBackdrop = (id: BackdropId) => byId.get(id)!;
-
-export function pickBackdrop(text: string): BackdropId {
-  const haystack = ` ${text.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ')} `;
-  let best: BackdropId = 'chill';
-  let bestScore = 0;
-  for (const item of backdrops) {
-    let score = 0;
-    for (const word of item.keywords) {
-      if (haystack.includes(` ${word} `) || haystack.includes(` ${word}s `)) score += word.includes(' ') ? 2 : 1;
-    }
-    if (score > bestScore) {
-      best = item.id;
-      bestScore = score;
-    }
-  }
-  return best;
-}
 
 const overrideKey = (partyId: string) => `vibe.backdrop.${partyId}`;
 const listeners = new Set<() => void>();
@@ -154,9 +129,9 @@ function subscribe(listener: () => void) {
 }
 
 /** Returns the backdrop in effect for a party plus whether it was chosen automatically. */
-export function usePartyBackdrop(party: Pick<Party, 'id' | 'name' | 'goal'>) {
+export function usePartyBackdrop(party: Pick<Party, 'id' | 'name' | 'goal' | 'theme'>) {
   const override = useSyncExternalStore(subscribe, () => readOverride(party.id), () => null);
-  const automatic = pickBackdrop(`${party.name} ${party.goal}`);
+  const automatic = party.theme && byId.has(party.theme) ? party.theme : 'chill';
   const id = override ?? automatic;
   return { definition: byId.get(id)!, automatic, isAutomatic: !override };
 }

@@ -19,6 +19,10 @@ The user approved Milestone 1 application implementation on November 14, 2026. D
 
 Current app: https://d1ia555vbcj8k2.cloudfront.net, shared account 851725603471, Ohio, Haiku 4.5. Earlier 56 backend / 10 adapter checks plus the 25 focused 3B checks, typechecks, production build and strict synthesis passed. The authorized completion check exercised two users and two research requests. See the completion report for observed coverage. See [handoff](milestone-3-handoff.md) and [current status](../STATUS.md).
 
+## Additional requested semantic party themes
+
+Replace the frontend keyword classifier with bounded Bedrock Haiku selection during party creation. Persist one allowlisted theme and its model/fallback source for the shared background and matching mascot accessories. Retain personal background overrides. Older parties use Everyday until an admin invokes semantic selection in Details. Provide visible neutral fallback on creation failure and preserve the prior theme on a failed explicit reclassification. API model access follows the existing scoped Haiku inference profile. Local checks passed, deployment and live verification are recorded in STATUS.md.
+
 ## Additional requested party management and mascot update
 
 Implemented and deployed November 15 after the custom-domain setup. This follows the user’s new feature request and preserves the earlier deferred Milestone 5 tasks.
