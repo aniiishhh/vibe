@@ -154,11 +154,17 @@ export function MemoryPage({ api }: { api: VibeApi }) {
         {profileQuery.isError && <p className="preview-unavailable">Your learning setting could not load. Retry to change it.</p>}
       </section>
 
-      <section className="profile-preview-section"><h2>Your categorized profile</h2><button type="button" disabled={ownerPreview.isFetching} onClick={() => void ownerPreview.refetch()}>Refresh profile</button><p>Owner-only preview of current points. Private and candidate points stay outside group context until approved and shared.</p>
-        {ownerPreview.isError ? <button type="button" onClick={() => void ownerPreview.refetch()}>Retry preview</button> : <p>Provider summary status: {ownerPreview.data?.providerStatus ?? 'loading'}. Current saved points are shown below.</p>}
-        {ownerPreview.data?.buckets.map(bucket => <div key={bucket.category}><h3>{bucket.category}</h3><ul>{bucket.points.map(point => <li key={point.id}><a href={`#memory-${point.id}`}>{point.text}</a> · {point.approval}</li>)}</ul></div>)}
-        {ownerPreview.data && <p>Checked {new Date(ownerPreview.data.checkedAt).toLocaleString()}</p>}
-        {ownerPreview.data?.truncated && <p>More points are available in the full list below.</p>}
+      <section className="profile-preview-section">
+        <details className="owner-profile">
+          <summary>Your categorized profile</summary>
+          <div className="owner-profile-content">
+            <p>Only you can see this view. Points become available to a party after approval and its sharing opt-in.</p>
+            <button className="button button-secondary button-small" type="button" disabled={ownerPreview.isFetching} onClick={() => void ownerPreview.refetch()}>Refresh profile</button>
+            {ownerPreview.isError ? <p role="alert">Your profile could not load. Use Refresh profile to retry.</p> : <p>Provider summary status · {ownerPreview.data?.providerStatus ?? 'loading'}</p>}
+            {ownerPreview.data?.buckets.map(bucket => <div className="owner-profile-category" key={bucket.category}><h3>{bucket.category}</h3><ul>{bucket.points.map(point => <li key={point.id}><a href={`#memory-${point.id}`}>{point.text}</a><small>{point.approval}</small></li>)}</ul></div>)}
+            {ownerPreview.data?.truncated && <p>More points are available in the full list below.</p>}
+          </div>
+        </details>
       </section>
 
       <section className="memory-facts-section" aria-labelledby="facts-title">

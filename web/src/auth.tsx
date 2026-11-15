@@ -13,8 +13,6 @@ export interface AuthContextValue {
   ready: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
-  /** Present only in the local mock preview, where Cognito is not used. */
-  mockSignIn?: (email: string) => void;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

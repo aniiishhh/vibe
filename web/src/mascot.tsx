@@ -14,30 +14,7 @@ export type MascotState =
   | 'summoned' | 'thinking' | 'working' | 'reading' | 'done' | 'error'
   | 'held' | 'dizzy' | 'sleeping' | 'mischief' | 'shocked' | 'zoom' | 'peek' | 'present';
 
-export const MASCOT_STATES: ReadonlyArray<{ id: MascotState; label: string }> = [
-  { id: 'idle', label: 'Idle' },
-  { id: 'wave', label: 'Wave' },
-  { id: 'listening', label: 'Listening' },
-  { id: 'curious', label: 'Curious' },
-  { id: 'excited', label: 'Excited' },
-  { id: 'laughing', label: 'Laughing' },
-  { id: 'love', label: 'Love' },
-  { id: 'sad', label: 'Sad' },
-  { id: 'summoned', label: 'Tagged' },
-  { id: 'thinking', label: 'Thinking' },
-  { id: 'working', label: 'Working' },
-  { id: 'reading', label: 'Reading' },
-  { id: 'done', label: 'Done' },
-  { id: 'error', label: 'Error' },
-  { id: 'held', label: 'Held' },
-  { id: 'dizzy', label: 'Dizzy' },
-  { id: 'sleeping', label: 'Sleeping' },
-  { id: 'mischief', label: 'Mischief' },
-  { id: 'shocked', label: 'Shocked' },
-  { id: 'zoom', label: 'Flying' },
-  { id: 'peek', label: 'Peeking' },
-  { id: 'present', label: 'Presenting' },
-];
+
 
 type IdleAction = 'wave' | 'twirl' | 'stretch' | 'yawn' | 'hum' | 'lookaround' | 'bounce' | 'wink' | 'useProp' | 'juggle';
 const IDLE_ACTIONS: IdleAction[] = ['wave', 'twirl', 'stretch', 'yawn', 'hum', 'lookaround', 'bounce', 'wink', 'useProp', 'useProp', 'juggle'];

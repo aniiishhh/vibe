@@ -1,5 +1,5 @@
 import { PartyTasks } from './PartyTasks';
-import { lazy, memo, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
+import { lazy, memo, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { createContext, useContext } from 'react';
 import { QueryClient, QueryClientProvider, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -29,10 +29,8 @@ import { useTheme, type ThemePreference } from './theme';
 
 const MemoryPage = lazy(() => import('./MemoryPage').then(module => ({default:module.MemoryPage})));
 const MascotDock = lazy(() => import('./mascot-dock').then(module => ({default:module.MascotDock})));
-const MascotDemo = lazy(() => import('./mascot-demo').then(module => ({default:module.MascotDemo})));
 
 const ApiContext = createContext<VibeApi | null>(null);
-const PreviewContext = createContext(false);
 
 function useApi() {
   const api = useContext(ApiContext);
@@ -79,7 +77,7 @@ VITE_EVENTS_REALTIME_ENDPOINT=`;
         <p className="auth-lede">Vibe needs Cognito, API and AppSync Events settings before it can connect.</p>
         {result.loadError && <p className="inline-error" role="alert">{result.loadError}</p>}
         {result.missing.length > 0 && <p className="setup-missing">Missing: {result.missing.join(', ')}</p>}
-        <p className="setup-copy">For local development, copy this into <code>web/.env.local</code> and fill in the deployed values. To preview the interface with sample data instead, open <code>/?mock</code>.</p>
+        <p className="setup-copy">For local development, copy this into <code>web/.env.local</code> and fill in the deployed values.</p>
         <pre className="setup-code"><code>{envExample}</code></pre>
         <button className="button button-secondary" onClick={() => window.location.reload()} type="button"><RefreshCw size={15} /> Check again</button>
       </section>
@@ -87,14 +85,8 @@ VITE_EVENTS_REALTIME_ENDPOINT=`;
   );
 }
 
-interface PreviewOptions {
-  api: VibeApi;
-  AuthProvider: ComponentType<{ children: ReactNode }>;
-}
-
-export function App({ config, preview }: { config: RuntimeConfig; preview?: PreviewOptions }) {
-  const api = useMemo(() => preview?.api ?? createApi(config), [config, preview]);
-  const Auth = preview?.AuthProvider ?? AuthProvider;
+export function App({ config }: { config: RuntimeConfig }) {
+  const api = useMemo(() => createApi(config), [config]);
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: { retry: 1, refetchOnWindowFocus: true, refetchOnReconnect: true, staleTime: 0 },
@@ -106,15 +98,13 @@ export function App({ config, preview }: { config: RuntimeConfig; preview?: Prev
   return (
     <QueryClientProvider client={queryClient}>
       <ApiContext.Provider value={api}>
-        <PreviewContext.Provider value={Boolean(preview)}>
-          <Auth>
+        <AuthProvider>
             <BrowserRouter>
               <Routes>
                 <Route path="/signin" element={<SignInPage />} />
                 <Route path="/signup" element={<SignUpPage />} />
                 <Route path="/confirm" element={<ConfirmPage />} />
                 <Route path="/invite/:token" element={<InvitePage />} />
-                {import.meta.env.DEV && <Route path="/pip" element={<Suspense fallback={<BootScreen />}><MascotDemo /></Suspense>} />}
                 <Route element={<ProtectedRoute />}>
                   <Route element={<WorkspaceShell />}>
                     <Route index element={<WorkspaceHome />} />
@@ -125,8 +115,7 @@ export function App({ config, preview }: { config: RuntimeConfig; preview?: Prev
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </BrowserRouter>
-          </Auth>
-        </PreviewContext.Provider>
+        </AuthProvider>
       </ApiContext.Provider>
     </QueryClientProvider>
   );
@@ -153,7 +142,6 @@ function readCollapsed() {
 function WorkspaceShell() {
   const api = useApi();
   const auth = useAuth();
-  const isPreview = useContext(PreviewContext);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
@@ -208,7 +196,6 @@ function WorkspaceShell() {
           profile={profileQuery.data}
           profileLoading={profileQuery.isPending}
           profileError={profileQuery.isError}
-          isPreview={isPreview}
           onClose={closeSidebar}
           onCreateParty={() => { setMobileNavOpen(false); setNewParty({ open: true }); }}
           onSignOut={onSignOut}
@@ -224,7 +211,7 @@ function WorkspaceShell() {
 }
 
 function Sidebar({
-  parties, partiesLoading, activePartyId, profile, profileLoading, profileError, isPreview, onClose, onCreateParty, onSignOut, onRetryProfile,
+  parties, partiesLoading, activePartyId, profile, profileLoading, profileError, onClose, onCreateParty, onSignOut, onRetryProfile,
 }: {
   parties: Party[];
   partiesLoading: boolean;
@@ -232,7 +219,6 @@ function Sidebar({
   profile?: Profile;
   profileLoading: boolean;
   profileError: boolean;
-  isPreview: boolean;
   onClose: () => void;
   onCreateParty: () => void;
   onSignOut: () => Promise<void>;
@@ -262,7 +248,6 @@ function Sidebar({
         {!partiesLoading && parties.length === 0 && <p className="sidebar-empty">No parties yet. Start one and invite your people.</p>}
       </nav>
       <div className="sidebar-bottom">
-        {isPreview && <p className="preview-note">Local preview with sample data</p>}
         {profileError && <div className="profile-load-error"><span>Profile didn’t load</span><button type="button" onClick={onRetryProfile}>Retry</button></div>}
         <AccountMenu profile={profile} loading={profileLoading} onSignOut={onSignOut} />
       </div>
@@ -531,11 +516,6 @@ function AuthForm({ mode, next, notice }: { mode: 'signin' | 'signup'; next: str
     setBusy(true);
     try {
       const normalizedEmail = email.trim().toLowerCase();
-      if (auth.mockSignIn) {
-        auth.mockSignIn(normalizedEmail);
-        navigate(next, { replace: true });
-        return;
-      }
       if (isSignUp) {
         const result = await signUp({
           username: normalizedEmail,
@@ -668,7 +648,6 @@ type EventsState = 'connecting' | 'live' | 'offline' | 'mismatch';
 function PartyPage({ config }: { config: RuntimeConfig }) {
   const { partyId = '' } = useParams();
   const api = useApi();
-  const isPreview = useContext(PreviewContext);
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const partyQuery = useQuery({ queryKey: ['party', partyId], queryFn: () => api.getParty(partyId), enabled: Boolean(partyId) });
@@ -689,10 +668,6 @@ function PartyPage({ config }: { config: RuntimeConfig }) {
   };
 
   useEffect(() => {
-    if (isPreview) {
-      setEventsState('live');
-      return;
-    }
     let cancelled = false;
     let channel: Awaited<ReturnType<typeof events.connect>> | undefined;
     setEventsState('connecting');
@@ -740,7 +715,7 @@ function PartyPage({ config }: { config: RuntimeConfig }) {
       cancelled = true;
       channel?.close();
     };
-  }, [config.eventsHttpEndpoint, config.eventsRealtimeEndpoint, partyId, isPreview]);
+  }, [config.eventsHttpEndpoint, config.eventsRealtimeEndpoint, partyId]);
 
   if (partyQuery.isPending) return <main className="party-loading"><div className="page-topbar"><ShellNavButtons /></div><div className="delayed-reveal party-loading-lines"><span className="skeleton skeleton-heading" /><span className="skeleton skeleton-line short" /></div></main>;
   if (partyQuery.isError) return <main className="party-error"><div className="page-topbar"><ShellNavButtons /></div><ErrorState title="This party didn’t load" message={errorMessage(partyQuery.error)} onRetry={() => void partyQuery.refetch()} /></main>;
