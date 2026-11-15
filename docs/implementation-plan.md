@@ -173,17 +173,21 @@ Acceptance requires task persistence after reload, participant acceptance and re
 
 ## Milestone 5 — demonstration and submission
 
-On November 15 the user authorized only UI integration/deployment and a professional README with website images and the supplied AWS architecture diagram. Other tasks below remain deferred. Integration follows the `anish/ui` theme and mascot, with current collaboration behavior preserved.
+On November 15 the user authorized UI integration/deployment and a professional README with website images and the supplied AWS diagram. That requested scope is complete. Other Milestone 5 tasks remain deferred under the user's instruction. See [UI integration evidence](results/milestone-5-ui-integration-2026-11-15.md).
 
+### Requested scope
 
-- [ ] Integrate the existing `anish/ui` branch as the UI/mascot source. Preserve its mascot, themes, backdrops, mentions and interactions while wiring the current memory, research, participation, tasks, modes and invitation APIs. Resolve frontend overlap against the latest implementation branch and deploy the integrated interface. Use the branch's components and styling for this integration. Reviewed source revision is `5971cd76de3f6c0c72e6f81975da962017e64754`; fetch the latest branch before merging. Preserve Milestone 4 reply links, participation controls, task acceptance/revisions, mode settings and email status when reconciling frontend overlap.
+- [x] Integrate the existing `anish/ui` revision `5971cd76de3f6c0c72e6f81975da962017e64754`, preserving its theme, mascot, automatic title/goal backdrops, mentions and interactions. Reconcile current memory/research, reply links, participation, tasks, modes, email availability and approval controls. Deploy and run bounded live UI checks.
+- [x] Remove demonstration-only fixtures, simulated replies/run timers, mock sign-in, preview switches and the mascot playground. Real party names/goals feed the automatic background and mascot theme.
+- [x] Add a professional README covering the product, features, privacy/consent, architecture, setup, deployment, repository layout and attribution. Include four actual-app screenshots and the supplied original AWS diagram under `docs/assets/`.
+- [x] Make reviewable checkpoint commits and push to `anish/implementation`. Record deployed state, focused checks and cleanup in STATUS.md.
 
+### Deferred under the user's instruction
 
-- [ ] Mobile QR, conversation, memory and plan flows.
+- [ ] Full mobile QR, conversation, memory and plan acceptance flows beyond the bounded UI integration check.
 - [ ] Real-device test on the deployed URL.
-- [ ] Measure latency, attribution, corrections, isolation, actions and usage.
-- [ ] Record actual model tokens, memory ingestion and browser steps.
-- [ ] Public README with setup, architecture, AI assistance and source attribution.
+- [ ] Broad latency, attribution, corrections, isolation, action and usage measurements.
+- [ ] Complete model-token, memory-ingestion and browser-step accounting.
 - [ ] Prepare Devpost write-up and optional video for team review.
 - [ ] Submit after explicit team authorization.
 

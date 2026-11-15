@@ -4,13 +4,23 @@ Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementatio
 
 ## Milestone state
 
-**Milestone 3 is implemented and deployed** on the shared app from `anish/implementation`. The user authorized completion and deployment on November 15. A bounded two-user live Haiku scenario passed the remaining 3B acceptance checks, general TinyFish research and ASU class research. Milestone 4 is also implemented/deployed and verified below. Milestone 5, including the requested `anish/ui` integration, is next. See [the completion report](docs/results/milestone-3-completion-2026-11-15.md) for exact coverage and limits.
+**Milestone 3 is implemented and deployed** on the shared app from `anish/implementation`. The user authorized completion and deployment on November 15. A bounded two-user live Haiku scenario passed the remaining 3B acceptance checks, general TinyFish research and ASU class research. Milestone 4 is also implemented/deployed and verified below. The requested Milestone 5 UI integration and README are complete below; the other Milestone 5 tasks are deferred. See [the completion report](docs/results/milestone-3-completion-2026-11-15.md) for exact coverage and limits.
 
-### Milestone 5 UI integration in progress
+### Milestone 5 requested UI and README scope completed
 
-The user authorized integrating `anish/ui`, adapting existing components to its theme, deploying the result and creating a professional README with website screenshots and the supplied AWS diagram. Other Milestone 5 work is deferred. Milestone 4 was committed/pushed as `c622f3b` before integration.
+The user authorized UI integration/deployment and a professional README with website images and the supplied AWS diagram. Other Milestone 5 work remains deferred. Milestone 4 was committed/pushed first as `c622f3b`. UI integration was committed/pushed as `6b1d25f`, demonstration-only removal as `bd0a2c7`, and the README/assets as `34ccb2f`.
 
-The redesign is merged from `5971cd76de3f6c0c72e6f81975da962017e64754`. Current collaboration controls are being reconciled into its details panel. Reply links, citations, editable/versioned notes and participation, task actions, modes, SES status and private owner previews are retained. Memory and mascot modules load separately, static message rows are memoized, and hidden/disabled mascot polling is suppressed. A local desktop/390px preview render passed without browser exceptions. The user clarified that demonstration-only logic must be removed. Canned parties/profiles/replies, mock sign-in and preview switches, and the mascot playground are removed. Themes continue to derive from each real party's name/goal and feed both background and mascot. Live deployed verification and README screenshots are pending.
+The current deployed frontend integrates `anish/ui` revision `5971cd76de3f6c0c72e6f81975da962017e64754`. Pip, mentions, light/dark/system themes, contextual backdrops and its details-panel layout are integrated with the live APIs. Title/goal keyword rules determine the automatic theme and matching mascot accessories, with an optional per-device background override. Canned parties/profiles/replies, simulated run timers, mock sign-in, preview switches and the mascot playground were removed from the application.
+
+Reply/source links, citations, editable/versioned notes and participation, task actions, modes, SES availability, approved sharing and owner-only memory views remain connected to canonical state. The categorized owner preview follows the same theme. Source links load bounded older history when necessary.
+
+The latest frontend-only deployment reached UPDATE_COMPLETE after 11:54 UTC (4:54 AM Phoenix). Backend resources, model and service configuration retain the Milestone 4 deployment. Production serves the new website assets. Memory and mascot modules are lazy-loaded; message rows and the mascot are memoized; mascot polling skips hidden/disabled states. The main application bundle still has the existing Vite size advisory.
+
+Workspace/frontend types, production build, strict synthesis and the UI detector passed. A real two-account fixture produced an ASU-sourced reply with five citations. Live browser checks passed sign-in, AppSync subscription, study-theme selection, Pip visibility, typing with zero observed >50ms long tasks, reply source IDs, task acceptance/persistence, party modes, editable notes, sharing, link/QR invitations, SES availability, memory approval, categorized owner preview and dark-mode persistence. At 390px the composer worked without horizontal overflow. Desktop, dark memory and compact screenshots were visually inspected. Two screenshot passes stopped at an exact-label browser locator while the note editor was visible; the scoped textarea locator was corrected and the remaining checks passed without repeating model research.
+
+The professional [README](README.md) includes four images from temporary records in the actual deployed application and the user-supplied architecture PNG. Relative document/image links, PNG integrity and the architecture image's byte-for-byte preservation were checked. Both temporary Cognito users and all three fixture passes' canonical/provider data were removed (56, 34 and 38 canonical record deletions respectively). No queue was purged. Temporary credential files were removed.
+
+Continue only with newly requested work. The user's deferred Milestone 5 tasks are still identified in the plan. SES remains sandboxed and broad performance/device/source-quality evaluation retains its earlier limits. See [UI integration evidence](docs/results/milestone-5-ui-integration-2026-11-15.md).
 
 ### November 15 Milestone 4 completion
 
@@ -50,12 +60,13 @@ Completion cleanup succeeded. Both temporary Cognito users, 87 canonical fixture
 | 3C profiles/retrieval | Implemented/deployed: owner-only categorized canonical previews, provider freshness, validated shared retrieval and correction fallback. Unverifiable provider prose is withheld. |
 | 3D research | Implemented/deployed: bounded ASU/RMP/syllabus/TinyFish tools, native Haiku tool loop, citations, schedule comparison and source/coverage labels. Latest shared Haiku ASU class lookup and general TinyFish citation checks passed. Broad recommendation-quality evaluation remains outside the bounded check. |
 | 4 | Implemented/deployed. 77 backend tests and bounded live two-user checks passed for contextual participation, quiet learning, tasks, modes and SES simulator invitations. |
+| 5 requested scope | `anish/ui` integrated and deployed, demo logic removed, professional README/images/architecture added. Other Milestone 5 tasks deferred by the user. |
 
-Read [the handoff](docs/milestone-3-handoff.md) and [implementation plan](docs/implementation-plan.md) before continuing. Milestone 4 builds on those 3B cursors. Continue with Milestone 5 and the `anish/ui` integration.
+Read [the handoff](docs/milestone-3-handoff.md) and [implementation plan](docs/implementation-plan.md) before continuing. Milestone 4 builds on those 3B cursors. The requested UI/README integration is complete. Other Milestone 5 work requires a new user request.
 
 ## Current shared deployment
 
-**https://d1ia555vbcj8k2.cloudfront.net** — stack `Vibe-dev`, account **851725603471**, **us-east-2**, **UPDATE_COMPLETE**. Latest deployment updated API/dispatcher/memory/agent packages, stream filtering, scoped permissions and frontend assets. The research package retains its Milestone 3 deployment. All five functions are Active/Successful. Agent and memory workers use **us.anthropic.claude-haiku-4-5-20251001-v1:0**. Different-model fallback is disabled for evaluation. Anthropic first-use setup and a real READY invocation succeeded before the shared model switch.
+**https://d1ia555vbcj8k2.cloudfront.net** — stack `Vibe-dev`, account **851725603471**, **us-east-2**, **UPDATE_COMPLETE**. Latest deployment updated frontend assets only. API/dispatcher/memory/agent packages and scoped permissions retain Milestone 4, and the research package retains Milestone 3. All five functions are Active/Successful. Agent and memory workers use **us.anthropic.claude-haiku-4-5-20251001-v1:0**. Different-model fallback is disabled for evaluation. Anthropic first-use setup and a real READY invocation succeeded before the shared model switch.
 
 | Setting | Value |
 | --- | --- |
@@ -92,6 +103,8 @@ Earlier private-account multi-user/browser/source assertions passed, with cleanu
 External source coverage is bounded and availability can change. The checked live syllabus probe earlier returned not_found; syllabus extraction/ranking has offline fixture coverage. Derived provider abstractions with unverifiable inputs are withheld. Broad semantic/language quality, physical-device and inbox-confirmation checks remain open. Conditional asynchronous TinyAgent browser research awaits an actual interaction need. Two older synthetic PARTY_NOTES dead-letter jobs in the retained private account were left untouched; no queue was purged.
 
 Evidence:
+
+- [Milestone 5 UI integration and README](docs/results/milestone-5-ui-integration-2026-11-15.md)
 
 - [Milestone 4 completion and deployment](docs/results/milestone-4-completion-2026-11-15.md)
 
