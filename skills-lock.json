@@ -463,6 +463,13 @@
       "skillPath": "skills/specialized-skills/analytics-skills/finding-data-lake-assets/SKILL.md",
       "computedHash": "37811ba457775cbd2718b84b8e387a86c59f5dda5b78c2ac83a3ddef66ae9f63"
     },
+    "hyperframes": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/hyperframes/SKILL.md",
+      "computedHash": "373b4b19ec8564cbf23f7f3b8399ee9fb4d92609d66948d4b98c13ebe63bbcbc",
+      "installMode": "copy"
+    },
     "impeccable": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
