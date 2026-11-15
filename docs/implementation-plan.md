@@ -118,7 +118,31 @@ Acceptance requires real class research and a sourced compatibility explanation 
 
 Start with the structured party-note write path and extraction ownership safeguards. Improve profiles/retrieval while integrating the research tools. Use focused regression checks for the specific failures above, then one bounded multi-party live scenario covering memory and research together. Record implemented work, observed behavior and remaining gaps in the status report. Recheck the final browser flow after fixes to close the verification gap carried from Milestone 2.
 
-## Milestone 4 — plans and modes
+## Milestone 4 — contextual participation, background learning, plans and modes
+
+### 4A — understand short replies using surrounding conversation
+
+- [ ] Give extraction a bounded, chronologically ordered window containing the relevant proposal and surrounding messages from multiple speakers. Carry stable author IDs, message IDs, party ID, timestamps and available reply-to links. Start with the existing 40-message / 12,000-character context budget.
+- [ ] Resolve short responses such as “That sounds fun, I’m in” against the specific activity or proposal they answer. Prefer explicit reply links; use nearby context only when the reference is unambiguous.
+- [ ] Record participation as a party-scoped fact linking the participant’s own response to the proposal’s source messages. Preserve suggested, confirmed and unresolved states, plus corrections or withdrawal.
+- [ ] Keep durable personal learning tied to evidence the subject authored about themselves. A one-time agreement to join an activity establishes participation in that plan; creating a reusable interest requires explicit durable evidence and the existing candidate/approval flow.
+- [ ] Use other speakers’ messages to resolve context while preserving profile ownership. Respect learning controls, current membership, source access, correction versions and tombstones.
+- [ ] When several proposals could fit, or the referenced proposal falls outside accessible context, retain an unresolved reference and surface the need for clarification. Keep task acceptance bound to the authenticated acceptance workflow and the actual task scope.
+
+Acceptance requires a conversation where A proposes camping and B replies “I’m in,” producing a sourced participation record for B. Also check two competing proposals, an explicit reply to an older proposal, a quoted agreement, a withdrawal and a removed member. Personal memory should gain a camping preference only when B supplies explicit durable evidence and permits the corresponding learning/sharing steps.
+
+### 4B — learn from quieter users without mentions
+
+- [ ] Add a time-based trigger alongside mentions and message-count triggers. When a human message is saved, maintain a queryable per-party pending-work marker and per-author extraction cursors.
+- [ ] As an initial configurable policy, make work eligible after two minutes of party inactivity and discover it on a five-minute scheduled tick. Reuse the recovery schedule where practical. Document the resulting scheduling delay separately from provider processing time.
+- [ ] At the first eligible tick, enqueue bounded contextual extraction for pending contributions, including learning-enabled authors with fewer than ten messages. Include the surrounding conversation needed by 4A and retain continuation cursors for additional batches.
+- [ ] Recheck each author’s learning setting, current membership and memory revision when the job starts and before candidate writes. Preserve the existing private-candidate, owner-approval and per-party sharing controls.
+- [ ] Deduplicate timer, mention and message-count jobs against their covered source boundaries. A delayed job must preserve later edits, deletions and withdrawals. Schedule remaining work after a partial batch and stop scheduling when the backlog is drained.
+- [ ] Bound background model work with a configurable initial limit of one timer-triggered batch per party per five minutes, the existing batch/context limits, metered-feature switch and persisted usage controls. Skip model calls for empty or already-covered work. Keep extraction silent in the chat while exposing processing/errors in the memory UI.
+
+Acceptance requires an opted-in user to contribute two eligible statements, never tag @Vibe and remain below ten messages. After the configured idle period and scheduled tick, private candidates should appear. Check learning disabled, no new messages, duplicate ticks overlapping a mention, a multi-batch backlog, membership removal and a correction/deletion while work is queued. Record observed candidate latency and model-call counts.
+
+### 4C — shared tasks, modes and email
 
 - [ ] Persist proposed tasks and versioned edit proposals.
 - [ ] Members accept, claim, decline and complete their own assignments.
@@ -127,7 +151,7 @@ Start with the structured party-note write path and extraction ownership safegua
 - [ ] Focused, Friendly and Banter tone settings.
 - [ ] Application-sent email through SES when sender and delivery access are ready.
 
-Acceptance requires task persistence after reload, participant acceptance and rejection of unauthorized state transitions.
+Acceptance requires task persistence after reload, participant acceptance and rejection of unauthorized state transitions. Complete the contextual participation and quiet-user background-learning acceptance scenarios above as part of this milestone.
 
 ## Milestone 5 — demonstration and submission
 
