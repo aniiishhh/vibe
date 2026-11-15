@@ -13,7 +13,7 @@ beforeEach(() => {
     vi.clearAllMocks();
     rows.clear();
     put('META', { notesEpoch: 0, notesRevision: 0, ownerId: "alice", membershipRevision: 0 });
-    put('MEMBER#alice', { userId: 'alice' });
+    put('MEMBER#alice', { userId: 'alice', role: 'owner' });
     put('MEMBER#bob', { userId: 'bob' });
     put('MSG#a', { id: 'a', partyId: 'party', authorId: 'alice', role: 'user', notesEpochAtCreation: 0 });
     put('MSG#b', { id: 'b', partyId: 'party', authorId: 'bob', role: 'user', notesEpochAtCreation: 0 });

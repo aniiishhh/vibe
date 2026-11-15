@@ -4,17 +4,6 @@ export function isVibeMention(text: string): boolean {
   return /(^|\s)@vibe\b/i.test(text);
 }
 
-export function memberRemovalPermission(
-  ownerId: string,
-  actorId: string,
-  targetId: string,
-): 'allowed' | 'owner-cannot-leave' | 'forbidden' {
-  if (ownerId === actorId && targetId === ownerId) return 'owner-cannot-leave';
-  if (actorId !== ownerId && targetId !== actorId) return 'forbidden';
-  if (targetId === ownerId) return 'forbidden';
-  return 'allowed';
-}
-
 export function leaseIsActive(status: unknown, leaseUntil: unknown, now: number): boolean {
   return status === 'thinking' && Number(leaseUntil ?? 0) >= now;
 }

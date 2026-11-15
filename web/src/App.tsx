@@ -12,9 +12,9 @@ import { events } from 'aws-amplify/api';
 import { confirmSignUp, resendSignUpCode, signIn, signUp } from 'aws-amplify/auth';
 import {
   AlertCircle, ArrowLeft, ArrowUp, Check, CheckCircle2, ChevronUp, Copy, Link2, LoaderCircle, LogOut,
-  Monitor, Moon, NotebookText, PanelLeft, PanelRight, QrCode, RefreshCw, SquarePen, Sun, X,
+  Archive, ArchiveRestore, Monitor, Moon, NotebookText, PanelLeft, PanelRight, QrCode, RefreshCw, SquarePen, Sun, X,
 } from 'lucide-react';
-import type { AgentRun, Member, Message, Party, PartyFact, PartyNoteKind, Profile, SendResult } from '@vibe/shared';
+import type { AgentRun, ConversationMode, Member, Message, Party, PartyFact, PartyNoteKind, Profile, SendResult } from '@vibe/shared';
 import { AuthProvider, useAuth } from './auth';
 import { ApiRequestError, createApi, errorMessage, type VibeApi } from './api';
 import { deriveRealtimeEndpoint, type RuntimeConfig } from './runtime';
@@ -28,7 +28,7 @@ import { ShellContext, ShellNavButtons, type ShellControls } from './shell';
 import { useTheme, type ThemePreference } from './theme';
 
 const MemoryPage = lazy(() => import('./MemoryPage').then(module => ({default:module.MemoryPage})));
-const MascotDock = lazy(() => import('./mascot-dock').then(module => ({default:module.MascotDock})));
+import { MascotDock } from './mascot-dock';
 
 const ApiContext = createContext<VibeApi | null>(null);
 
@@ -153,8 +153,8 @@ function WorkspaceShell() {
   const profileQuery = useQuery({ queryKey: ['profile'], queryFn: api.getProfile });
 
   useEffect(() => {
-    if (location.pathname === '/' && partiesQuery.isSuccess && partiesQuery.data.length > 0) {
-      navigate(`/parties/${encodeURIComponent(partiesQuery.data[0].id)}`, { replace: true });
+    if (location.pathname === '/' && partiesQuery.isSuccess && partiesQuery.data.some(party => !party.archived)) {
+      navigate(`/parties/${encodeURIComponent(partiesQuery.data.find(party => !party.archived)!.id)}`, { replace: true });
     }
   }, [location.pathname, navigate, partiesQuery.data, partiesQuery.isSuccess]);
 
@@ -225,6 +225,8 @@ function Sidebar({
   onRetryProfile: () => void;
 }) {
   const location = useLocation();
+  const [showArchived, setShowArchived] = useState(false);
+  const visibleParties = parties.filter(party => showArchived ? party.archived : !party.archived);
   const onMemory = location.pathname === '/memory';
   return (
     <aside className="sidebar" aria-label="Main navigation">
@@ -238,14 +240,14 @@ function Sidebar({
           <NotebookText size={17} /><span>Personal memory</span>
         </Link>
       </div>
-      <div className="sidebar-section-label">Parties</div>
+      <div className="sidebar-section-label">{showArchived ? 'Archived parties' : 'Parties'}<button className="text-button" type="button" onClick={() => setShowArchived(value => !value)}>{showArchived ? 'Back' : 'Archived'}</button></div>
       <nav className="party-nav" aria-label="Parties">
         {partiesLoading ? (
           <div className="party-nav-skeleton delayed-reveal" aria-label="Loading parties">
             {[72, 56, 64].map((width) => <span key={width} className="skeleton" style={{ width: `${width}%` }} />)}
           </div>
-        ) : parties.map((party) => <PartyNavItem key={party.id} party={party} active={party.id === activePartyId} />)}
-        {!partiesLoading && parties.length === 0 && <p className="sidebar-empty">No parties yet. Start one and invite your people.</p>}
+        ) : visibleParties.map((party) => <PartyNavItem key={party.id} party={party} active={party.id === activePartyId} />)}
+        {!partiesLoading && visibleParties.length === 0 && <p className="sidebar-empty">{showArchived ? 'No archived parties.' : 'No parties yet. Start one and invite your people.'}</p>}
       </nav>
       <div className="sidebar-bottom">
         {profileError && <div className="profile-load-error"><span>Profile didn’t load</span><button type="button" onClick={onRetryProfile}>Retry</button></div>}
@@ -349,8 +351,8 @@ const starters = [
 function WorkspaceHome() {
   const api = useApi();
   const partiesQuery = useQuery({ queryKey: ['parties'], queryFn: async () => (await api.listParties()).parties });
-  const [create, setCreate] = useState<{ open: boolean; preset?: { name: string; goal: string } }>({ open: false });
-  if (partiesQuery.isPending || (partiesQuery.isSuccess && partiesQuery.data.length > 0)) return <main className="home-state"><div className="page-topbar"><ShellNavButtons /></div></main>;
+  const shell = useContext(ShellContext);
+  if (partiesQuery.isPending || (partiesQuery.isSuccess && partiesQuery.data.some(party => !party.archived))) return <main className="home-state"><div className="page-topbar"><ShellNavButtons /></div></main>;
   if (partiesQuery.isError) return <main className="home-state"><div className="page-topbar"><ShellNavButtons /></div><ErrorState title="Your parties didn’t load" message={errorMessage(partiesQuery.error)} onRetry={() => void partiesQuery.refetch()} /></main>;
   return (
     <>
@@ -361,16 +363,15 @@ function WorkspaceHome() {
           <p>A party is a group chat with a shared goal. Invite people with a link, and mention @Vibe when you want help planning, researching or deciding.</p>
           <div className="starter-grid">
             {starters.map((starter) => (
-              <button key={starter.name} className="starter" type="button" onClick={() => setCreate({ open: true, preset: starter })}>
+              <button key={starter.name} className="starter" type="button" onClick={() => shell?.createParty(starter)}>
                 <StarterSwatch name={starter.name} goal={starter.goal} />
                 <span><strong>{starter.name}</strong><span>{starter.goal}</span></span>
               </button>
             ))}
           </div>
-          <button className="text-button" type="button" onClick={() => setCreate({ open: true })}>Or start from scratch</button>
+          <button className="text-button" type="button" onClick={() => shell?.createParty()}>Or start from scratch</button>
         </div>
       </main>
-      <CreatePartyDialog open={create.open} preset={create.preset} onOpenChange={(open) => setCreate((current) => ({ ...current, open }))} />
     </>
   );
 }
@@ -403,25 +404,38 @@ function CreatePartyDialog({ open, preset, onOpenChange }: { open: boolean; pres
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [goal, setGoal] = useState('');
+  const [mode, setMode] = useState<ConversationMode>('friendly');
+  const [createdParty, setCreatedParty] = useState<Party | null>(null);
   useEffect(() => {
     if (open) {
       setName(preset?.name ?? '');
       setGoal(preset?.goal ?? '');
+      setMode('friendly');
+      setCreatedParty(null);
+      createMutation.reset();
     }
   }, [open, preset]);
   const createMutation = useMutation({
     mutationFn: api.createParty,
     onSuccess: async (party) => {
       await queryClient.invalidateQueries({ queryKey: ['parties'] });
-      onOpenChange(false);
-      navigate(`/parties/${encodeURIComponent(party.id)}`);
+      queryClient.setQueryData(['party', party.id], party);
+      queryClient.setQueryData<Party[]>(['parties'], current => [party, ...(current ?? []).filter(item => item.id !== party.id)]);
+      setCreatedParty(party);
     },
   });
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    if (name.trim() && goal.trim()) createMutation.mutate({ name: name.trim(), goal: goal.trim() });
+    if (name.trim() && goal.trim()) createMutation.mutate({ name: name.trim(), goal: goal.trim(), mode });
   };
   const { definition } = usePartyBackdrop({ id: 'draft', name, goal });
+
+  if (createdParty) return <InviteDialog party={createdParty} open={open} setup onOpenChange={(next) => {
+    if (!next) {
+      onOpenChange(false);
+      navigate(`/parties/${encodeURIComponent(createdParty.id)}`);
+    }
+  }} />;
 
   return (
     <Dialog.Root open={open} onOpenChange={(next) => { if (!createMutation.isPending) onOpenChange(next); }}>
@@ -430,10 +444,11 @@ function CreatePartyDialog({ open, preset, onOpenChange }: { open: boolean; pres
         <Dialog.Content className="dialog-content">
           <Dialog.Close className="dialog-close icon-button" aria-label="Close"><X size={18} /></Dialog.Close>
           <Dialog.Title className="dialog-title">New party</Dialog.Title>
-          <Dialog.Description className="dialog-description">Name it and say what you’re figuring out. You’ll get an invite link next.</Dialog.Description>
+          <Dialog.Description className="dialog-description">Choose a goal and Vibe mode. Invite people on the next step or do it later.</Dialog.Description>
           <form className="form-stack" onSubmit={submit}>
             <label className="field-label">Name<input className="text-input" autoFocus maxLength={80} required value={name} onChange={(event) => setName(event.target.value)} placeholder="Weekend in San Diego" /></label>
             <label className="field-label">Goal<textarea className="text-input text-area" maxLength={280} required rows={3} value={goal} onChange={(event) => setGoal(event.target.value)} placeholder="What should the group decide or get done?" /></label>
+            <label className="field-label">Vibe mode<select className="text-input" value={mode} onChange={event => setMode(event.target.value as ConversationMode)}><option value="focused">Focused</option><option value="friendly">Friendly</option><option value="banter">Banter</option></select><span className="field-help">Admins can change this later.</span></label>
             <div className="dialog-backdrop-hint"><BackdropSwatch id={definition.id} size={26} /><span>Background: <strong>{definition.label}</strong>, picked from the name and goal. You can change it later.</span></div>
             {createMutation.isError && <p className="inline-error" role="alert">{errorMessage(createMutation.error, 'The party could not be created.')}</p>}
             <div className="dialog-actions"><Dialog.Close asChild><button className="button button-secondary" type="button" disabled={createMutation.isPending}>Cancel</button></Dialog.Close><button className="button button-primary" type="submit" disabled={!name.trim() || !goal.trim() || createMutation.isPending}>{createMutation.isPending && <LoaderCircle className="spin" size={16} />} Create party</button></div>
@@ -900,12 +915,48 @@ function PartyDetailsPanel({ open, party, members, membersLoading, membersError,
           <MemberRoster members={members} loading={membersLoading} failed={membersError} currentUserId={currentUserId} partyId={party.id} onRetry={onRetryMembers} />
         </section>
         <section className="details-section">
+          <h3>Your chat</h3>
+          <PartyMembershipControls party={party} userId={currentUserId} />
+        </section>
+        <section className="details-section">
           <h3>Background</h3>
           <BackdropPicker party={party} />
         </section>
       </div>
     </aside>
   );
+}
+
+function PartyMembershipControls({ party, userId }: { party: Party; userId: string }) {
+  const api = useApi();
+  const client = useQueryClient();
+  const navigate = useNavigate();
+  const [confirmLeave, setConfirmLeave] = useState(false);
+  const archive = useMutation({
+    mutationFn: () => api.archiveParty(party.id, !party.archived),
+    onSuccess: async (updated) => {
+      client.setQueryData(['party', party.id], updated);
+      client.setQueryData<Party[]>(['parties'], current => current?.map(item => item.id === party.id ? updated : item));
+      await client.invalidateQueries({ queryKey: ['parties'] });
+      if (updated.archived) navigate('/');
+    },
+  });
+  const leave = useMutation({
+    mutationFn: () => api.removeMember(party.id, userId),
+    onSuccess: async () => {
+      client.setQueryData<Party[]>(['parties'], current => current?.filter(item => item.id !== party.id));
+      for (const key of ['party', 'members', 'messages', 'party-facts', 'tasks']) client.removeQueries({ queryKey: [key, party.id] });
+      navigate('/');
+      await client.invalidateQueries({ queryKey: ['parties'] });
+    },
+  });
+  const busy = archive.isPending || leave.isPending;
+  return <div className="party-chat-controls">
+    <button className="button button-secondary" type="button" disabled={busy} onClick={() => archive.mutate()}>{party.archived ? <ArchiveRestore size={15} /> : <Archive size={15} />}{party.archived ? 'Unarchive chat' : 'Archive chat'}</button>
+    <p className="details-note">Archived chats stay in Archived. You remain a member.</p>
+    {confirmLeave ? <div><p>Leave this party? You’ll lose access to its conversation. An invitation is needed to rejoin.</p><div className="party-note-actions"><button className="text-button text-button-danger" type="button" disabled={busy} onClick={() => leave.mutate()}>{leave.isPending ? 'Leaving…' : 'Leave party'}</button><button className="text-button" type="button" disabled={busy} onClick={() => setConfirmLeave(false)}>Cancel</button></div></div> : <button className="text-button text-button-danger" type="button" disabled={busy} onClick={() => setConfirmLeave(true)}>Leave party</button>}
+    {(archive.error || leave.error) && <p className="inline-error" role="alert">{errorMessage(archive.error ?? leave.error)}</p>}
+  </div>;
 }
 
 function BackdropPicker({ party }: { party: Party }) {
@@ -986,6 +1037,8 @@ function PartyFactsList({ party, members }: { party: Party; members: Member[] })
   const client = useQueryClient();
   const [text, setText] = useState('');
   const [kind, setKind] = useState<PartyNoteKind>('suggestion');
+  const viewerId = useAuth().user?.id;
+  const canManage = members.some(member => member.userId === viewerId && member.role !== 'member');
   const factsQuery = useQuery({
     queryKey: ['party-facts', party.id],
     queryFn: async () => (await api.getPartyFacts(party.id)).facts,
@@ -999,23 +1052,23 @@ function PartyFactsList({ party, members }: { party: Party; members: Member[] })
   return (
     <div className="party-notes-editor">
         {factsQuery.isPending ? <p>Loading party memory…</p> : factsQuery.isError ? <div role="alert">{errorMessage(factsQuery.error)} <button type="button" onClick={() => void factsQuery.refetch()}>Retry</button></div> : !factsQuery.data.length ? <p>No shared notes yet.</p> : (
-          <ul className="facts-list">{factsQuery.data.filter(fact => !fact.subjectId).map(fact => <PartyNoteRow key={fact.id} fact={fact} partyId={party.id} members={members} partyOwnerId={party.ownerId} refresh={refresh} />)}{[...new Set(factsQuery.data.flatMap(fact => fact.subjectId ? [fact.subjectId] : []))].map(subjectId => <li key={subjectId}><div><h3>{factsQuery.data.find(fact => fact.subjectId === subjectId)?.subjectName ?? 'Participant'} · party notes</h3><ul>{factsQuery.data.filter(fact => fact.subjectId === subjectId).map(fact => <PartyNoteRow key={fact.id} fact={fact} partyId={party.id} members={members} partyOwnerId={party.ownerId} refresh={refresh} />)}</ul></div></li>)}</ul>
+          <ul className="facts-list">{factsQuery.data.filter(fact => !fact.subjectId).map(fact => <PartyNoteRow key={fact.id} fact={fact} partyId={party.id} members={members} canManage={canManage} refresh={refresh} />)}{[...new Set(factsQuery.data.flatMap(fact => fact.subjectId ? [fact.subjectId] : []))].map(subjectId => <li key={subjectId}><div><h3>{factsQuery.data.find(fact => fact.subjectId === subjectId)?.subjectName ?? 'Participant'} · party notes</h3><ul>{factsQuery.data.filter(fact => fact.subjectId === subjectId).map(fact => <PartyNoteRow key={fact.id} fact={fact} partyId={party.id} members={members} canManage={canManage} refresh={refresh} />)}</ul></div></li>)}</ul>
         )}
-        <form className="party-note-form" onSubmit={event => { event.preventDefault(); create.mutate(); }}>
+        {canManage && <form className="party-note-form" onSubmit={event => { event.preventDefault(); create.mutate(); }}>
           <label>New party note<textarea maxLength={500} required value={text} onChange={event => setText(event.target.value)} /></label>
           <label>Type<select value={kind} onChange={event => setKind(event.target.value as PartyNoteKind)}>{noteKinds.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
           <button className="button button-secondary" type="submit" disabled={create.isPending || !text.trim()}>{create.isPending ? 'Saving…' : 'Add note'}</button>
           {create.isError && <p role="alert">{errorMessage(create.error)}</p>}
-        </form>
+        </form>}
     </div>
   );
 }
 
-function PartyNoteRow({ fact, partyId, members, partyOwnerId, refresh }: { partyOwnerId: string; fact: PartyFact; partyId: string; members: Member[]; refresh: () => Promise<unknown> }) {
+function PartyNoteRow({ fact, partyId, members, canManage, refresh }: { canManage: boolean; fact: PartyFact; partyId: string; members: Member[]; refresh: () => Promise<unknown> }) {
   const api = useApi();
   const [editing, setEditing] = useState(false);
   const viewerId = useAuth().user?.id;
-  const canEdit = viewerId === (fact.subjectId ?? (fact.source === 'manual' ? fact.speakerId : partyOwnerId));
+  const canEdit = fact.subjectId ? viewerId === fact.subjectId : canManage;
   const [text, setText] = useState(fact.text);
   const [kind, setKind] = useState<PartyNoteKind>(fact.kind ?? 'suggestion');
   const [version, setVersion] = useState(fact.version ?? 1);
@@ -1061,7 +1114,12 @@ function MemberRoster({ members, loading, failed, currentUserId, partyId, onRetr
     },
     onError: (error) => setRosterError(errorMessage(error, 'This member could not be removed.')),
   });
-  const canManage = members.find((member) => member.userId === currentUserId)?.role === 'owner';
+  const roleMutation = useMutation({
+    mutationFn: ({ userId, role }: { userId: string; role: 'admin' | 'member' }) => api.changeMemberRole(partyId, userId, role),
+    onSuccess: async () => { setRosterError(''); await queryClient.invalidateQueries({ queryKey: ['members', partyId] }); await queryClient.invalidateQueries({ queryKey: ['party', partyId] }); },
+    onError: error => setRosterError(errorMessage(error)),
+  });
+  const canManage = members.some(member => member.userId === currentUserId && member.role !== 'member');
 
   if (loading) return <span className="skeleton skeleton-line delayed-reveal" />;
   if (failed) return <div className="details-error"><span>People couldn’t load.</span><button className="text-button" type="button" onClick={onRetry}>Retry</button></div>;
@@ -1069,12 +1127,13 @@ function MemberRoster({ members, loading, failed, currentUserId, partyId, onRetr
     <>
       <ul className="member-list">
         {members.map((member) => {
-          const removable = canManage && member.role !== 'owner' && member.userId !== currentUserId;
+          const removable = canManage && member.userId !== currentUserId;
           const isConfirming = confirmRemove === member.userId;
           return (
             <li key={member.userId}>
               <Avatar name={member.name} size="small" />
-              <span className="member-copy"><strong>{member.name}{member.userId === currentUserId ? ' (you)' : ''}</strong><span>{member.role === 'owner' ? 'Owner' : 'Member'}</span></span>
+              <span className="member-copy"><strong>{member.name}{member.userId === currentUserId ? ' (you)' : ''}</strong><span>{member.role === 'member' ? 'Member' : 'Admin'}</span></span>
+              {removable && !isConfirming && <button className="text-button text-button-quiet" type="button" disabled={roleMutation.isPending || removeMutation.isPending} onClick={() => roleMutation.mutate({ userId: member.userId, role: member.role === 'member' ? 'admin' : 'member' })}>{member.role === 'member' ? 'Make admin' : 'Remove admin'}</button>}
               {removable && !isConfirming && <button className="text-button text-button-quiet" type="button" onClick={() => { setRosterError(''); setConfirmRemove(member.userId); }}>Remove</button>}
               {removable && isConfirming && <span className="remove-confirm"><button className="text-button text-button-danger" type="button" disabled={removeMutation.isPending} onClick={() => removeMutation.mutate(member.userId)}>{removeMutation.isPending ? 'Removing…' : 'Remove'}</button><button className="text-button text-button-quiet" type="button" onClick={() => setConfirmRemove(null)}>Keep</button></span>}
             </li>
@@ -1086,7 +1145,7 @@ function MemberRoster({ members, loading, failed, currentUserId, partyId, onRetr
   );
 }
 
-function InviteDialog({ party, open, onOpenChange }: { party: Party; open: boolean; onOpenChange: (open: boolean) => void }) {
+function InviteDialog({ party, open, onOpenChange, setup = false }: { party: Party; open: boolean; setup?: boolean; onOpenChange: (open: boolean) => void }) {
   const api = useApi();
   const [inviteUrl, setInviteUrl] = useState('');
   const [expiresAt, setExpiresAt] = useState('');
@@ -1136,7 +1195,7 @@ function InviteDialog({ party, open, onOpenChange }: { party: Party; open: boole
         <Dialog.Overlay className="dialog-overlay" />
         <Dialog.Content className="dialog-content invite-dialog">
           <Dialog.Close className="dialog-close icon-button" aria-label="Close"><X size={18} /></Dialog.Close>
-          <Dialog.Title className="dialog-title">Invite to {party.name}</Dialog.Title>
+          <Dialog.Title className="dialog-title">{setup ? `Party created · Invite to ${party.name}` : `Invite to ${party.name}`}</Dialog.Title>
           <Dialog.Description className="dialog-description">Anyone with the link can ask to join after signing in.</Dialog.Description>
           <form className="party-note-form" onSubmit={event=>{event.preventDefault();emailSend.mutate();}}>
             <label>Email invitation<input className="text-input" type="email" required value={email} onChange={event=>{setEmail(event.target.value);setEmailClientId(crypto.randomUUID());emailSend.reset();}} /></label>
@@ -1160,6 +1219,7 @@ function InviteDialog({ party, open, onOpenChange }: { party: Party; open: boole
               <button className="button button-primary button-full" type="button" disabled={inviteMutation.isPending} onClick={() => inviteMutation.mutate()}>{inviteMutation.isPending ? <LoaderCircle className="spin" size={16} /> : <Link2 size={16} />} Create link and QR code</button>
             </div>
           )}
+          {setup && <button className="button button-secondary button-full" type="button" onClick={() => onOpenChange(false)}>Continue to chat · Invite later</button>}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -1393,7 +1453,7 @@ function ChatPanel({ party, backdropId, members, currentUserId, localMessages, s
 
   return (
     <section className="chat-panel" ref={chatPanelRef} aria-label={`Conversation in ${party.name}`}>
-      {!pagesQuery.isPending && <Suspense fallback={null}><MascotDock containerRef={chatPanelRef} composerRef={composerBoxRef} composerInputRef={composeRef} runs={runs} draft={draft} messages={visibleMessages} currentUserId={currentUserId} theme={backdropId} /></Suspense>}
+      {!pagesQuery.isPending && <MascotDock containerRef={chatPanelRef} composerRef={composerBoxRef} composerInputRef={composeRef} runs={runs} draft={draft} messages={visibleMessages} currentUserId={currentUserId} theme={backdropId} />}
       <div className="message-scroll" ref={scrollRef} onScroll={onScroll}>
         <div className="message-column-wrap">
           {sourceId && !visibleMessages.some(message => message.id === sourceId) && pages.length >= 6 && <p className="run-note">This source is further back in the conversation. Load earlier messages to continue.</p>}

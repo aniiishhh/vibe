@@ -104,10 +104,17 @@ export function createApi(config: RuntimeConfig) {
     }),
     exportMemories: () => request<string>('/me/memories/export'),
     listParties: () => request<{ parties: Party[] }>('/parties'),
-    createParty: (body: { name: string; goal: string }) => request<Party>('/parties', {
+    createParty: (body: { name: string; goal: string; mode?: ConversationMode }) => request<Party>('/parties', {
       method: 'POST',
       body: JSON.stringify(body),
     }),
+    archiveParty: (partyId: string, archived: boolean) => request<Party>(`/parties/${encodeURIComponent(partyId)}/archive`, {
+      method: 'PATCH', body: JSON.stringify({ archived }),
+    }),
+    changeMemberRole: (partyId: string, userId: string, role: 'admin' | 'member') => request<{ members: Member[] }>(
+      `/parties/${encodeURIComponent(partyId)}/members/${encodeURIComponent(userId)}`,
+      { method: 'PATCH', body: JSON.stringify({ role }) },
+    ),
     getParty: (partyId: string) => request<Party>(`/parties/${encodeURIComponent(partyId)}`),
     getMembers: (partyId: string) => request<{ members: Member[] }>(`/parties/${encodeURIComponent(partyId)}/members`),
     updatePartyMemorySharing: (partyId: string, useSharedMemory: boolean) => request<Member>(

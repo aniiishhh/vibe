@@ -1,3 +1,4 @@
+import { allMembers, archiveParty, changeMember, requireAdmin } from './party-membership.js';
 import { ownerProfile } from './owner-profile.js';
 import { createPartyNote, changePartyNote, createPartyNoteInput, editPartyNoteInput, deletePartyNoteInput } from './party-notes.js';
 import { emailInviteAvailability, sendEmailInvite } from './email-invites.js';
@@ -27,7 +28,6 @@ import {
   notFound,
   partySyncOutboxItem,
   partyMembershipRevisionUpdate,
-  queryItems,
   refreshOutboxItem,
   requireParty,
   tableName,
@@ -39,7 +39,7 @@ import {
   type Item,
   type JwtClaims,
 } from './store.js';
-import { isVibeMention, memberRemovalPermission } from './domain.js';
+import { isVibeMention } from './domain.js';
 import {
   createMemory,
   deleteMemory,
@@ -53,6 +53,7 @@ import {
 const partyInput = z.object({
   name: z.string().trim().min(1).max(80),
   goal: z.string().trim().min(1).max(1_000),
+  mode: z.enum(['focused', 'friendly', 'banter']).default('friendly'),
 });
 const profileInput = z.object({
   name: z.string().trim().min(1).max(80).optional(),
@@ -229,11 +230,13 @@ async function listParties(userId: string): Promise<{ parties: Party[] }> {
 
   const verified = await Promise.all(memberships.map(async (membership) => {
     const partyId = typeof membership.partyId === 'string' ? membership.partyId : '';
-    if (!partyId || !await getItem(`PARTY#${partyId}`, `MEMBER#${userId}`)) return undefined;
+    if (!partyId) return undefined;
+    const currentMembership = await getItem(`PARTY#${partyId}`, `MEMBER#${userId}`);
+    if (!currentMembership) return undefined;
     const party = await getItem(`PARTY#${partyId}`, 'META');
-    return party ? toParty(party) : undefined;
+    return party ? { ...toParty(party), archived: currentMembership.archived === true } : undefined;
   }));
-  return { parties: verified.filter((party): party is Party => party !== undefined) };
+  return { parties: verified.filter(party => party !== undefined) };
 }
 
 async function getParty(partyId: string, userId: string): Promise<Party> {
@@ -242,46 +245,7 @@ async function getParty(partyId: string, userId: string): Promise<Party> {
 
 async function listMembers(partyId: string, userId: string): Promise<{ members: ReturnType<typeof toMember>[] }> {
   await requireParty(partyId, userId);
-  const page = await queryItems({ PK: `PARTY#${partyId}`, beginsWith: 'MEMBER#', consistentRead: true });
-  return { members: page.items.map(toMember).sort((a, b) => a.joinedAt.localeCompare(b.joinedAt)) };
-}
-
-async function removeMember(partyId: string, targetId: string, claims: JwtClaims): Promise<void> {
-  const party = await getItem(`PARTY#${partyId}`, 'META');
-  if (!party) throw notFound('Party not found.');
-  const ownerId = String(party.ownerId);
-  const permission = memberRemovalPermission(ownerId, claims.sub, targetId);
-  if (permission === 'owner-cannot-leave') {
-    throw new AppError(409, 'OWNER_CANNOT_LEAVE', 'The party owner cannot leave this party.');
-  }
-  if (permission === 'forbidden') throw forbidden();
-  if (!await getItem(`PARTY#${partyId}`, `MEMBER#${targetId}`)) throw notFound('Party member not found.');
-  const refresh = refreshOutboxItem(partyId);
-  const actions: NonNullable<TransactWriteCommandInput['TransactItems']> = [];
-  // A self-leave Delete condition is already the membership check; DynamoDB
-  // forbids two transaction actions from targeting the same item.
-  if (targetId !== claims.sub) actions.push(membershipCheck(partyId, claims.sub));
-  actions.push(
-    {
-      Delete: {
-        TableName: tableName(),
-        Key: key(`PARTY#${partyId}`, `MEMBER#${targetId}`),
-        ConditionExpression: 'attribute_exists(PK)',
-      },
-    },
-    partyMembershipRevisionUpdate(partyId, Number(party.membershipRevision ?? 0)),
-    { Put: { TableName: tableName(), Item: refresh, ConditionExpression: 'attribute_not_exists(PK)' } },
-  );
-  try {
-    await transact(actions);
-  } catch (error) {
-    if (isTransactionCanceled(error)) {
-      if (!await getItem(`PARTY#${partyId}`, `MEMBER#${claims.sub}`)) throw forbidden();
-      if (!await getItem(`PARTY#${partyId}`, `MEMBER#${targetId}`)) throw notFound('Party member not found.');
-      throw new AppError(409, 'MEMBERSHIP_CONFLICT', 'Party membership changed in another session. Reload and try again.');
-    }
-    throw error;
-  }
+  return { members: await allMembers(partyId) };
 }
 
 async function createInvite(partyId: string, claims: JwtClaims): Promise<{ token: string; expiresAt: string }> {
@@ -323,7 +287,7 @@ async function joinInvite(token: string, claims: JwtClaims): Promise<Party> {
   if (!invite) throw notFound('Invite not found.');
   const partyId = String(invite.partyId);
   const partyItem = await getItem(`PARTY#${partyId}`, 'META');
-  if (!partyItem) throw notFound('Party not found.');
+  if (!partyItem || partyItem.closed === true) throw notFound('Party not found.');
   if (await getItem(`PARTY#${partyId}`, `MEMBER#${claims.sub}`)) return toParty(partyItem);
   const expiresAt = typeof invite.expiresAt === 'string' ? invite.expiresAt : '';
   if (!expiresAt || Date.parse(expiresAt) <= Date.now()) {
@@ -600,10 +564,9 @@ async function route(event: APIGatewayProxyEventV2WithJWTAuthorizer, claims: Jwt
   }
   if (parts[0] === 'parties' && parts[1] && parts.length === 2 && method === 'PATCH') {
     const input = parseBody(event, z.object({ mode: z.enum(['focused','friendly','banter']), version: z.number().int().nonnegative() }).strict());
-    const party = await requireParty(parts[1], claims.sub);
-    if (party.ownerId !== claims.sub) throw forbidden();
+    await requireAdmin(parts[1], claims.sub);
     try {
-      await transact([membershipCheck(parts[1], claims.sub), { Update: { TableName: tableName(), Key: key(`PARTY#${parts[1]}`, 'META'),
+      await transact([membershipCheck(parts[1], claims.sub, true), { Update: { TableName: tableName(), Key: key(`PARTY#${parts[1]}`, 'META'),
         UpdateExpression: 'SET #mode = :mode, settingsVersion = :next',
         ConditionExpression: input.version === 0 ? 'attribute_exists(PK) AND (attribute_not_exists(settingsVersion) OR settingsVersion = :version)' : 'settingsVersion = :version',
         ExpressionAttributeNames: { '#mode': 'mode' }, ExpressionAttributeValues: { ':mode': input.mode, ':next': input.version+1, ':version': input.version } } },
@@ -647,6 +610,15 @@ async function route(event: APIGatewayProxyEventV2WithJWTAuthorizer, claims: Jwt
   if (parts[0] === 'parties' && parts[2] === 'members' && parts.length === 3 && method === 'GET') {
     return response(200, await listMembers(parts[1]!, claims.sub));
   }
+  if (parts[0] === 'parties' && parts[2] === 'archive' && parts.length === 3 && method === 'PATCH') {
+    const input = parseBody(event, z.object({ archived: z.boolean() }).strict());
+    return response(200, await archiveParty(parts[1]!, claims.sub, input.archived));
+  }
+  if (parts[0] === 'parties' && parts[2] === 'members' && parts.length === 4 && method === 'PATCH') {
+    const input = parseBody(event, z.object({ role: z.enum(['admin', 'member']) }).strict());
+    await changeMember(parts[1]!, claims.sub, parts[3]!, input.role);
+    return response(200, await listMembers(parts[1]!, claims.sub));
+  }
   if (parts[0] === 'parties' && parts[2] === 'membership' && parts.length === 3 && method === 'PATCH') {
     return response(200, await updatePartyMemorySharing(parts[1]!, claims, event));
   }
@@ -660,7 +632,7 @@ async function route(event: APIGatewayProxyEventV2WithJWTAuthorizer, claims: Jwt
     return response(200, await getPartyMemoryFacts(parts[1]!, claims.sub));
   }
   if (parts[0] === 'parties' && parts[2] === 'members' && parts.length === 4 && method === 'DELETE') {
-    await removeMember(parts[1]!, parts[3]!, claims);
+    await changeMember(parts[1]!, claims.sub, parts[3]!);
     return response(204);
   }
   if (parts[0] === 'parties' && parts[2] === 'invites' && parts.length === 3 && method === 'POST') {

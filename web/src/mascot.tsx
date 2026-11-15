@@ -787,7 +787,7 @@ const PROP_SCALE: Record<BackdropId, { scale: number; ox: number; oy: number }> 
   build: { scale: 1.16, ox: 80, oy: 60 },
   food: { scale: 1.55, ox: 80, oy: 42 },
   outdoors: { scale: 1.5, ox: 80, oy: 44 },
-  celebrate: { scale: 1.55, ox: 80, oy: 42 },
+  celebrate: { scale: 1, ox: 80, oy: 42 },
   chill: { scale: 1.48, ox: 80, oy: 44 },
 };
 

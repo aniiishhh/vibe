@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type RefObject } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type RefObject } from 'react';
 import type { AgentRun, Message } from '@vibe/shared';
 import type { BackdropId } from './backdrops';
 import { Mascot, type MascotState } from './mascot';
@@ -176,6 +176,7 @@ export function MascotDock({ containerRef, composerRef, composerInputRef, runs, 
     const container = containerRef.current;
     if (!container) return;
     const box = container.getBoundingClientRect();
+    if (!box.width || !box.height) return;
     const nextSize = box.width < 640 ? 118 : 168;
     setSize(nextSize);
     const maxX = Math.max(0, box.width - nextSize);
@@ -192,14 +193,16 @@ export function MascotDock({ containerRef, composerRef, composerInputRef, runs, 
     setPosition({ x: clamp(right, 0, maxX), y: clamp(top, 0, maxY) });
   }, [containerRef, composerRef]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    if (!enabled) return;
+    // Passive effects run after the parent chat attaches its DOM ref.
     place();
     const container = containerRef.current;
     if (!container) return;
     const observer = new ResizeObserver(() => { if (!drag.current) place(); });
     observer.observe(container);
     return () => observer.disconnect();
-  }, [place, containerRef]);
+  }, [place, containerRef, enabled]);
 
   const persist = (next: Position) => {
     const box = containerRef.current?.getBoundingClientRect();

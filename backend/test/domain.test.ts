@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Message } from '@vibe/shared';
-import { boundedConversation, memoryQueryForTurn, isVibeMention, leaseIsActive, memberRemovalPermission } from '../src/domain.js';
+import { boundedConversation, memoryQueryForTurn, isVibeMention, leaseIsActive } from '../src/domain.js';
 
 describe('agent request boundaries', () => {
   it('recognizes an explicit @Vibe mention without matching email addresses', () => {
@@ -44,10 +44,4 @@ describe('agent request boundaries', () => {
     expect(leaseIsActive('queued', 20_000, 19_999)).toBe(false);
   });
 
-  it('limits member removal to owners and self-service leave', () => {
-    expect(memberRemovalPermission('owner', 'owner', 'member')).toBe('allowed');
-    expect(memberRemovalPermission('owner', 'member', 'member')).toBe('allowed');
-    expect(memberRemovalPermission('owner', 'member', 'other')).toBe('forbidden');
-    expect(memberRemovalPermission('owner', 'owner', 'owner')).toBe('owner-cannot-leave');
-  });
 });

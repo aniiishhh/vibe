@@ -1,3 +1,4 @@
+import { isAdmin, requireAdmin } from './party-membership.js';
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { ulid } from 'ulid';
@@ -47,7 +48,8 @@ export async function createPartyNote(partyId: string, userId: string, raw: unkn
 }): Promise<PartyFact | undefined> {
     const input = createPartyNoteInput.parse(raw);
     if (input.kind === 'participation') throw new AppError(400, 'INVALID_NOTE_KIND', 'Participation is recorded from sourced responses.');
-    await requireParty(partyId, userId);
+    if (extraction) await requireParty(partyId, userId);
+    else await requireAdmin(partyId, userId);
     const meta = await getItem(`PARTY#${partyId}`, 'META');
     if (!meta)
         throw new AppError(404, 'NOT_FOUND', 'Party not found.');
@@ -78,7 +80,7 @@ export async function createPartyNote(partyId: string, userId: string, raw: unkn
     const revision = Number(meta.notesRevision ?? 0);
     try {
         await transact([
-            membershipCheck(partyId, userId), notesRevisionUpdate(partyId, revision, false),
+            membershipCheck(partyId, userId, !extraction), notesRevisionUpdate(partyId, revision, false),
             { Put: { TableName: tableName(), Item: note, ConditionExpression: existing ? '#version = :version' : 'attribute_not_exists(PK)', ...(existing ? { ExpressionAttributeNames: { '#version': 'version' }, ExpressionAttributeValues: { ':version': existing.version } } : {}) } },
             { Put: { TableName: tableName(), Item: refreshOutboxItem(partyId) } },
         ]);
@@ -102,9 +104,10 @@ export async function changePartyNote(partyId: string, userId: string, id: strin
         throw new AppError(404, 'NOT_FOUND', 'Party note not found.');
     if ('participationStatus' in input && current.kind !== 'participation') throw new AppError(400,'INVALID_NOTE_KIND','Participation status applies to participation records.');
     const canonical = toPublicPartyFact(current);
-    const editor = canonical.subjectId ?? (current.source === 'manual' ? current.speakerId : meta.ownerId);
-    if (editor !== userId)
-        throw new AppError(403, 'NOTE_READ_ONLY', 'Only the preference owner or the responsible note author can change this note.');
+    const ownCorrection = canonical.subjectId === userId;
+    const admin = isAdmin(await getItem(`PARTY#${partyId}`, `MEMBER#${userId}`));
+    if (canonical.subjectId ? !ownCorrection : !admin)
+        throw new AppError(403, 'NOTE_READ_ONLY', 'Only admins can change shared notes. Personal records can be corrected by their subject.');
     if (Number(current.version ?? 1) !== input.version)
         throw conflict();
     if (!deleted && current.kind === 'participation' && 'kind' in input && input.kind !== 'participation') throw new AppError(400, 'INVALID_NOTE_KIND', 'Keep the participation record type when correcting it.');
@@ -115,7 +118,7 @@ export async function changePartyNote(partyId: string, userId: string, id: strin
     const sourceIds = Array.isArray(current.sourceMessageIds) ? [...new Set(current.sourceMessageIds as string[])] : [];
     try {
         await transact([
-            membershipCheck(partyId, userId), notesRevisionUpdate(partyId, Number(meta.notesRevision ?? 0), true),
+            membershipCheck(partyId, userId, !ownCorrection), notesRevisionUpdate(partyId, Number(meta.notesRevision ?? 0), true),
             { Put: { TableName: tableName(), Item: next, ConditionExpression: 'attribute_exists(PK) AND (attribute_not_exists(#version) OR #version = :version) AND (attribute_not_exists(#deleted) OR #deleted = :false)', ExpressionAttributeNames: { '#version': 'version', '#deleted': 'deleted' }, ExpressionAttributeValues: { ':version': input.version, ':false': false } } },
             { Put: { TableName: tableName(), Item: { ...key(`PARTY#${partyId}`, `NOTE_HISTORY#${id}#${input.version}`), ...{ previous: current, editedAt: now, editedBy: userId } } } },
             ...sourceIds.map(messageId => ({ Put: { TableName: tableName(), Item: { ...key(`PARTY#${partyId}`, `NOTE_SUPPRESS#${messageId}`), noteId: id, createdAt: now } } })),

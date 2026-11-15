@@ -2,6 +2,14 @@
 
 Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementation`.
 
+## Party management and mascot update in progress
+
+November 15 user-requested update implements per-user archive/restore, self-leave, multiple admins with promote/demote/remove controls, admin-only Vibe mode changes and manual shared notes, creation-time mode selection and optional invitation setup. Existing owner memberships retain admin privileges. Membership-revision transactions prevent concurrent role/removal/join changes from abandoning a populated party. The last admin must appoint a successor before leaving a populated party. The last person leaving closes the empty party to old invitations. Personal preference/participation corrections remain subject-owned.
+
+Mascot positioning now runs after parent DOM refs attach, reruns when enabled and observes container size changes. Pip is bundled with the app to remove the deferred invisible loading boundary. The celebration hat is reduced to its original drawing scale. A local StrictMode browser fixture passed first mount, unmount/remount and hide/show, and celebration/study/travel rendering was visually checked. This adds roughly 14 KB gzip to the initial bundle compared with the preceding lazy build. Existing Vite bundle-size advisory remains.
+
+83 backend tests passed, workspace types and production build passed, and the UI detector reported no findings. AWS deployment and a bounded live membership verification are pending. No model/research regression was requested for this change.
+
 ## Custom domain deployed and public DNS verified
 
 The user authorized connecting **vibe-chat.us** through Porkbun on November 15. The certificate validation CNAME is publicly visible and ACM reports **ISSUED** in us-east-1. The shared `Vibe-dev` stack reached **UPDATE_COMPLETE** and CloudFront `E2CC4LLGDDIPFE` reports **Deployed**, with `vibe-chat.us` attached and TLSv1.2_2025 configured. API `APP_URL` is now `https://vibe-chat.us` and its update succeeded. Persistent context in `infra/cdk.json` retains the domain/certificate on future deployments.

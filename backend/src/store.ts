@@ -115,12 +115,13 @@ export async function transact(items: NonNullable<TransactWriteCommandInput['Tra
   await db.send(new TransactWriteCommand({ TransactItems: items }));
 }
 
-export function membershipCheck(partyId: string, userId: string) {
+export function membershipCheck(partyId: string, userId: string, adminOnly = false) {
   return {
     ConditionCheck: {
       TableName: tableName(),
       Key: key(`PARTY#${partyId}`, `MEMBER#${userId}`),
-      ConditionExpression: 'attribute_exists(PK)',
+      ConditionExpression: adminOnly ? 'attribute_exists(PK) AND (#role = :admin OR #role = :owner)' : 'attribute_exists(PK)',
+      ...(adminOnly ? { ExpressionAttributeNames: { '#role': 'role' }, ExpressionAttributeValues: { ':admin': 'admin', ':owner': 'owner' } } : {}),
     },
   };
 }
@@ -151,7 +152,7 @@ export function toMember(item: Item): Member {
     userId: String(item.userId),
     name: String(item.name),
     joinedAt: String(item.joinedAt),
-    role: item.role === 'owner' ? 'owner' : 'member',
+    role: item.role === 'owner' ? 'owner' : item.role === 'admin' ? 'admin' : 'member',
     useSharedMemory: item.useSharedMemory === true,
     ...(typeof item.memoryRevision === 'number' ? { memoryRevision: item.memoryRevision } : {}),
   };
@@ -243,7 +244,7 @@ export async function requireParty(partyId: string, userId: string): Promise<Par
   if (!item) throw notFound('Party not found.');
   const member = await getItem(`PARTY#${partyId}`, `MEMBER#${userId}`);
   if (!member) throw forbidden();
-  return toParty(item);
+  return { ...toParty(item), archived: member.archived === true };
 }
 
 export function makeOutboxItem(
