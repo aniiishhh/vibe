@@ -1,6 +1,6 @@
 # Milestone 3 handoff for Anish and Codex
 
-The user approved pushing the completed 3A/3C/3D implementation to `anish/implementation` on November 15, 2026, with **3B explicitly open**. Do not mark all of Milestone 3 complete. Anish's latest planning-only commit `3e25592` and its Milestone 4A/4B/4C scope are preserved.
+**Milestone 3 is implemented and deployed** from `anish/implementation`. On November 15 Anish authorized finishing and deploying the remaining work without subagents. The update passed 25 focused memory checks, workspace typechecks, production build, strict synthesis and a bounded live two-user Haiku scenario. Read [the completion report](results/milestone-3-completion-2026-11-15.md) and STATUS.md for observed coverage. Milestone 4A/4B/4C is the next implementation work.
 
 ## Delivered
 
@@ -14,13 +14,15 @@ The user approved pushing the completed 3A/3C/3D implementation to `anish/implem
 
 ## Open work and ownership
 
-**3B remains unimplemented:** replacing the English first-person gate, broader/mixed-language self-descriptions, bounded pending extraction across eligible authors on a mention, continuation, durable-versus-temporary classification and broader fact consolidation/learning-state visibility. Existing Milestone 2 ownership, learning-off, review/approval, opt-in and tombstone protections must be preserved. The checklist in implementation-plan.md remains unchecked.
+**3B implementation and deployment are complete.** The worker accepts bounded self-descriptions without a pronoun gate, fans mentions out across eligible authors, paginates/continues work, consolidates same-party equivalent evidence and exposes extraction state in the owner screen. Owner-change barriers distinguish automatic revision advances from corrections and learning-control changes. Existing approval, sharing and tombstone protections remain in force. Read the updated STATUS.md and 3B plan for limits and verification.
 
-Milestone 4A concerns contextual short replies/participation; 4B adds idle/timer learning for quieter users; 4C adds accepted tasks, modes and email. Their detailed plan is unchanged. 3B overlaps the extractor/cursor ownership that 4A/4B need, so resolve that gap explicitly rather than treating it as already delivered. Start by reading `backend/src/memory-worker.ts`, `backend/src/handler.ts`, `backend/src/memory-store.ts` and their tests. Party preference extraction is separate in `party-note-extraction.ts`; do not silently convert party preferences into approved global memories.
+The shared app now includes the API/dispatcher/memory-worker changes and frontend. The live scenario passed English pronoun-free and Spanish learning, quotation/third-party/temporary exclusions, equivalent-fact provenance consolidation, canonical correction and owner-profile isolation. ASU class research and TinyFish general research returned persisted citations. Mixed Hindi/English remains fixture-only coverage. Broad language/recommendation quality remains unmeasured.
+
+Milestone 4A concerns contextual short replies/participation; 4B adds idle/timer learning for quieter users; 4C adds accepted tasks, modes and email. Their detailed plan is unchanged. Build 4A/4B on the deployed 3B extractor/cursor and owner-change barrier. Start by reading `backend/src/memory-worker.ts`, `backend/src/handler.ts`, `backend/src/memory-store.ts` and their tests. Party preference extraction is separate in `party-note-extraction.ts`; do not silently convert party preferences into approved global memories.
 
 ## Current deployment
 
-App: https://d1ia555vbcj8k2.cloudfront.net. Stack Vibe-dev, account 851725603471, us-east-2, UPDATE_COMPLETE. Agent/research workers Active/Successful. Model: `us.anthropic.claude-haiku-4-5-20251001-v1:0`.
+App: https://d1ia555vbcj8k2.cloudfront.net. Stack Vibe-dev, account 851725603471, us-east-2, UPDATE_COMPLETE. API/dispatcher/memory/agent/research workers Active/Successful. Model: `us.anthropic.claude-haiku-4-5-20251001-v1:0`.
 
 Supermemory and TinyFish credentials already live as SecureStrings `/vibe/dev/supermemory-api-key` and `/vibe/dev/tinyfish-api-key`. Do not overwrite or put them in Git/frontend settings. Bhavesh's CLI profile is `vibe-team`; Anish should use his own authorized profile and verify STS account first. The existing Monthly Budget $50 was confirmed; it is an alert, not a cap. Private account 782610231983 remains separate, with no account/chat migration.
 
@@ -45,7 +47,7 @@ For authorized deployment, select your own CLI profile and set AWS_REGION=us-eas
 
 ## Verification and limits
 
-Final checks: **56 backend tests, 10 adapter tests, typechecks, production build and strict CDK synthesis passed**. The existing frontend bundle-size advisory remains. Earlier two-user/browser/source checks and cleanup recovery are recorded in docs/results/. Later Haiku question-scoping and tool-filter changes have focused fixture coverage and deployment/configuration verification, not a complete live recommendation-quality pass. The user elected to manually test and asked not to restart extra live recommendation evaluations.
+Final checks: **56 backend tests, 10 adapter tests, typechecks, production build and strict CDK synthesis passed**. The existing frontend bundle-size advisory remains. Earlier two-user/browser/source checks and cleanup recovery are recorded in docs/results/. The authorized completion update additionally passed 25 focused memory checks and bounded live English/Spanish personal-learning, consolidation, ownership, correction and cited ASU/TinyFish research checks. Broader recommendation quality and physical browser/mobile interaction were outside this completion scenario.
 
 Public sources are unofficial and can be missing/unavailable. Syllabus text extraction and fallback ordering have offline coverage; the checked live syllabus probe earlier returned not_found. RMP sample metrics are not complete course aggregates. Derived Supermemory abstractions with unverifiable inputs are withheld. Older synthetic PARTY_NOTES dead-letter jobs in the retained private account were left untouched. Broader ranking/language evaluation, physical-device/email-confirmation checks and conditional interactive browser research remain open. Read the specific result reports before making stronger claims.
 

@@ -47,7 +47,7 @@ describe('canonical memory extraction', () => {
       if (PK === 'USER#owner' && SK === 'PROFILE') return state.profile;
       if (PK === 'PARTY#party' && SK === 'MEMBER#owner') return { userId: 'owner' };
       if (PK === 'PARTY#party' && SK === 'MSG#message-1') return state.message;
-      if (PK === 'USER#owner' && SK.startsWith('PREF#')) return state.existingFact;
+      if (PK === 'USER#owner' && SK === `PREF#${state.existingFact?.id}`) return state.existingFact;
       if (PK === 'USER#owner' && SK.startsWith('SUPPRESS#')) return state.tombstone;
       return undefined;
     });
@@ -113,5 +113,32 @@ describe('canonical memory extraction', () => {
 
     expect(first?.SK).toBe(second?.SK);
   });
+  it('accepts mixed automatic revisions within a protected owner epoch', async () => {
+    const result = await createExtractedCandidate('owner', {
+      ...candidateInput(), sourceRevision: 1, minSourceRevision: 0,
+    });
+    expect(result.status).toBe('created');
+  });
+
+  it('keeps paraphrased retries suppressed by source tombstones', async () => {
+    state.tombstone = { factId: 'deleted' };
+    const result = await createExtractedCandidate('owner', { ...candidateInput(), text: 'Mornings work best.' });
+    expect(result.status).toBe('source-suppressed');
+    expect(storeMocks.transact).not.toHaveBeenCalled();
+  });
+
+  it('merges equivalent evidence while preserving owner wording and approval', async () => {
+    state.existingFact = {
+      entityType: 'MEMORY_FACT', id: 'existing', ownerId: 'owner', text: 'Owner wording', category: 'schedule', version: 3,
+      approval: 'approved', approvedVersion: 3, source: 'conversation', sourcePartyId: 'party',
+      sourceMessageIds: ['older-source'], syncState: 'synced', createdAt: '2026-01-01', updatedAt: '2026-01-01',
+    };
+    const result = await createExtractedCandidate('owner', { ...candidateInput(), duplicateOf: 'existing' });
+    expect(result.status).toBe('consolidated');
+    expect(result.fact).toMatchObject({ text: 'Owner wording', version: 3, approval: 'approved', sourceMessageIds: ['older-source', 'message-1'] });
+    const actions = storeMocks.transact.mock.calls[0][0];
+    expect(actions.some((action: any) => action.Put?.Item.entityType === 'MEMORY_FACT')).toBe(false);
+  });
+
 });
 

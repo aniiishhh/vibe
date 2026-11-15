@@ -30,7 +30,7 @@ export interface MemoryFact {
   syncError?: string;
   deleted?: boolean;
 }
-export interface MemoryList { memories: MemoryFact[]; profilePreview: string; memoryRevision: number }
+export interface MemoryList { memories: MemoryFact[]; profilePreview: string; memoryRevision: number; extractionState?: 'pending' | 'processing' | 'idle' | 'error'; extractionUpdatedAt?: string }
 export interface CreateMemoryInput { text: string; category?: string; expiresAt?: string; approved?: boolean }
 export interface UpdateMemoryInput { version: number; text?: string; category?: string; expiresAt?: string | null; approved?: boolean }
 export type PartyNoteKind = 'decision' | 'suggestion' | 'constraint' | 'question' | 'disagreement' | 'preference';

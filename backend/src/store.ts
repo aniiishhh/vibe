@@ -281,12 +281,14 @@ export function memoryExtractOutboxItem(
   triggerMessageId: string,
   force: boolean,
   expectedRevision: number,
+  fanout = false,
 ): Item {
   return makeOutboxItem('MEMORY_EXTRACT', partyId, {
     partyId,
     triggerMessageId,
     force,
     expectedRevision,
+    fanout,
   });
 }
 

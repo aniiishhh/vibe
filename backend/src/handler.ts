@@ -434,8 +434,8 @@ async function sendMessage(partyId: string, claims: JwtClaims, event: APIGateway
   };
   const refresh = refreshOutboxItem(partyId);
   const partySync = partySyncOutboxItem(partyId, messageId);
-  const memoryExtract = profile.learningEnabled === true
-    ? memoryExtractOutboxItem(partyId, messageId, mentioned, Number(profile.memoryRevision ?? 0))
+  const memoryExtract = mentioned || profile.learningEnabled === true
+    ? memoryExtractOutboxItem(partyId, messageId, mentioned, Number(profile.memoryRevision ?? 0), mentioned)
     : undefined;
   const transaction: NonNullable<TransactWriteCommandInput['TransactItems']> = [
     membershipCheck(partyId, claims.sub),
@@ -459,6 +459,13 @@ async function sendMessage(partyId: string, claims: JwtClaims, event: APIGateway
     { Put: { TableName: tableName(), Item: partySync, ConditionExpression: 'attribute_not_exists(PK)' } },
     ...(memoryExtract ? [{ Put: { TableName: tableName(), Item: memoryExtract, ConditionExpression: 'attribute_not_exists(PK)' } }] : []),
   ];
+  if (profile.learningEnabled === true) {
+    transaction.push({ Update: { TableName: tableName(), Key: key(`USER#${claims.sub}`, 'PROFILE'),
+      UpdateExpression: 'SET extractionState = :pending, extractionUpdatedAt = :now',
+      ConditionExpression: 'attribute_exists(PK)',
+      ExpressionAttributeValues: { ':pending': 'pending', ':now': createdAt },
+    } });
+  }
   if (mentioned) {
     transaction.push({ Put: { TableName: tableName(), Item: makeOutboxItem('PARTY_NOTES', partyId, { partyId, messageId }), ConditionExpression: 'attribute_not_exists(PK)' } });
     const run: AgentRun = result.run!;
@@ -539,6 +546,8 @@ async function updateProfile(claims: JwtClaims, event: APIGatewayProxyEventV2Wit
     values[':zero'] = 0;
     values[':one'] = 1;
     sets.push('#memoryRevision = if_not_exists(#memoryRevision, :zero) + :one');
+    sets.push('learningBarrierRevision = :barrier');
+    values[':barrier'] = Number(previous.memoryRevision ?? 0) + 1;
   }
   const compareMemoryRevision = input.learningEnabled !== undefined;
   try {

@@ -8,16 +8,16 @@ The user approved Milestone 1 application implementation on November 14, 2026. D
 
 ## November 15 handoff status
 
-The user approved pushing completed **3A, 3C and 3D** to `anish/implementation` while explicitly keeping **3B open**. Milestone 3 as a whole is **partially complete**, not fully accepted. Anish can continue from this checkpoint, but must account for 3B when developing contextual/background learning in Milestone 4. The detailed Milestone 4A/4B/4C plan from Anish's `3e25592` is preserved below.
+**Milestone 3 is implemented and deployed** to the shared account. The user authorized deployment/completion on November 15. The remaining 3B flow passed 25 focused memory checks and a bounded two-user live Haiku acceptance scenario, alongside TinyFish general research and ASU class research. The detailed Milestone 4A/4B/4C plan from Anish's `3e25592` is preserved below.
 
 | Part | Implementation | Verification / remaining work |
 | --- | --- | --- |
 | 3A party memory | Implemented and deployed | Earlier two-user/browser checks passed; latest Haiku behavior remains for manual retesting. |
-| 3B broader personal learning | **Open** | English gate, author-triggered extraction and broader learning/consolidation work remain; checklist below is authoritative. |
+| 3B broader personal learning | Implemented and deployed | 25 focused checks, typechecks, build and bounded live English/Spanish learning, ownership, exclusions, consolidation and correction checks passed. |
 | 3C owner profiles and memory selection | Implemented and deployed | Canonical/privacy/correction checks passed; derived provider prose remains withheld when unverifiable, broad semantic quality remains unevaluated. |
 | 3D research | Implemented and deployed | Class/RMP/web source probes and focused regressions passed; latest expanded filters/syllabus/review behavior awaits manual acceptance. Interactive TinyAgent work is conditional on a demonstrated need. |
 
-Current app: https://d1ia555vbcj8k2.cloudfront.net, shared account 851725603471, Ohio, Haiku 4.5. Final checks: 56 backend tests, 10 adapter tests, typechecks, production build and strict synthesis passed. Live recommendation scenarios were not restarted after the user chose manual testing. See [handoff](milestone-3-handoff.md) and [current status](../STATUS.md).
+Current app: https://d1ia555vbcj8k2.cloudfront.net, shared account 851725603471, Ohio, Haiku 4.5. Earlier 56 backend / 10 adapter checks plus the 25 focused 3B checks, typechecks, production build and strict synthesis passed. The authorized completion check exercised two users and two research requests. See the completion report for observed coverage. See [handoff](milestone-3-handoff.md) and [current status](../STATUS.md).
 
 ## Milestone 0 — configuration
 
@@ -86,16 +86,17 @@ Acceptance requires a discussion that produces a visible sourced decision and an
 
 ### 3B — broader automatic personal learning
 
-The current extractor uses an English first-person filter and runs on an author's mention or ten pending messages from that author.
+Implemented and deployed on November 15. The English-pronoun gate is removed. Every mention fans out in ten-member pages to separate current learning-enabled authors. Author windows contain at most twenty messages / 12,000 source-text characters; scan jobs examine at most 300 rows and continue sparse scans with bounded source-ID carryover. Cursors and remaining-work outbox records commit atomically. Automatic learning increments preserve the owner-change barrier, so continuation survives candidate creation while owner changes suppress stale evidence.
 
-- [ ] Replace the English-pronoun gate with bounded extraction that recognizes self-descriptions and paraphrases. Cover English variants and at least one non-English or mixed-language example, and document the languages actually checked.
-- [ ] Keep subject ownership bound to authenticated message authors and source IDs. Quoted text, third-party claims, agent replies and retrieved webpages must not establish another person's profile.
-- [ ] On an @Vibe request, process eligible pending contributions from learning-enabled party members using bounded per-author jobs. Preserve continuation cursors when a batch exceeds the work budget.
-- [ ] Preserve learning-off behavior, private candidate review, explicit sharing approval and per-party opt-in. Show pending extraction and failures where relevant in the memory UI.
-- [ ] Separate durable personal preferences from trip-specific budgets, temporary availability and party decisions. Preserve party scope and expiry for temporary constraints.
-- [ ] Consolidate repeated facts while retaining provenance. Protect owner edits and source-wide tombstones when extraction is retried or phrased differently.
+- [x] Replace the English-pronoun gate with bounded extraction for self-descriptions and paraphrases. English variants, Spanish and mixed Hindi/English have mocked-provider input/prompt coverage. English pronoun-free and Spanish examples also passed the live Haiku check. Mixed Hindi/English has fixture-only coverage.
+- [x] Bind profile subjects and source IDs to authenticated authors. Each model call receives one author's human messages. Prompts exclude quotations, third-party claims, agent replies and retrieved text as personal evidence; canonical writes validate source ownership again.
+- [x] Process eligible pending contributions from learning-enabled party members on @Vibe mentions, with bounded per-author jobs, paginated membership discovery and continuation cursors. This also works when the mentioning author has learning disabled.
+- [x] Preserve learning-off, candidate review, approval and party opt-in. Show pending extraction, processing and failure state in the owner memory screen.
+- [x] Explicitly classify durable personal evidence separately from temporary availability, one-trip budgets and party decisions in extraction instructions. Temporary constraints stay in party notes, with expiry when the source supplies a definite end.
+- [x] Consolidate equivalent evidence against the newest forty active points. Merge same-party provenance under revision/version checks while preserving owner text and approval. Keep new-party/overflow evidence separately sourced. Tombstones suppress paraphrased retries from deleted/edited sources.
 
-Acceptance requires equivalent preferences expressed in different wording, one documented non-English or mixed-language example, contributions from two authors, and correct handling of a quotation, third-party claim and temporary constraint. Learning-off and stale-job correction/deletion cases must continue to pass.
+Verification used 25 focused memory checks plus workspace typechecks and the production web build. Checks cover two-author routing, non-English input transport, member pagination, sparse scans, continuation after candidate creation, input bounds, failures, learning-off, removed authors, source ownership, consolidation and stale correction/tombstone behavior. The subsequent bounded live Haiku scenario passed English/Spanish extraction, quotation/third-party/one-trip exclusions, two-author source isolation, equivalent-preference consolidation, correction/profile isolation, general TinyFish research and ASU class research. These specific examples satisfy the remaining bounded milestone acceptance. Broader language/recommendation-quality evaluation remains unmeasured. See results/milestone-3-completion-2026-11-15.md.
+
 
 ### 3C — richer profiles and better memory selection
 
@@ -127,7 +128,7 @@ Implemented and deployed; final combined live application assertions passed; cle
 - [x] Display partial results and source failures.
 - [ ] Conditional follow-up: add an asynchronous browser research job when a source demonstrates an interaction need. Current tested sources work through Search/Fetch and typed retrieval; no browser interaction requirement has been observed.
 
-Acceptance requires real class research and a sourced compatibility explanation for two students, plus a general trip or brainstorming question through the same app. The earlier integrated source/browser checkpoint passed on the prior model; latest shared Haiku follow-ups remain for manual acceptance. The research flow must honor a corrected preference and current sharing settings.
+Acceptance requires real class research and a sourced compatibility explanation for two students, plus a general trip or brainstorming question through the same app. The earlier integrated source/browser checkpoint passed on the prior model; the completion scenario also passed shared Haiku ASU class and general TinyFish citation checks. Expanded syllabus/filter/review quality retains the focused fixture/source coverage documented in the earlier reports. The research flow must honor a corrected preference and current sharing settings.
 
 ### Delivery and verification
 

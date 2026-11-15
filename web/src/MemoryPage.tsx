@@ -14,9 +14,9 @@ export function MemoryPage({ api }: { api: VibeApi }) {
   const memoriesQuery = useQuery({
     queryKey: ['memories'],
     queryFn: api.getMemories,
-    refetchInterval: (query) => query.state.data?.memories.some((memory) =>
+    refetchInterval: (query) => (['pending', 'processing'].includes(query.state.data?.extractionState ?? '') || query.state.data?.memories.some((memory) =>
       memory.syncState === 'pending' || memory.syncState === 'processing' || memory.syncState === 'deleting',
-    ) ? 5_000 : false,
+    )) ? 5_000 : false,
   });
   const ownerPreview = useQuery({ queryKey:['owner-profile', memoriesQuery.data?.memoryRevision], queryFn:api.getOwnerProfile, enabled:memoriesQuery.isSuccess });
   const [search, setSearch] = useState('');
@@ -122,6 +122,9 @@ export function MemoryPage({ api }: { api: VibeApi }) {
           <div>
             <h2 id="learning-title">Learn from my messages</h2>
             <p>When this is on, Vibe can turn your own messages into private review candidates. Nothing is shared until you approve it and opt in for a party.</p>
+            {learningEnabled && memoriesQuery.data?.extractionState === 'pending' && <p role="status">Messages are waiting for an @Vibe mention or a batch of ten of your messages.</p>}
+            {learningEnabled && memoriesQuery.data?.extractionState === 'processing' && <p role="status">Reviewing your messages for private memory candidates…</p>}
+            {learningEnabled && memoriesQuery.data?.extractionState === 'error' && <p role="status">Memory extraction encountered an error. Queued retries run automatically. A new @Vibe mention can retry pending messages.</p>}
             {learningError && <p className="inline-error learning-error" role="alert">{learningError}</p>}
           </div>
         </div>

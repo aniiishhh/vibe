@@ -110,6 +110,11 @@ async function enqueueMemory(record: OutboxRecord): Promise<void> {
       triggerMessageId,
       force: record.payload.force === true,
       expectedRevision,
+      fanout: record.payload.fanout === true,
+      ...(typeof record.payload.ownerId === 'string' ? { ownerId: record.payload.ownerId } : {}),
+      ...(typeof record.payload.scanAfter === 'string' ? { scanAfter: record.payload.scanAfter } : {}),
+      ...(Array.isArray(record.payload.pendingMessageIds) ? { pendingMessageIds: record.payload.pendingMessageIds } : {}),
+      ...(typeof record.payload.memberAfter === 'string' ? { memberAfter: record.payload.memberAfter } : {}),
     };
     groupId = partyId;
   } else {

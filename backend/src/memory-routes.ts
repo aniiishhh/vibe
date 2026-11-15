@@ -77,10 +77,13 @@ function renderProfilePreview(facts: MemoryFact[]): string {
 export async function getMemories(claims: JwtClaims): Promise<MemoryList> {
   const profile = await getOrCreateProfile(claims);
   const memories = await listOwnerFacts(claims.sub, { includeDeleted: true });
+  const extraction = await getItem(`USER#${claims.sub}`, 'PROFILE');
   return {
     memories,
     profilePreview: renderProfilePreview(memories),
     memoryRevision: Number(profile.memoryRevision ?? 0),
+    ...(['pending', 'processing', 'idle', 'error'].includes(String(extraction?.extractionState))
+      ? { extractionState: extraction?.extractionState as MemoryList['extractionState'], extractionUpdatedAt: String(extraction?.extractionUpdatedAt ?? '') } : {}),
   };
 }
 

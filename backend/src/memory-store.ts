@@ -31,10 +31,13 @@ export interface ExtractedCandidateInput {
    * because one extraction batch can create several candidates sequentially. */
   sourceRevision?: number;
   expectedRevision: number;
+  minSourceRevision?: number;
+  duplicateOf?: string;
 }
 
 export type ExtractedCandidateStatus =
   | 'created'
+  | 'consolidated'
   | 'duplicate'
   | 'source-suppressed'
   | 'revision-conflict'
@@ -244,7 +247,9 @@ function profileRevisionUpdate(ownerId: string, now: string, expectedRevision?: 
     Update: {
       TableName: tableName(),
       Key: key(`USER#${ownerId}`, 'PROFILE'),
-      UpdateExpression: 'SET #revision = if_not_exists(#revision, :zero) + :one, updatedAt = :now',
+      UpdateExpression: 'SET #revision = if_not_exists(#revision, :zero) + :one, updatedAt = :now' +
+        (!requireLearning && expectedRevision !== undefined ? ', learningBarrierRevision = :barrier' :
+          requireLearning ? ', learningBarrierRevision = if_not_exists(learningBarrierRevision, :barrier)' : ''),
       ...(expectedRevision === undefined ? { ConditionExpression: 'attribute_exists(PK)' } : {
         ConditionExpression: requireLearning
           ? 'attribute_exists(PK) AND #revision = :expected AND #learning = :enabled'
@@ -258,6 +263,7 @@ function profileRevisionUpdate(ownerId: string, now: string, expectedRevision?: 
         ':zero': 0,
         ':one': 1,
         ':now': now,
+        ...(expectedRevision !== undefined ? { ':barrier': requireLearning ? expectedRevision : expectedRevision + 1 } : {}),
         ...(expectedRevision === undefined ? {} : {
           ':expected': expectedRevision,
           ...(requireLearning ? { ':enabled': true } : {}),
@@ -338,6 +344,7 @@ export async function createExtractedCandidate(
     !sourceMessageIds.length || sourceMessageIds.length > 20 ||
     sourceMessageIds.some((id) => !id || id.length > 80) ||
     !Number.isInteger(sourceRevision) || sourceRevision < 0 || sourceRevision > input.expectedRevision ||
+    (input.minSourceRevision !== undefined && (!Number.isSafeInteger(input.minSourceRevision) || input.minSourceRevision < 0 || input.minSourceRevision > sourceRevision)) ||
     !Number.isInteger(input.expectedRevision) || input.expectedRevision < 0
   ) {
     return { status: 'source-invalid', memoryRevision };
@@ -373,7 +380,9 @@ export async function createExtractedCandidate(
   }
   if (sourceItems.some((item) => {
     const stampedRevision = item?.memoryRevisionAtCreation;
-    if (typeof stampedRevision === 'number') return stampedRevision !== sourceRevision;
+    if (typeof stampedRevision === 'number') return input.minSourceRevision === undefined
+      ? stampedRevision !== sourceRevision
+      : stampedRevision < input.minSourceRevision || stampedRevision > sourceRevision;
     // Older messages predate revision stamping. They may be used only before
     // any memory change has advanced the profile revision.
     return currentRevision !== 0 || sourceRevision !== 0;
@@ -386,6 +395,41 @@ export async function createExtractedCandidate(
   );
   const markers = await Promise.all(markerKeys.map((markerKey) => getItem(String(markerKey.PK), String(markerKey.SK))));
   if (markers.some(Boolean)) return { status: 'source-suppressed', memoryRevision: currentRevision };
+
+  // Consolidation keeps the owner's wording and approval. Only same-party
+  // provenance is extended, so private source metadata never crosses parties.
+  const duplicate = input.duplicateOf
+    ? await getOwnerFact(ownerId, input.duplicateOf, { includeDeleted: true })
+    : undefined;
+  if (duplicate) {
+    if (duplicate.deleted) return { status: 'source-suppressed', memoryRevision: currentRevision };
+    if (duplicate.source === 'conversation' && duplicate.sourcePartyId === input.sourcePartyId) {
+      const merged = [...new Set([...(duplicate.sourceMessageIds ?? []), ...sourceMessageIds])];
+      if (merged.length === duplicate.sourceMessageIds?.length) return { status: 'duplicate', fact: duplicate, memoryRevision: currentRevision };
+      if (merged.length <= 20) {
+        const now = new Date().toISOString();
+        try {
+          await transact([
+            profileRevisionUpdate(ownerId, now, currentRevision, true),
+            membershipCheck(input.sourcePartyId, ownerId),
+            { Update: { TableName: tableName(), Key: memoryFactKey(ownerId, duplicate.id),
+              UpdateExpression: 'SET sourceMessageIds = :sources',
+              ConditionExpression: '#version = :version AND (attribute_not_exists(deleted) OR deleted = :false)',
+              ExpressionAttributeNames: { '#version': 'version' },
+              ExpressionAttributeValues: { ':sources': merged, ':version': duplicate.version, ':false': false } } },
+            ...markerKeys.map(markerKey => ({ ConditionCheck: { TableName: tableName(), Key: markerKey, ConditionExpression: 'attribute_not_exists(PK)' } })),
+          ]);
+          return { status: 'consolidated', fact: { ...duplicate, sourceMessageIds: merged }, memoryRevision: currentRevision + 1 };
+        } catch (error) {
+          if (!(error instanceof Error) || error.name !== 'TransactionCanceledException') throw error;
+          return { status: 'revision-conflict', memoryRevision: await getOwnerRevision(ownerId) };
+        }
+      }
+    }
+    // Keep a separate sourced candidate if merging would lose provenance.
+    else if (duplicate.source === 'manual') return { status: 'duplicate', fact: duplicate, memoryRevision: currentRevision };
+    else if (duplicate.sourcePartyId === input.sourcePartyId) return { status: 'duplicate', fact: duplicate, memoryRevision: currentRevision };
+  }
 
   const now = new Date().toISOString();
   const nextRevision = currentRevision + 1;
