@@ -1,3 +1,4 @@
+import { recordPendingMessage, scheduleBackgroundMemory } from './background-memory.js';
 import { defaultProvider } from '@aws-sdk/credential-provider-node';
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 import { QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
@@ -111,6 +112,7 @@ async function enqueueMemory(record: OutboxRecord): Promise<void> {
       force: record.payload.force === true,
       expectedRevision,
       fanout: record.payload.fanout === true,
+      background: record.payload.background === true,
       ...(typeof record.payload.ownerId === 'string' ? { ownerId: record.payload.ownerId } : {}),
       ...(typeof record.payload.scanAfter === 'string' ? { scanAfter: record.payload.scanAfter } : {}),
       ...(Array.isArray(record.payload.pendingMessageIds) ? { pendingMessageIds: record.payload.pendingMessageIds } : {}),
@@ -195,6 +197,7 @@ async function handleStream(event: DynamoDBStreamEvent): Promise<void> {
   for (const record of event.Records) {
     if (record.eventName !== 'INSERT' || !record.dynamodb?.NewImage) continue;
     const item = unmarshall(record.dynamodb.NewImage as never);
+    if (item.entityType === 'MESSAGE' && item.role === 'user') { await recordPendingMessage(item); continue; }
     if (item.entityType !== 'OUTBOX' || item.status !== 'PENDING' || typeof item.effectId !== 'string') continue;
     await dispatchEffect(item.effectId);
   }
@@ -232,5 +235,6 @@ export const handler: Handler<DynamoDBStreamEvent | ScheduledEvent> = async (eve
     await handleStream(event);
     return;
   }
+  await scheduleBackgroundMemory();
   await handleRecovery();
 };

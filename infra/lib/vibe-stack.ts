@@ -1,3 +1,4 @@
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { DEFAULT_MODEL_ID } from '@vibe/shared';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -155,6 +156,7 @@ export class VibeStack extends Stack {
     const apiFunction = this.createNodeFunction('ApiFunction', 'api', 'handler.ts', 30, 512, {
       TABLE_NAME: table.tableName,
       SUPERMEMORY_PARAMETER_NAME: supermemoryParameterName,
+      INVITE_SENDER_PARAMETER: `/vibe/${STAGE}/invite-sender`,
     });
     const agentFunction = this.createNodeFunction('AgentFunction', 'agent', 'agent.ts', 150, 1024, {
       TABLE_NAME: table.tableName,
@@ -169,6 +171,9 @@ export class VibeStack extends Stack {
       TABLE_NAME: table.tableName,
       AGENT_QUEUE_URL: agentQueue.queueUrl,
       MEMORY_QUEUE_URL: memoryQueue.queueUrl,
+      METERED_FEATURES_ENABLED: 'true',
+      MEMORY_IDLE_SECONDS: '120',
+      MEMORY_BACKGROUND_INTERVAL_SECONDS: '300',
     });
     const subscriptionFunction = this.createNodeFunction(
       'SubscriptionFunction',
@@ -188,6 +193,10 @@ export class VibeStack extends Stack {
     });
     memoryFunction.addEnvironment('APP_STAGE', STAGE);
 
+    const inviteSender = ssm.StringParameter.valueForStringParameter(this, `/vibe/${STAGE}/invite-sender`);
+    apiFunction.addToRolePolicy(new iam.PolicyStatement({ actions: ['ses:SendEmail','ses:GetEmailIdentity'], resources: [`arn:${Stack.of(this).partition}:ses:${Stack.of(this).region}:${Stack.of(this).account}:identity/${inviteSender}`] }));
+    apiFunction.addToRolePolicy(new iam.PolicyStatement({ actions: ['ses:GetAccount'], resources: ['*'] }));
+    apiFunction.addToRolePolicy(new iam.PolicyStatement({ actions: ['ssm:GetParameter'], resources: [Stack.of(this).formatArn({ service:'ssm', resource:'parameter', resourceName:`vibe/${STAGE}/invite-sender` })] }));
     apiFunction.addEnvironment('APP_STAGE', STAGE);
     agentFunction.addEnvironment('APP_STAGE', STAGE);
     dispatcherFunction.addEnvironment('APP_STAGE', STAGE);
@@ -223,10 +232,10 @@ export class VibeStack extends Stack {
     table.grantStreamRead(dispatcherFunction);
     dispatcherFunction.addToRolePolicy(
       new iam.PolicyStatement({
-        actions: ['dynamodb:GetItem', 'dynamodb:Query', 'dynamodb:UpdateItem'],
+        actions: ['dynamodb:GetItem', 'dynamodb:Query', 'dynamodb:UpdateItem', 'dynamodb:PutItem', 'dynamodb:DeleteItem', 'dynamodb:ConditionCheckItem'],
         resources: [table.tableArn, `${table.tableArn}/index/GSI2`],
         conditions: {
-          'ForAllValues:StringLike': { 'dynamodb:LeadingKeys': ['OUTBOX#*'] },
+          'ForAllValues:StringLike': { 'dynamodb:LeadingKeys': ['OUTBOX#*', 'PARTY#*', 'MEMORY_PENDING', 'MEMORY#PENDING#0'] },
         },
       }),
     );
@@ -366,6 +375,10 @@ export class VibeStack extends Stack {
           eventName: ['INSERT'],
           dynamodb: { NewImage: { status: { S: ['PENDING'] } } },
         }),
+        lambda.FilterCriteria.filter({
+          eventName: ['INSERT'],
+          dynamodb: { NewImage: { entityType: { S: ['MESSAGE'] }, role: { S: ['user'] } } },
+        }),
       ],
     });
     dispatcherFunction.addEventSource(streamEventSource);
@@ -474,6 +487,8 @@ export class VibeStack extends Stack {
         },
       },
     });
+
+    apiFunction.addEnvironment('APP_URL', `https://${distribution.distributionDomainName}`);
 
     const webDeployLogs = new logs.LogGroup(this, 'WebDeploymentLogs', {
       logGroupName: `/vibe/${STAGE}/web-deployment`,

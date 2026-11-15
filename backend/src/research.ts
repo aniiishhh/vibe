@@ -1,3 +1,4 @@
+import { taskInput } from './tasks.js';
 import { createHash } from 'node:crypto';
 import { semesterPattern, normalizeCourseTerms } from './semester.js';
 import { getItem, key as itemKey, tableName, transact } from './store.js';
@@ -184,6 +185,7 @@ export async function runResearch(options: {
     invoke: (messages: Message[], tools: Tool[]) => Promise<ConverseCommandOutput>;
     load: () => Promise<ResearchState | undefined>;
     save: (state: ResearchState) => Promise<void>;
+    executeAction?: (name: string, input: unknown) => Promise<unknown>;
 }) {
     const s = await options.load() ?? { messages: options.messages, round: 0, calls: 0, searches: 0, fetches: 0, characters: 0, inputTokens: 0, outputTokens: 0, citations: [], warnings: [], nextTool: 0 };
     while (s.round < 5) {
@@ -201,7 +203,11 @@ export async function runResearch(options: {
                 s.warnings.push('Research call limit reached; this answer uses the evidence already collected.');
                 conversation.at(-1)?.content?.push({text:'Research is finished. Answer only the current user request from the captured evidence; do not recap earlier tasks or unrelated findings. Explain relevant missing information. No additional tools are available.'});
             }
-            const r = await options.invoke(conversation, s.round < 4 ? tools : []);
+            const actionTools: Tool[] = options.executeAction ? [
+                { toolSpec: { name: 'propose_task', description: 'Propose a persistent party task. This never accepts an assignment for someone. Use authenticated member IDs from party context.', inputSchema: { json: z.toJSONSchema(taskInput) as never } } },
+                { toolSpec: { name: 'propose_task_change', description: 'Propose a versioned task change. Its assignee must accept the revised assignment.', inputSchema: { json: z.toJSONSchema(z.object({ taskId: z.string(), version: z.number().int().positive(), proposal: taskInput }).strict()) as never } } },
+            ] : [];
+            const r = await options.invoke(conversation, s.round < 4 ? [...tools, ...actionTools] : []);
             if (!r.output?.message)
                 throw Error('Missing model response');
             s.response = r.output.message;
@@ -229,7 +235,13 @@ export async function runResearch(options: {
             if (!call.name || !call.toolUseId)
                 throw Error('Invalid model tool request');
             await options.save(s);
-            const result = await executeTool(call.name, call.input, s, options.deadline, () => options.save(s));
+            let result: unknown;
+            if (['propose_task','propose_task_change'].includes(call.name) && options.executeAction) {
+                try {
+                    if (++s.calls > 8) throw new Error('Action budget reached');
+                    result = { status: 'ok', task: await options.executeAction(call.name, call.input) };
+                } catch(error) { result = { status: 'error', error: error instanceof Error ? error.message : 'Task action failed' }; }
+            } else result = await executeTool(call.name, call.input, s, options.deadline, () => options.save(s));
             s.messages.at(-1)!.content!.push({ toolResult: { toolUseId: call.toolUseId, content: [{ text: JSON.stringify(result) }] } });
             s.nextTool = i + 1;
             await options.save(s);

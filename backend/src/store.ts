@@ -162,6 +162,8 @@ export function toParty(item: Item): Party {
     id: String(item.id),
     name: String(item.name),
     goal: String(item.goal),
+    mode: item.mode === 'focused' || item.mode === 'banter' ? item.mode : 'friendly',
+    settingsVersion: Number(item.settingsVersion ?? 0),
     ownerId: String(item.ownerId),
     createdAt: String(item.createdAt),
   };

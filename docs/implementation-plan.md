@@ -136,40 +136,45 @@ Start with the structured party-note write path and extraction ownership safegua
 
 ## Milestone 4 — contextual participation, background learning, plans and modes
 
+Implemented and deployed on November 15 with user authorization. 77 backend tests, typechecks, production build and strict synthesis passed. The live two-user scenario passed contextual camping agreement/withdrawal, quiet private learning without mentions, task proposals and versioned self-actions, all modes, a real sandbox SES invitation and desktop controls. See [completion evidence](results/milestone-4-completion-2026-11-15.md). Arbitrary-recipient email requires SES production access; sandbox eligibility is shown by the app.
+
 ### 4A — understand short replies using surrounding conversation
 
-- [ ] Give extraction a bounded, chronologically ordered window containing the relevant proposal and surrounding messages from multiple speakers. Carry stable author IDs, message IDs, party ID, timestamps and available reply-to links. Start with the existing 40-message / 12,000-character context budget.
-- [ ] Resolve short responses such as “That sounds fun, I’m in” against the specific activity or proposal they answer. Prefer explicit reply links; use nearby context only when the reference is unambiguous.
-- [ ] Record participation as a party-scoped fact linking the participant’s own response to the proposal’s source messages. Preserve suggested, confirmed and unresolved states, plus corrections or withdrawal.
-- [ ] Keep durable personal learning tied to evidence the subject authored about themselves. A one-time agreement to join an activity establishes participation in that plan; creating a reusable interest requires explicit durable evidence and the existing candidate/approval flow.
-- [ ] Use other speakers’ messages to resolve context while preserving profile ownership. Respect learning controls, current membership, source access, correction versions and tombstones.
-- [ ] When several proposals could fit, or the referenced proposal falls outside accessible context, retain an unresolved reference and surface the need for clarification. Keep task acceptance bound to the authenticated acceptance workflow and the actual task scope.
+- [x] Give extraction a bounded, chronologically ordered window containing the relevant proposal and surrounding messages from multiple speakers. Carry stable author IDs, message IDs, party ID, timestamps and available reply-to links. Start with the existing 40-message / 12,000-character context budget.
+- [x] Resolve short responses such as “That sounds fun, I’m in” against the specific activity or proposal they answer. Prefer explicit reply links; use nearby context only when the reference is unambiguous.
+- [x] Record participation as a party-scoped fact linking the participant’s own response to the proposal’s source messages. Preserve suggested, confirmed and unresolved states, plus corrections or withdrawal.
+- [x] Keep durable personal learning tied to evidence the subject authored about themselves. A one-time agreement to join an activity establishes participation in that plan; creating a reusable interest requires explicit durable evidence and the existing candidate/approval flow.
+- [x] Use other speakers’ messages to resolve context while preserving profile ownership. Respect learning controls, current membership, source access, correction versions and tombstones.
+- [x] When several proposals could fit, or the referenced proposal falls outside accessible context, retain an unresolved reference and surface the need for clarification. Keep task acceptance bound to the authenticated acceptance workflow and the actual task scope.
 
 Acceptance requires a conversation where A proposes camping and B replies “I’m in,” producing a sourced participation record for B. Also check two competing proposals, an explicit reply to an older proposal, a quoted agreement, a withdrawal and a removed member. Personal memory should gain a camping preference only when B supplies explicit durable evidence and permits the corresponding learning/sharing steps.
 
 ### 4B — learn from quieter users without mentions
 
-- [ ] Add a time-based trigger alongside mentions and message-count triggers. When a human message is saved, maintain a queryable per-party pending-work marker and per-author extraction cursors.
-- [ ] As an initial configurable policy, make work eligible after two minutes of party inactivity and discover it on a five-minute scheduled tick. Reuse the recovery schedule where practical. Document the resulting scheduling delay separately from provider processing time.
-- [ ] At the first eligible tick, enqueue bounded contextual extraction for pending contributions, including learning-enabled authors with fewer than ten messages. Include the surrounding conversation needed by 4A and retain continuation cursors for additional batches.
-- [ ] Recheck each author’s learning setting, current membership and memory revision when the job starts and before candidate writes. Preserve the existing private-candidate, owner-approval and per-party sharing controls.
-- [ ] Deduplicate timer, mention and message-count jobs against their covered source boundaries. A delayed job must preserve later edits, deletions and withdrawals. Schedule remaining work after a partial batch and stop scheduling when the backlog is drained.
-- [ ] Bound background model work with a configurable initial limit of one timer-triggered batch per party per five minutes, the existing batch/context limits, metered-feature switch and persisted usage controls. Skip model calls for empty or already-covered work. Keep extraction silent in the chat while exposing processing/errors in the memory UI.
+- [x] Add a time-based trigger alongside mentions and message-count triggers. When a human message is saved, maintain a queryable per-party pending-work marker and per-author extraction cursors.
+- [x] As an initial configurable policy, make work eligible after two minutes of party inactivity and discover it on a five-minute scheduled tick. Reuse the recovery schedule where practical. Document the resulting scheduling delay separately from provider processing time.
+- [x] At each eligible tick, enqueue one bounded contextual extraction batch, processing one pending learning-enabled author, including authors with fewer than ten messages, plus shared contextual notes. Additional authors/backlog remain pending for later ticks. Include the surrounding conversation needed by 4A and retain continuation cursors for additional batches.
+- [x] Recheck each author’s learning setting, current membership and memory revision when the job starts and before candidate writes. Preserve the existing private-candidate, owner-approval and per-party sharing controls.
+- [x] Deduplicate timer, mention and message-count jobs against their covered source boundaries. A delayed job must preserve later edits, deletions and withdrawals. Schedule remaining work after a partial batch and stop scheduling when the backlog is drained.
+- [x] Bound background model work with a configurable initial limit of one timer-triggered batch per party per five minutes, the existing batch/context limits, metered-feature switch and persisted usage controls. Skip model calls for empty or already-covered work. Keep extraction silent in the chat while exposing processing/errors in the memory UI.
 
-Acceptance requires an opted-in user to contribute two eligible statements, never tag @Vibe and remain below ten messages. After the configured idle period and scheduled tick, private candidates should appear. Check learning disabled, no new messages, duplicate ticks overlapping a mention, a multi-batch backlog, membership removal and a correction/deletion while work is queued. Record observed candidate latency and model-call counts.
+Acceptance requires an opted-in user to contribute two eligible statements, never tag @Vibe and remain below ten messages. After the configured idle period and scheduled tick, private candidates should appear. Check learning disabled, no new messages, duplicate ticks overlapping a mention, a multi-batch backlog, membership removal and a correction/deletion while work is queued. Observed quiet-candidate latency was 141 seconds after an explicitly invoked scheduled-handler pass following the actual idle threshold. The batch made two successful model requests, using 3,388 input and 507 output tokens. The enabled five-minute schedule normally adds discovery delay, yielding approximately two to seven minutes plus queue/provider processing.
 
 ### 4C — shared tasks, modes and email
 
-- [ ] Persist proposed tasks and versioned edit proposals.
-- [ ] Members accept, claim, decline and complete their own assignments.
-- [ ] Material changes require renewed acceptance.
-- [ ] Duplicate tool execution returns the recorded action result.
-- [ ] Focused, Friendly and Banter tone settings.
-- [ ] Application-sent email through SES when sender and delivery access are ready.
+- [x] Persist proposed tasks and versioned edit proposals.
+- [x] Members accept, claim, decline and complete their own assignments.
+- [x] Material changes require renewed acceptance.
+- [x] Duplicate tool execution returns the recorded action result.
+- [x] Focused, Friendly and Banter tone settings.
+- [x] Application-sent email through SES with the verified sender, availability/sandbox feedback and idempotent recorded results. A real mailbox-simulator send passed. Arbitrary-recipient production delivery awaits AWS approval outside the current sandbox configuration.
 
 Acceptance requires task persistence after reload, participant acceptance and rejection of unauthorized state transitions. Complete the contextual participation and quiet-user background-learning acceptance scenarios above as part of this milestone.
 
 ## Milestone 5 — demonstration and submission
+
+- [ ] Integrate the existing `anish/ui` branch as the UI/mascot source. Preserve its mascot, themes, backdrops, mentions and interactions while wiring the current memory, research, participation, tasks, modes and invitation APIs. Resolve frontend overlap against the latest implementation branch and deploy the integrated interface. Use the branch's components and styling for this integration. Reviewed source revision is `5971cd76de3f6c0c72e6f81975da962017e64754`; fetch the latest branch before merging. Preserve Milestone 4 reply links, participation controls, task acceptance/revisions, mode settings and email status when reconciling frontend overlap.
+
 
 - [ ] Mobile QR, conversation, memory and plan flows.
 - [ ] Real-device test on the deployed URL.

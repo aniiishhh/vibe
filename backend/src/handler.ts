@@ -1,5 +1,7 @@
 import { ownerProfile } from './owner-profile.js';
 import { createPartyNote, changePartyNote, createPartyNoteInput, editPartyNoteInput, deletePartyNoteInput } from './party-notes.js';
+import { emailInviteAvailability, sendEmailInvite } from './email-invites.js';
+import { listTasks, mutateTask } from './tasks.js';
 import { createHash, randomBytes } from 'node:crypto';
 import type {
   APIGatewayProxyEventV2WithJWTAuthorizer,
@@ -59,6 +61,7 @@ const profileInput = z.object({
 const messageInput = z.object({
   text: z.string().trim().min(1).max(4_000),
   clientId: z.uuid(),
+  replyToId: z.string().min(1).max(80).optional(),
 });
 const pageInput = z.object({ limit: z.coerce.number().int().min(1).max(50).default(50) });
 
@@ -130,6 +133,7 @@ function mapMessage(item: Item): Message {
     role: item.role === 'assistant' ? 'assistant' : 'user',
     text: String(item.text),
     createdAt: String(item.createdAt),
+    ...(typeof item.replyToId === 'string' ? { replyToId: item.replyToId } : {}),
     ...(typeof item.runId === 'string' ? { runId: item.runId } : {}),
     ...(Array.isArray(item.citations) ? {citations:item.citations as NonNullable<Message['citations']>} : {}),
     ...(Array.isArray(item.researchWarnings) ? {researchWarnings:item.researchWarnings as string[]} : {}),
@@ -397,6 +401,7 @@ async function sendMessage(partyId: string, claims: JwtClaims, event: APIGateway
   const previous = await getItem(String(clientKey.PK), String(clientKey.SK));
   if (previous && previous.result && typeof previous.result === 'object') return previous.result as SendResult;
 
+  if (input.replyToId && !await getItem(`PARTY#${partyId}`, `MSG#${input.replyToId}`)) throw new AppError(400, 'INVALID_REPLY', 'Reply to a message in this party.');
   const partyMeta = await getItem(`PARTY#${partyId}`, 'META');
   const profile = await getOrCreateProfile(claims);
   const messageId = ulid();
@@ -410,6 +415,7 @@ async function sendMessage(partyId: string, claims: JwtClaims, event: APIGateway
     authorName: profile.name,
     role: 'user',
     text: input.text,
+    ...(input.replyToId ? { replyToId: input.replyToId } : {}),
     createdAt,
     ...(mentioned ? { runId: messageId } : {}),
   };
@@ -430,6 +436,7 @@ async function sendMessage(partyId: string, claims: JwtClaims, event: APIGateway
     entityType: 'MESSAGE',
     ...message,
     memoryRevisionAtCreation: Number(profile.memoryRevision ?? 0),
+    memoryLearningEnabledAtCreation: profile.learningEnabled === true,
     notesEpochAtCreation: Number(partyMeta?.notesEpoch ?? 0),
   };
   const refresh = refreshOutboxItem(partyId);
@@ -580,6 +587,31 @@ async function route(event: APIGatewayProxyEventV2WithJWTAuthorizer, claims: Jwt
   if (path === '/api') path = '/';
   else if (path.startsWith('/api/')) path = path.slice(4);
   const parts = path.split('/').filter(Boolean).map((part) => decodeURIComponent(part));
+  if (parts[0] === 'parties' && parts[1] && parts[2] === 'email-invites' && parts.length === 3) {
+    await requireParty(parts[1], claims.sub);
+    if (method === 'GET') return response(200, await emailInviteAvailability());
+    if (method === 'POST') return response(200, await sendEmailInvite(parts[1], claims.sub, parseBody(event,z.unknown()), () => createInvite(parts[1],claims)));
+  }
+  if (parts[0] === 'parties' && parts[1] && parts[2] === 'tasks') {
+    if (parts.length === 3 && method === 'GET') return response(200, { tasks: await listTasks(parts[1], claims.sub) });
+    if ((parts.length === 3 && method === 'POST') || (parts.length === 4 && method === 'PATCH')) {
+      return response(parts.length === 3 ? 201 : 200, await mutateTask(parts[1], claims.sub, parseBody(event, z.unknown()), parts[3]));
+    }
+  }
+  if (parts[0] === 'parties' && parts[1] && parts.length === 2 && method === 'PATCH') {
+    const input = parseBody(event, z.object({ mode: z.enum(['focused','friendly','banter']), version: z.number().int().nonnegative() }).strict());
+    const party = await requireParty(parts[1], claims.sub);
+    if (party.ownerId !== claims.sub) throw forbidden();
+    try {
+      await transact([membershipCheck(parts[1], claims.sub), { Update: { TableName: tableName(), Key: key(`PARTY#${parts[1]}`, 'META'),
+        UpdateExpression: 'SET #mode = :mode, settingsVersion = :next',
+        ConditionExpression: input.version === 0 ? 'attribute_exists(PK) AND (attribute_not_exists(settingsVersion) OR settingsVersion = :version)' : 'settingsVersion = :version',
+        ExpressionAttributeNames: { '#mode': 'mode' }, ExpressionAttributeValues: { ':mode': input.mode, ':next': input.version+1, ':version': input.version } } },
+        { Put: { TableName: tableName(), Item: refreshOutboxItem(parts[1]) } }]);
+    } catch(error) { if (isTransactionCanceled(error)) throw new AppError(409,'SETTINGS_CONFLICT','Party settings changed. Reload and try again.'); throw error; }
+    return response(200, await requireParty(parts[1], claims.sub));
+  }
+
 
   if (parts.length === 1 && parts[0] === 'me' && method === 'GET') {
     return response(200, await getOrCreateProfile(claims));

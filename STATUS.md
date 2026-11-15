@@ -4,7 +4,24 @@ Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementatio
 
 ## Milestone state
 
-**Milestone 3 is implemented and deployed** on the shared app from `anish/implementation`. The user authorized completion and deployment on November 15. A bounded two-user live Haiku scenario passed the remaining 3B acceptance checks, general TinyFish research and ASU class research. Milestone 4A/4B/4C is the next implementation work. See [the completion report](docs/results/milestone-3-completion-2026-11-15.md) for exact coverage and limits.
+**Milestone 3 is implemented and deployed** on the shared app from `anish/implementation`. The user authorized completion and deployment on November 15. A bounded two-user live Haiku scenario passed the remaining 3B acceptance checks, general TinyFish research and ASU class research. Milestone 4 is also implemented/deployed and verified below. Milestone 5, including the requested `anish/ui` integration, is next. See [the completion report](docs/results/milestone-3-completion-2026-11-15.md) for exact coverage and limits.
+
+### November 15 Milestone 4 completion
+
+The user authorized full Milestone 4 implementation, deployment and bounded verification. `Vibe-dev` reached UPDATE_COMPLETE after the 11:22 UTC update. API, agent, dispatcher, memory and research functions are Active/Successful. This update deployed API/agent/dispatcher/memory packages and frontend assets, expanded the source-message stream filter and scoped dispatcher/SES permissions, and reused the enabled five-minute recovery schedule. Existing account, Ohio endpoints, Haiku model and provider secrets serve this milestone.
+
+- **4A** adds explicit message replies and bounded multi-author context with older linked proposals, party-scoped suggested/confirmed/unresolved/withdrawn participation, sourced ownership, owner corrections and stale-response/tombstone guards. A one-time agreement stays outside durable personal preferences.
+- **4B** adds monotonic stream-maintained party/author pending markers, two-minute inactivity eligibility and discovery on the existing five-minute schedule. A party gets at most one timer batch per five minutes, enforced transactionally with a persisted batch counter. Each batch handles one eligible author and a shared contextual-notes phase. Longer author backlogs stay pending for another tick. Mention/count triggers reuse the same canonical cursors. Empty/covered work skips model calls.
+- **4C** adds persistent task proposals and version histories, owner/proposer revisions, authenticated self-accept/claim/decline/complete actions, renewed acceptance after material edits, and recorded-action replay. Native agent tools can propose tasks and revisions. They cannot accept assignments for people. Party owners choose Focused/Friendly/Banter with version guards.
+- Application email invitations read a verified user-selected sender from SSM String `/vibe/dev/invite-sender`. Real SES sending and recorded-result replay passed with the mailbox simulator. SES remains in sandbox mode. The app explains permitted recipients and reports failed/uncertain delivery. A timeout preserves uncertainty to avoid automatic duplicate sends. Arbitrary-recipient delivery requires separate SES production access. No production-access request was submitted.
+
+**77 backend tests**, workspace types, production build, strict synthesis and deployment passed. The UI detector found no issues in the changed targets. One two-user live scenario passed task persistence/idempotency/permissions/version transitions, all three mode settings, actual SES simulator sending, quiet-user candidates, source ownership, quoted-agreement exclusion, contextual participation and withdrawal, native agent task proposals, authenticated claims, owner previews and removed-member rejection. Desktop browser task controls and the stored mode were checked. The 390px viewport check found no horizontal overflow. Full mobile/physical-device coverage remains in Milestone 5.
+
+Quiet learning produced two private candidates **141 seconds** after the last human message, with no @Vibe mention and fewer than ten own messages. The completion check invoked the actual scheduled-handler path after the real two-minute idle period. Its enabled EventBridge rule remains `rate(5 minutes)`, so ordinary eligible discovery can take approximately two to seven minutes after the final message, followed by worker/provider latency. The observed idle batch made **two successful model requests** with **3,388 input / 507 output tokens** across personal and shared-context extraction. The learning-disabled member gained no private candidates, and joining camping created no reusable camping preference.
+
+Both temporary Cognito users, 92 canonical fixture records and all fixture Supermemory namespaces were removed. Provider deletion followed the 95-second in-flight-write wait. See [the completion report](docs/results/milestone-4-completion-2026-11-15.md).
+
+The user named `anish/ui` as the UI/mascot source. Milestone 5 explicitly integrates that branch's themes, backdrops, mascot and interactions with the current feature APIs. Milestone 4 adds functional controls within the existing components and styling. The reviewed UI branch revision is `5971cd76de3f6c0c72e6f81975da962017e64754`; fetch its latest revision before integration.
 
 ### November 15 Milestone 3 completion
 
@@ -26,13 +43,13 @@ Completion cleanup succeeded. Both temporary Cognito users, 87 canonical fixture
 | 3B broader personal learning | Implemented/deployed. Focused checks and bounded live English/Spanish learning, ownership, consolidation and correction scenario passed. |
 | 3C profiles/retrieval | Implemented/deployed: owner-only categorized canonical previews, provider freshness, validated shared retrieval and correction fallback. Unverifiable provider prose is withheld. |
 | 3D research | Implemented/deployed: bounded ASU/RMP/syllabus/TinyFish tools, native Haiku tool loop, citations, schedule comparison and source/coverage labels. Latest shared Haiku ASU class lookup and general TinyFish citation checks passed. Broad recommendation-quality evaluation remains outside the bounded check. |
-| 4 | Planned, not implemented. Anish's 3e25592 plan for 4A contextual participation, 4B quiet-user background learning and 4C tasks/modes/email is preserved. |
+| 4 | Implemented/deployed. 77 backend tests and bounded live two-user checks passed for contextual participation, quiet learning, tasks, modes and SES simulator invitations. |
 
-Read [the handoff](docs/milestone-3-handoff.md) and [implementation plan](docs/implementation-plan.md) before continuing. The deployed 3B extractor/cursor changes provide the starting point for 4A/4B.
+Read [the handoff](docs/milestone-3-handoff.md) and [implementation plan](docs/implementation-plan.md) before continuing. Milestone 4 builds on those 3B cursors. Continue with Milestone 5 and the `anish/ui` integration.
 
 ## Current shared deployment
 
-**https://d1ia555vbcj8k2.cloudfront.net** — stack `Vibe-dev`, account **851725603471**, **us-east-2**, **UPDATE_COMPLETE**. Latest deployment updated API/dispatcher/memory/agent/research packages and frontend assets. All five functions are Active/Successful. Agent and memory workers use **us.anthropic.claude-haiku-4-5-20251001-v1:0**. Different-model fallback is disabled for evaluation. Anthropic first-use setup and a real READY invocation succeeded before the shared model switch.
+**https://d1ia555vbcj8k2.cloudfront.net** — stack `Vibe-dev`, account **851725603471**, **us-east-2**, **UPDATE_COMPLETE**. Latest deployment updated API/dispatcher/memory/agent packages, stream filtering, scoped permissions and frontend assets. The research package retains its Milestone 3 deployment. All five functions are Active/Successful. Agent and memory workers use **us.anthropic.claude-haiku-4-5-20251001-v1:0**. Different-model fallback is disabled for evaluation. Anthropic first-use setup and a real READY invocation succeeded before the shared model switch.
 
 | Setting | Value |
 | --- | --- |
@@ -45,6 +62,8 @@ Read [the handoff](docs/milestone-3-handoff.md) and [implementation plan](docs/i
 | FIFO queues | vibe-dev-agent.fifo / vibe-dev-memory.fifo in this account |
 | Research Lambda | vibe-dev-research, Python 3.12 x86_64, IAM invocation only |
 | Provider credentials | SSM SecureStrings /vibe/dev/supermemory-api-key and /vibe/dev/tinyfish-api-key |
+| Invitation sender | SSM String /vibe/dev/invite-sender, verified SES identity in Ohio, sandbox sending |
+| Background discovery | Enabled rate(5 minutes), 120-second idle threshold, at most one party batch per 300 seconds |
 
 Bhavesh's local AWS profile `vibe-team` is IAM user bhavesh; its VibeDeployers group currently has AdministratorAccess and SignInLocalDevelopmentAccess. On another machine use the developer's own authorized profile and verify STS account before AWS mutations. The earlier scoped policy example in docs/aws/ is not required while admin access is effective. Runtime roles independently use scoped permissions, including the Haiku profile and its verified US destination-model ARNs.
 
@@ -60,13 +79,15 @@ The existing **Monthly Budget $50** was confirmed; it notifies rather than enfor
 
 ## Final verification and limits
 
-**56 backend tests and 10 adapter tests passed** before the teammate handoff. The 3B update passed **25 focused memory checks**, workspace typechecks, production build and strict CDK synthesis. A subsequent authorized two-user live Haiku scenario passed the checks recorded in the completion report. Diff/whitespace checks passed. The existing frontend bundle-size advisory remains. Planned source/docs were scanned for credential patterns; no provider keys, AWS access IDs or private-key blocks were found. Ignored secrets, generated wheels, CDK output and browser credentials are excluded. The unrelated `output/imagegen/vibe-devpost-thumbnail.png` is preserved locally and excluded from this handoff.
+**56 backend tests and 10 adapter tests passed** before the teammate handoff. The subsequent Milestone 4 update passed **77 backend tests**. The 3B update passed **25 focused memory checks**, workspace typechecks, production build and strict CDK synthesis. A subsequent authorized two-user live Haiku scenario passed the checks recorded in the completion report. Diff/whitespace checks passed. The existing frontend bundle-size advisory remains. Planned source/docs were scanned for credential patterns; no provider keys, AWS access IDs or private-key blocks were found. Ignored secrets, generated wheels, CDK output and browser credentials are excluded. The unrelated `output/imagegen/vibe-devpost-thumbnail.png` is preserved locally and excluded from this handoff.
 
 Earlier private-account multi-user/browser/source assertions passed, with cleanup recovery documented. The November 15 completion check used two temporary shared-account users and two @Vibe requests. It passed pronoun-free English and Spanish private learning, quote/third-party/one-trip exclusions, source ownership, equivalent-fact provenance consolidation, corrected owner previews, real TinyFish general research and sourced ASU class research. It produced two and three initial candidates for the respective users. The public frontend asset includes the new extraction-state UI. This check covers specific observed examples. Broad recommendation-quality evaluation and a new browser/mobile interaction pass remain outside its scope. The earlier stopped eight-call synthetic evaluation remains historical evidence only.
 
 External source coverage is bounded and availability can change. The checked live syllabus probe earlier returned not_found; syllabus extraction/ranking has offline fixture coverage. Derived provider abstractions with unverifiable inputs are withheld. Broad semantic/language quality, physical-device and inbox-confirmation checks remain open. Conditional asynchronous TinyAgent browser research awaits an actual interaction need. Two older synthetic PARTY_NOTES dead-letter jobs in the retained private account were left untouched; no queue was purged.
 
 Evidence:
+
+- [Milestone 4 completion and deployment](docs/results/milestone-4-completion-2026-11-15.md)
 
 - [Milestone 3 completion and deployment](docs/results/milestone-3-completion-2026-11-15.md)
 
@@ -80,7 +101,7 @@ Evidence:
 
 Use Node 24+, npm and Python 3.12/pip. `npm ci`; prepare a local `.venv` and install research/requirements.txt plus pytest; build the research asset with `npm run build:research`; run tests/typechecks and `npm run build`. See [research setup/provenance](research/README.md). The vendored clients are sufficient to build; the ignored SameClass reference checkout is optional.
 
-The completion deployment used Anish’s local `default` profile, verified as account 851725603471. For shared deployment set your own AWS_PROFILE, AWS_REGION=us-east-2, VIBE_AWS_ACCOUNT=851725603471, VIBE_AWS_REGION=us-east-2 and VIBE_LOW_QUOTA=false. Run strict `npm run synth`, review `npm run diff -w infra`, then deploy only within the current chat's authorization. Do not overwrite secrets or change account/region implicitly.
+The completion deployment used Anish’s local `default` profile, verified as account 851725603471. For shared deployment set your own AWS_PROFILE, AWS_REGION=us-east-2, VIBE_AWS_ACCOUNT=851725603471, VIBE_AWS_REGION=us-east-2 and VIBE_LOW_QUOTA=false. The existing `/vibe/dev/invite-sender` parameter is required by the SES identity-scoped deployment policy. In a new account, verify a sender in that region and create this String parameter before synthesis/deployment. Run strict `npm run synth`, review `npm run diff -w infra`, then deploy only within the current chat's authorization. Do not overwrite secrets or change account/region implicitly.
 
 Local `web/.env.local` is ignored and currently targets this shared backend; another machine must copy `web/.env.example` and fill the public values above. Use the absolute API Gateway URL locally. Production loads `/config.json`. Local provider keys are not needed for frontend-only work.
 

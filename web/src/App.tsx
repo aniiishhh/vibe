@@ -1,3 +1,4 @@
+import { PartyTasks } from './PartyTasks';
 import type { PartyNoteKind } from '@vibe/shared';
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { createContext, useContext } from 'react';
@@ -540,6 +541,7 @@ function PartyPage({ config }: { config: RuntimeConfig }) {
     void queryClient.invalidateQueries({ queryKey: ['party', partyId] });
     void queryClient.invalidateQueries({ queryKey: ['members', partyId] });
     void queryClient.invalidateQueries({ queryKey: ['party-facts', partyId] });
+    void queryClient.invalidateQueries({ queryKey: ['tasks', partyId] });
     void queryClient.invalidateQueries({ queryKey: ['parties'] });
   };
 
@@ -609,6 +611,7 @@ function PartyPage({ config }: { config: RuntimeConfig }) {
         onInvite={() => setInviteOpen(true)}
         onRetryMembers={() => void membersQuery.refetch()}
       />
+      <PartyTasks api={api} party={partyQuery.data} members={membersQuery.data ?? []} viewerId={user?.id ?? ''} />
       <PartyFactsPanel party={partyQuery.data} members={membersQuery.data ?? []} />
       <ChatPanel
         party={partyQuery.data}
@@ -745,7 +748,7 @@ function PartyFactsPanel({ party, members }: { party: Party; members: Member[] }
         <p className="party-facts-goal"><strong>Party goal</strong> {party.goal}</p>
         <p>Ask @Vibe to capture decisions and open questions from recent discussion. Automatic notes can need correction; You control your own preferences. Shared automatic notes can be corrected by the party owner; manual notes by their author.</p>
         {factsQuery.isPending ? <p>Loading party memory…</p> : factsQuery.isError ? <div role="alert">{errorMessage(factsQuery.error)} <button type="button" onClick={() => void factsQuery.refetch()}>Retry</button></div> : !factsQuery.data.length ? <p>No shared notes yet.</p> : (
-          <ul className="party-facts-list">{factsQuery.data.filter(fact => !fact.subjectId).map(fact => <PartyNoteRow key={fact.id} fact={fact} partyId={party.id} members={members} partyOwnerId={party.ownerId} refresh={refresh} />)}{[...new Set(factsQuery.data.flatMap(fact => fact.subjectId ? [fact.subjectId] : []))].map(subjectId => <li key={subjectId}><div><h3>{factsQuery.data.find(fact => fact.subjectId === subjectId)?.subjectName ?? 'Participant'} · preferences for this party</h3><ul>{factsQuery.data.filter(fact => fact.subjectId === subjectId).map(fact => <PartyNoteRow key={fact.id} fact={fact} partyId={party.id} members={members} partyOwnerId={party.ownerId} refresh={refresh} />)}</ul></div></li>)}</ul>
+          <ul className="party-facts-list">{factsQuery.data.filter(fact => !fact.subjectId).map(fact => <PartyNoteRow key={fact.id} fact={fact} partyId={party.id} members={members} partyOwnerId={party.ownerId} refresh={refresh} />)}{[...new Set(factsQuery.data.flatMap(fact => fact.subjectId ? [fact.subjectId] : []))].map(subjectId => <li key={subjectId}><div><h3>{factsQuery.data.find(fact => fact.subjectId === subjectId)?.subjectName ?? 'Participant'} · party notes</h3><ul>{factsQuery.data.filter(fact => fact.subjectId === subjectId).map(fact => <PartyNoteRow key={fact.id} fact={fact} partyId={party.id} members={members} partyOwnerId={party.ownerId} refresh={refresh} />)}</ul></div></li>)}</ul>
         )}
         <form className="party-note-form" onSubmit={event => { event.preventDefault(); create.mutate(); }}>
           <label>New party note<textarea maxLength={500} required value={text} onChange={event => setText(event.target.value)} /></label>
@@ -766,20 +769,22 @@ function PartyNoteRow({ fact, partyId, members, partyOwnerId, refresh }: { party
   const [text, setText] = useState(fact.text);
   const [kind, setKind] = useState<PartyNoteKind>(fact.kind ?? 'suggestion');
   const [version, setVersion] = useState(fact.version ?? 1);
-  const save = useMutation({ mutationFn: () => api.updatePartyFact(partyId, fact.id, { text, kind, version }), onSuccess: async () => { setEditing(false); await refresh(); } });
+  const [participationStatus,setParticipationStatus] = useState(fact.participationStatus ?? 'unresolved');
+  const save = useMutation({ mutationFn: () => api.updatePartyFact(partyId, fact.id, { text, kind, version, ...(fact.kind === 'participation' ? {participationStatus} : {}) }), onSuccess: async () => { setEditing(false); await refresh(); } });
   const remove = useMutation({ mutationFn: () => api.deletePartyFact(partyId, fact.id, fact.version ?? 1), onSuccess: refresh });
   const error = save.error ?? remove.error;
   return <li><div>
-    <strong>{fact.subjectName ? `${fact.topic ?? 'preferences'}` : fact.kind ?? 'suggestion'}</strong>
+    <strong>{fact.kind === 'participation' ? `Participation · ${fact.participationStatus ?? 'unresolved'}` : fact.subjectName ? `${fact.topic ?? 'preferences'}` : fact.kind ?? 'suggestion'}</strong>
     {editing ? <form className="party-note-form" onSubmit={event => { event.preventDefault(); save.mutate(); }}>
       <label>Note text<textarea required maxLength={500} value={text} onChange={event => setText(event.target.value)} /></label>
-      <label>Type<select value={kind} onChange={event => setKind(event.target.value as PartyNoteKind)}>{fact.subjectId && <option value="preference">Preference</option>}{noteKinds.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
+      <label>Type<select disabled={fact.kind === 'participation'} value={kind} onChange={event => setKind(event.target.value as PartyNoteKind)}>{fact.subjectId && <option value={fact.kind === 'participation' ? 'participation' : 'preference'}>{fact.kind === 'participation' ? 'Participation' : 'Preference'}</option>}{noteKinds.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
+      {fact.kind === 'participation' && <label>Participation status<select value={participationStatus} onChange={event=>setParticipationStatus(event.target.value as typeof participationStatus)}>{['suggested','confirmed','unresolved','withdrawn'].map(value=><option key={value} value={value}>{value}</option>)}</select></label>}
       <button type="submit" disabled={save.isPending || !text.trim()}>Save correction</button>
       <button type="button" onClick={() => { setEditing(false); save.reset(); }}>Cancel</button>
     </form> : <p>{fact.text}</p>}
     <small>{fact.source === 'conversation' ? 'From discussion' : 'Member recorded'} · v{fact.version ?? 1}{fact.lastEditorId ? ` · Last corrected by ${members.find(member => member.userId === fact.lastEditorId)?.name ?? 'a member'}` : ''} · <time dateTime={fact.updatedAt ?? fact.createdAt}>{new Date(fact.updatedAt ?? fact.createdAt).toLocaleString()}</time></small>
     <div className="party-note-actions">{fact.sourceMessageIds.map((id, index) => <Link key={id} to={`/parties/${encodeURIComponent(partyId)}#message-${encodeURIComponent(id)}`}>Source {index + 1}</Link>)}</div>
-    {!editing && canEdit && <div className="party-note-actions"><button type="button" disabled={remove.isPending} onClick={() => { setText(fact.text); setKind(fact.kind ?? 'suggestion'); setVersion(fact.version ?? 1); save.reset(); setEditing(true); }}>Edit</button><button type="button" disabled={remove.isPending} onClick={() => remove.mutate()}>{remove.isPending ? 'Removing…' : 'Remove'}</button></div>}
+    {!editing && canEdit && <div className="party-note-actions"><button type="button" disabled={remove.isPending} onClick={() => { setText(fact.text); setKind(fact.kind ?? 'suggestion'); setParticipationStatus(fact.participationStatus ?? 'unresolved'); setVersion(fact.version ?? 1); save.reset(); setEditing(true); }}>Edit</button><button type="button" disabled={remove.isPending} onClick={() => remove.mutate()}>{remove.isPending ? 'Removing…' : 'Remove'}</button></div>}
     {error && <p role="alert">{errorMessage(error)} <button type="button" onClick={() => { setEditing(false); save.reset(); remove.reset(); void refresh(); }}>Reload notes</button></p>}
   </div></li>;
 }
@@ -848,6 +853,10 @@ function InviteDialog({ party, open, onOpenChange }: { party: Party; open: boole
   const api = useApi();
   const [inviteUrl, setInviteUrl] = useState('');
   const [expiresAt, setExpiresAt] = useState('');
+  const [email, setEmail] = useState('');
+  const [emailClientId, setEmailClientId] = useState(() => crypto.randomUUID());
+  const emailStatus = useQuery({queryKey:['email-invites',party.id],queryFn:()=>api.emailInviteStatus(party.id),enabled:open});
+  const emailSend = useMutation({mutationFn:()=>api.sendEmailInvite(party.id,email,emailClientId)});
   const [qrData, setQrData] = useState('');
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState('');
@@ -892,6 +901,14 @@ function InviteDialog({ party, open, onOpenChange }: { party: Party; open: boole
           <Dialog.Close className="dialog-close icon-button" aria-label="Close"><X size={18} /></Dialog.Close>
           <Dialog.Title className="dialog-title">Invite someone</Dialog.Title>
           <Dialog.Description className="dialog-description">Share a link or scan the QR code to join {party.name}.</Dialog.Description>
+          <form className="party-note-form" onSubmit={event=>{event.preventDefault();emailSend.mutate();}}>
+            <label>Email invitation<input className="text-input" type="email" required value={email} onChange={event=>{setEmail(event.target.value);setEmailClientId(crypto.randomUUID());emailSend.reset();}} /></label>
+            {emailStatus.data?.reason && <p role="status">{emailStatus.data.reason}</p>}
+            {emailStatus.isError && <p role="alert">{errorMessage(emailStatus.error)}</p>}
+            <button className="button button-secondary" type="submit" disabled={!emailStatus.data?.available || emailSend.isPending || emailSend.data?.status==='sent' || emailSend.data?.status==='unknown'}>{emailSend.isPending?'Sending…':'Send invitation'}</button>
+            {emailSend.isError && <p role="alert">{errorMessage(emailSend.error)}</p>}
+            {emailSend.data && <p role="status">{emailSend.data.status==='sent'?'Invitation accepted by SES for delivery.':emailSend.data.reason}</p>}
+          </form>
           {inviteUrl ? (
             <div className="invite-result">
               {qrData ? <img className="invite-qr" src={qrData} alt={`QR code for the invitation to ${party.name}`} /> : <div className="invite-qr-placeholder"><LoaderCircle className="spin" size={18} /></div>}
@@ -917,6 +934,7 @@ interface PendingMessage {
   text: string;
   clientId: string;
   createdAt: string;
+  replyToId?: string;
 }
 
 function ChatPanel({ party, currentUserId, localMessages, setLocalMessages, localRuns, setLocalRuns }: {
@@ -930,6 +948,7 @@ function ChatPanel({ party, currentUserId, localMessages, setLocalMessages, loca
   const api = useApi();
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState('');
+  const [replyTo, setReplyTo] = useState<Message | null>(null);
   const [pendingAttempt, setPendingAttempt] = useState<PendingMessage | null>(null);
   const [failedAttempt, setFailedAttempt] = useState<PendingMessage | null>(null);
   const [sendError, setSendError] = useState('');
@@ -957,13 +976,14 @@ function ChatPanel({ party, currentUserId, localMessages, setLocalMessages, loca
   const runsByTrigger = useMemo(() => new Map(runs.map((run) => [run.triggerMessageId, run])), [runs]);
 
   const sendMutation = useMutation({
-    mutationFn: (attempt: PendingMessage) => api.sendMessage(party.id, { text: attempt.text, clientId: attempt.clientId }),
+    mutationFn: (attempt: PendingMessage) => api.sendMessage(party.id, { text: attempt.text, clientId: attempt.clientId, replyToId: attempt.replyToId }),
     onSuccess: async (result: SendResult, attempt) => {
       setLocalMessages((current) => uniqueMessages([...current, result.message]));
       if (result.run) setLocalRuns((current) => mergeRuns(current, [result.run!]));
       setPendingAttempt(null);
       setFailedAttempt(null);
       setSendError('');
+      setReplyTo(null);
       setDraft((current) => current === attempt.text ? '' : current);
       await queryClient.invalidateQueries({ queryKey: ['messages', party.id] });
     },
@@ -1006,7 +1026,7 @@ function ChatPanel({ party, currentUserId, localMessages, setLocalMessages, loca
     event.preventDefault();
     const text = draft.trim();
     if (!text || sendMutation.isPending || failedAttempt) return;
-    runAttempt({ text, clientId: crypto.randomUUID(), createdAt: new Date().toISOString() });
+    runAttempt({ text, clientId: crypto.randomUUID(), createdAt: new Date().toISOString(), ...(replyTo ? {replyToId:replyTo.id} : {}) });
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -1044,7 +1064,7 @@ function ChatPanel({ party, currentUserId, localMessages, setLocalMessages, loca
             {pagesQuery.hasNextPage && <div className="load-earlier-row"><button className="text-button load-earlier" type="button" disabled={pagesQuery.isFetchingNextPage} onClick={() => void loadEarlier()}>{pagesQuery.isFetchingNextPage ? <LoaderCircle className="spin" size={15} /> : <ArrowDown size={15} />} Load earlier messages</button></div>}
             {visibleMessages.length === 0 && !pendingAttempt && !failedAttempt ? <EmptyConversation onMention={addMention} /> : (
               <div className="message-list">
-                {visibleMessages.map((message) => <MessageRow key={message.id} message={message} isSelf={message.authorId === currentUserId} run={runsByTrigger.get(message.id)} />)}
+                {visibleMessages.map((message) => <MessageRow key={message.id} message={message} isSelf={message.authorId === currentUserId} run={runsByTrigger.get(message.id)} onReply={()=>{setReplyTo(message);composeRef.current?.focus();}} />)}
                 {pendingAttempt && <PendingMessageRow attempt={pendingAttempt} status="sending" />}
                 {failedAttempt && <PendingMessageRow attempt={failedAttempt} status="failed" />}
                 {pagesQuery.isFetching && !pagesQuery.isFetchingNextPage && <div className="refresh-indicator"><LoaderCircle className="spin" size={14} /> Checking for new messages</div>}
@@ -1055,6 +1075,7 @@ function ChatPanel({ party, currentUserId, localMessages, setLocalMessages, loca
         <div className="scroll-bottom-anchor" />
       </div>
       <form className="composer-area" onSubmit={submit}>
+        {replyTo && <div className="composer-error"><span>Replying to {replyTo.authorName} · {replyTo.text.slice(0,100)}</span><button type="button" onClick={()=>setReplyTo(null)}>Cancel reply</button></div>}
         {failedAttempt && <div className="composer-error" role="alert"><AlertCircle size={15} /><span>{sendError} The message stays here with its original send ID.</span></div>}
         <div className={`composer${failedAttempt ? ' composer-failed' : ''}`}>
           <textarea
@@ -1119,7 +1140,7 @@ const markdownComponents: Components = {
   },
 };
 
-function MessageRow({ message, isSelf, run }: { message: Message; isSelf: boolean; run?: AgentRun }) {
+function MessageRow({ message, isSelf, run, onReply }: { message: Message; isSelf: boolean; run?: AgentRun; onReply?: () => void }) {
   const isAssistant = message.role === 'assistant';
   const statusText = run?.status === 'queued' ? 'Vibe is in the queue…' : run?.status === 'thinking' ? 'Vibe is thinking…' : '';
   const time = formatTime(message.createdAt);
@@ -1128,9 +1149,11 @@ function MessageRow({ message, isSelf, run }: { message: Message; isSelf: boolea
       {(!isSelf || isAssistant) && <span className={`message-avatar${isAssistant ? ' message-avatar-vibe' : ''}`} aria-hidden="true">{isAssistant ? 'v' : <Avatar name={message.authorName} size="small" />}</span>}
       <div className="message-column">
         <div className="message-meta"><strong>{isAssistant ? 'Vibe' : isSelf ? 'You' : message.authorName}</strong><time dateTime={message.createdAt}>{time}</time></div>
+        {message.replyToId && <a className="text-button" href={`#message-${message.replyToId}`}>In reply to an earlier message</a>}
         <div className="message-bubble">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{message.text}</ReactMarkdown>
         </div>
+        {onReply && <button className="text-button" type="button" onClick={onReply}>Reply</button>}
         {message.citations?.length ? <details><summary>Sources ({message.citations.length})</summary><ul>{message.citations.map(source => <li key={source.id}><a href={source.url} target="_blank" rel="noopener noreferrer">[{source.id}] {new URL(source.url).hostname}</a> · {new Date(source.retrievedAt).toLocaleString()}</li>)}</ul></details> : null}
         {[...new Set(message.researchWarnings ?? [])].map((warning,index) => <p className="research-warning" role="status" key={index}>{warning}</p>)}
         {statusText && <p className="run-status"><LoaderCircle className="spin" size={13} /> {statusText}</p>}

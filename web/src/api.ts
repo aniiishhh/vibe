@@ -1,6 +1,9 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
 import type {
   AgentRun,
+  PartyTask,
+  TaskInput,
+  ConversationMode,
   Invite,
   CreateMemoryInput,
   MemoryFact,
@@ -75,6 +78,12 @@ export function createApi(config: RuntimeConfig) {
   }
 
   return {
+    getTasks: (id: string) => request<{tasks:PartyTask[]}>(`/parties/${encodeURIComponent(id)}/tasks`),
+    proposeTask: (id: string, proposal: TaskInput, actionId: string) => request<PartyTask>(`/parties/${encodeURIComponent(id)}/tasks`,{method:'POST',body:JSON.stringify({actionId,proposal})}),
+    changeTask: (id: string, taskId: string, version: number, action: 'edit'|'accept'|'claim'|'decline'|'complete', actionId: string, proposal?: TaskInput) => request<PartyTask>(`/parties/${encodeURIComponent(id)}/tasks/${encodeURIComponent(taskId)}`,{method:'PATCH',body:JSON.stringify({actionId,version,action,proposal})}),
+    updatePartyMode: (id: string, mode: ConversationMode, version: number) => request<Party>(`/parties/${encodeURIComponent(id)}`,{method:'PATCH',body:JSON.stringify({mode,version})}),
+    emailInviteStatus: (id: string) => request<{available:boolean;sandbox:boolean;reason:string}>(`/parties/${encodeURIComponent(id)}/email-invites`),
+    sendEmailInvite: (id: string, email: string, clientId: string) => request<{status:string;reason?:string}>(`/parties/${encodeURIComponent(id)}/email-invites`,{method:'POST',body:JSON.stringify({email,clientId})}),
     getProfile: () => request<Profile>('/me'),
     updateProfile: (body: { name?: string; learningEnabled?: boolean }) => request<Profile>('/me', {
       method: 'PUT',
@@ -106,7 +115,7 @@ export function createApi(config: RuntimeConfig) {
       { method: 'PATCH', body: JSON.stringify({ useSharedMemory }) },
     ),
     createPartyFact: (partyId: string, input: { text: string; kind: PartyNoteKind }) => request<PartyFact>(`/parties/${encodeURIComponent(partyId)}/facts`, { method: 'POST', body: JSON.stringify(input) }),
-    updatePartyFact: (partyId: string, factId: string, input: { version: number; text: string; kind: PartyNoteKind }) => request<PartyFact>(`/parties/${encodeURIComponent(partyId)}/facts/${encodeURIComponent(factId)}`, { method: 'PATCH', body: JSON.stringify(input) }),
+    updatePartyFact: (partyId: string, factId: string, input: { version: number; text: string; kind: PartyNoteKind; participationStatus?: 'suggested'|'confirmed'|'unresolved'|'withdrawn' }) => request<PartyFact>(`/parties/${encodeURIComponent(partyId)}/facts/${encodeURIComponent(factId)}`, { method: 'PATCH', body: JSON.stringify(input) }),
     deletePartyFact: (partyId: string, factId: string, version: number) => request<PartyFact>(`/parties/${encodeURIComponent(partyId)}/facts/${encodeURIComponent(factId)}`, { method: 'DELETE', body: JSON.stringify({ version }) }),
     getOwnerProfile: () => request<{revision:number; providerStatus:string; checkedAt:string; truncated:boolean; buckets:Array<{category:string; points:Array<{id:string;text:string;approval:string}>}>}>('/me/memory-profile'),
     getPartyFacts: (partyId: string) => request<{ facts: PartyFact[] }>(`/parties/${encodeURIComponent(partyId)}/facts`),
@@ -126,7 +135,7 @@ export function createApi(config: RuntimeConfig) {
       const query = cursor ? `?${new URLSearchParams({ cursor })}` : '';
       return request<MessagePage>(`/parties/${encodeURIComponent(partyId)}/messages${query}`);
     },
-    sendMessage: (partyId: string, body: { text: string; clientId: string }) => request<SendResult>(
+    sendMessage: (partyId: string, body: { text: string; clientId: string; replyToId?: string }) => request<SendResult>(
       `/parties/${encodeURIComponent(partyId)}/messages`,
       { method: 'POST', body: JSON.stringify(body) },
     ),

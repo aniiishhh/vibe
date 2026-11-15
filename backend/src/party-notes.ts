@@ -4,7 +4,7 @@ import { ulid } from 'ulid';
 import type { PartyFact } from '@vibe/shared';
 import { AppError, getItem, key, membershipCheck, refreshOutboxItem, requireParty, tableName, transact, type Item } from './store.js';
 import { toPublicPartyFact } from './memory-store.js';
-export const noteKind = z.enum(['decision', 'suggestion', 'constraint', 'question', 'disagreement', 'preference']);
+export const noteKind = z.enum(['decision', 'suggestion', 'constraint', 'question', 'disagreement', 'preference', 'participation']);
 export const createPartyNoteInput = z.object({
     text: z.string().trim().min(1).max(500), kind: noteKind,
     sourceMessageIds: z.array(z.string().min(1).max(80)).max(10).default([]),
@@ -15,6 +15,7 @@ export const createPartyNoteInput = z.object({
 export const editPartyNoteInput = z.object({
     version: z.number().int().positive(), text: z.string().trim().min(1).max(500), kind: noteKind,
     expiresAt: z.string().datetime().nullable().optional(),
+    participationStatus: z.enum(['suggested','confirmed','unresolved','withdrawn']).optional(),
 }).strict();
 export const deletePartyNoteInput = z.object({ version: z.number().int().positive() }).strict();
 export type NoteInput = z.infer<typeof createPartyNoteInput>;
@@ -45,6 +46,7 @@ export async function createPartyNote(partyId: string, userId: string, raw: unkn
     epoch: number;
 }): Promise<PartyFact | undefined> {
     const input = createPartyNoteInput.parse(raw);
+    if (input.kind === 'participation') throw new AppError(400, 'INVALID_NOTE_KIND', 'Participation is recorded from sourced responses.');
     await requireParty(partyId, userId);
     const meta = await getItem(`PARTY#${partyId}`, 'META');
     if (!meta)
@@ -98,12 +100,14 @@ export async function changePartyNote(partyId: string, userId: string, id: strin
     const [current, meta] = await Promise.all([getItem(`PARTY#${partyId}`, `FACT#${id}`), getItem(`PARTY#${partyId}`, 'META')]);
     if (!current || current.entityType !== 'PARTY_FACT' || current.deleted || !meta)
         throw new AppError(404, 'NOT_FOUND', 'Party note not found.');
+    if ('participationStatus' in input && current.kind !== 'participation') throw new AppError(400,'INVALID_NOTE_KIND','Participation status applies to participation records.');
     const canonical = toPublicPartyFact(current);
     const editor = canonical.subjectId ?? (current.source === 'manual' ? current.speakerId : meta.ownerId);
     if (editor !== userId)
         throw new AppError(403, 'NOTE_READ_ONLY', 'Only the preference owner or the responsible note author can change this note.');
     if (Number(current.version ?? 1) !== input.version)
         throw conflict();
+    if (!deleted && current.kind === 'participation' && 'kind' in input && input.kind !== 'participation') throw new AppError(400, 'INVALID_NOTE_KIND', 'Keep the participation record type when correcting it.');
     const now = new Date().toISOString();
     const next: Item = { ...current, ...canonical, ...input, version: input.version + 1, lastEditorId: userId, updatedAt: now, updatedBy: userId, deleted };
     if ('expiresAt' in input && input.expiresAt === null)

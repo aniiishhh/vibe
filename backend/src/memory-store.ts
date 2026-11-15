@@ -87,8 +87,9 @@ function toPartyFact(item: Item): PartyFact {
   return {
     ...(subjectId ? { subjectId, subjectName: String(item.subjectName ?? 'Participant'), topic } : {}),
     ...(typeof item.subjectId === "string" ? { subjectId: item.subjectId, subjectName: String(item.subjectName ?? "Participant"), topic: String(item.topic ?? "other") } : {}),
+    ...(item.kind === 'participation' ? { participationStatus: item.participationStatus as PartyFact['participationStatus'], proposalMessageIds: strings(item.proposalMessageIds), responseMessageId: String(item.responseMessageId) } : {}),
     version: Number(item.version ?? 1),
-    kind: subjectId ? "preference" : item.kind as PartyFact["kind"] ?? "suggestion",
+    kind: item.kind === "participation" ? "participation" : subjectId ? "preference" : item.kind as PartyFact["kind"] ?? "suggestion",
     updatedAt: String(item.updatedAt ?? item.createdAt),
     updatedBy: String(item.updatedBy ?? item.speakerId),
     ...(typeof item.lastEditorId === "string" ? {lastEditorId:item.lastEditorId} : {}),
@@ -194,7 +195,7 @@ export async function listPartyFacts(partyId: string): Promise<PartyFact[]> {
     .filter((item) => typeof item.expiresAt !== 'string' || Date.parse(item.expiresAt) > now)
     .map(toPartyFact).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   const currentTopics = new Set(facts.filter(fact => fact.subjectId && fact.id.startsWith('p_')).map(fact => `${fact.subjectId}:${fact.topic}`));
-  return Promise.all(facts.filter(fact => !fact.subjectId || fact.id.startsWith('p_') || !currentTopics.has(`${fact.subjectId}:${fact.topic}`)).map(async fact => {
+  return Promise.all(facts.filter(fact => !fact.subjectId || fact.kind === 'participation' || fact.id.startsWith('p_') || !currentTopics.has(`${fact.subjectId}:${fact.topic}`)).map(async fact => {
     if (!fact.subjectId) return fact;
     const member = await getItem(`PARTY#${partyId}`, `MEMBER#${fact.subjectId}`);
     const name = String(member?.name ?? fact.subjectName ?? 'Participant');
