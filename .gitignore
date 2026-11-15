@@ -9,9 +9,12 @@ dist/
 build/
 .next/
 __pycache__/
-*.pyc
+*.py[cod]
 .venv/
 venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 # Logs and OS/editor files
 *.log
@@ -21,3 +24,24 @@ venv/
 
 # Nested repo with its own git history
 sameclass-track3/
+
+# Test reports and local build caches
+coverage/
+playwright-report/
+test-results/
+.vite/
+*.tsbuildinfo
+
+# Local AWS deployment output and credentials
+cdk.out/
+.aws/
+*.pem
+*.key
+
+# Local Codex state
+.codex/.env
+.codex/.env.*
+.codex/auth.json
+.codex/history.jsonl
+.codex/sessions/
+.codex/log/
