@@ -2,6 +2,10 @@
 
 Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementation`.
 
+## Custom domain setup in progress
+
+The user authorized connecting **vibe-chat.us** through Porkbun on November 15. An ACM certificate was requested in us-east-1 and remains **PENDING_VALIDATION**. The Porkbun validation CNAME is awaiting user setup. CloudFront `E2CC4LLGDDIPFE` continues serving the existing hostname. Domain attachment, API invitation URL deployment and DNS cutover remain pending. Infrastructure support for paired domain/certificate context and a canonical invitation URL is prepared. Persistent context is intentionally added after certificate issuance. See [domain setup and exact DNS records](docs/aws/custom-domain.md) for the next steps and reproduction on another device.
+
 ## Milestone state
 
 **Milestone 3 is implemented and deployed** on the shared app from `anish/implementation`. The user authorized completion and deployment on November 15. A bounded two-user live Haiku scenario passed the remaining 3B acceptance checks, general TinyFish research and ASU class research. Milestone 4 is also implemented/deployed and verified below. The requested Milestone 5 UI integration and README are complete below; the other Milestone 5 tasks are deferred. See [the completion report](docs/results/milestone-3-completion-2026-11-15.md) for exact coverage and limits.

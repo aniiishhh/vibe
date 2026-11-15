@@ -17,6 +17,7 @@ import {
   aws_apigatewayv2_integrations as apigatewayv2Integrations,
   aws_appsync as appsync,
   aws_cloudfront as cloudfront,
+  aws_certificatemanager as acm,
   aws_cloudfront_origins as cloudfrontOrigins,
   aws_cognito as cognito,
   aws_dynamodb as dynamodb,
@@ -47,6 +48,21 @@ export class VibeStack extends Stack {
 
     Tags.of(this).add('project', 'vibe');
     Tags.of(this).add('environment', STAGE);
+
+    const websiteDomain = this.node.tryGetContext('vibe:domainName') as string | undefined;
+    const websiteCertificateArn = this.node.tryGetContext('vibe:certificateArn') as string | undefined;
+    if (Boolean(websiteDomain) !== Boolean(websiteCertificateArn)) {
+      throw new Error('Configure vibe:domainName and vibe:certificateArn together.');
+    }
+    if (websiteDomain && !/^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i.test(websiteDomain)) {
+      throw new Error('vibe:domainName must be a DNS hostname.');
+    }
+    if (websiteCertificateArn && !/^arn:aws:acm:us-east-1:\d{12}:certificate\/[a-f0-9-]+$/.test(websiteCertificateArn)) {
+      throw new Error('CloudFront requires an ACM certificate ARN in us-east-1.');
+    }
+    const websiteCertificate = websiteCertificateArn
+      ? acm.Certificate.fromCertificateArn(this, 'WebsiteCertificate', websiteCertificateArn)
+      : undefined;
 
     const userPool = new cognito.UserPool(this, 'UserPool', {
       userPoolName: `vibe-${STAGE}-users`,
@@ -464,6 +480,11 @@ export class VibeStack extends Stack {
     });
     const distribution = new cloudfront.Distribution(this, 'WebDistribution', {
       defaultRootObject: 'index.html',
+      ...(websiteDomain && websiteCertificate ? {
+        domainNames: [websiteDomain],
+        certificate: websiteCertificate,
+        minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2025,
+      } : {}),
       priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
       defaultBehavior: {
         origin: cloudfrontOrigins.S3BucketOrigin.withOriginAccessControl(webBucket),
@@ -488,7 +509,8 @@ export class VibeStack extends Stack {
       },
     });
 
-    apiFunction.addEnvironment('APP_URL', `https://${distribution.distributionDomainName}`);
+    const websiteUrl = `https://${websiteDomain ?? distribution.distributionDomainName}`;
+    apiFunction.addEnvironment('APP_URL', websiteUrl);
 
     const webDeployLogs = new logs.LogGroup(this, 'WebDeploymentLogs', {
       logGroupName: `/vibe/${STAGE}/web-deployment`,
@@ -517,8 +539,12 @@ export class VibeStack extends Stack {
     });
 
     new CfnOutput(this, 'WebsiteUrl', {
+      value: websiteUrl,
+      description: 'Canonical URL for the Vibe web app.',
+    });
+    new CfnOutput(this, 'CloudFrontUrl', {
       value: `https://${distribution.distributionDomainName}`,
-      description: 'CloudFront URL for the Vibe web app.',
+      description: 'CloudFront distribution hostname for DNS and troubleshooting.',
     });
     new CfnOutput(this, 'ApiGatewayUrl', {
       value: `${httpApi.apiEndpoint}/api`,

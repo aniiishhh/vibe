@@ -19,6 +19,10 @@ The user approved Milestone 1 application implementation on November 14, 2026. D
 
 Current app: https://d1ia555vbcj8k2.cloudfront.net, shared account 851725603471, Ohio, Haiku 4.5. Earlier 56 backend / 10 adapter checks plus the 25 focused 3B checks, typechecks, production build and strict synthesis passed. The authorized completion check exercised two users and two research requests. See the completion report for observed coverage. See [handoff](milestone-3-handoff.md) and [current status](../STATUS.md).
 
+## Additional authorized domain setup
+
+Connect `vibe-chat.us` through Porkbun to the existing CloudFront distribution. Certificate requested, DNS ownership validation pending. After issuance, persist CDK domain/certificate context, deploy the distribution alias and canonical invitation URL, complete Porkbun apex routing, and verify HTTPS and application access. See [setup steps](aws/custom-domain.md) and [current status](../STATUS.md).
+
 ## Milestone 0 — configuration
 
 - [x] Approve product and architecture for Milestone 1 implementation (user authorized November 14, 2026).
