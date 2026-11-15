@@ -2,7 +2,7 @@
 
 ## Current state
 
-November 15, 2026. The user authorized connecting `vibe-chat.us`, managed through Porkbun, to the shared Vibe deployment. The Porkbun validation CNAME is publicly visible and ACM reports `ISSUED`. Persistent domain/certificate context is configured. The shared stack reached `UPDATE_COMPLETE` and CloudFront reports `Deployed`. API invitation URLs now use `https://vibe-chat.us`. DNS cutover is pending. The app remains available at https://d1ia555vbcj8k2.cloudfront.net.
+November 15, 2026. The user authorized connecting `vibe-chat.us`, managed through Porkbun, to the shared Vibe deployment. The Porkbun validation CNAME is publicly visible and ACM reports `ISSUED`. Persistent domain/certificate context is configured. The shared stack reached `UPDATE_COMPLETE` and CloudFront reports `Deployed`. API invitation URLs now use `https://vibe-chat.us`. Porkbun root ALIAS now points to the distribution. The canonical app is https://vibe-chat.us, with the original CloudFront hostname also available.
 
 | Setting | Value |
 | --- | --- |
@@ -55,7 +55,7 @@ Replace conflicting apex parking/routing records. Preserve unrelated mail, verif
 
 ## Verification checkpoint
 
-Infrastructure types, strict synthesis and the focused CDK diff passed. Direct CloudFront routing with custom-hostname SNI passed HTTPS certificate verification, homepage HTTP 200, invite SPA HTTP 200 with matching app HTML, shared `/config.json`, and expected unauthenticated API HTTP 401. Public apex DNS still points at parking addresses. Public-domain routing and authenticated use remain to verify after cutover.
+Infrastructure types, strict synthesis and the focused CDK diff passed. Direct CloudFront routing with custom-hostname SNI passed HTTPS certificate verification, homepage HTTP 200, invite SPA HTTP 200 with matching app HTML, shared `/config.json`, and expected unauthenticated API HTTP 401. After cutover, authoritative Porkbun DNS and public resolver 1.1.1.1 returned CloudFront addresses. HTTPS using a freshly published address and original hostname/SNI passed the same homepage, invite SPA, config and API checks. The local OS resolver still cached a parking address at the checkpoint. Authenticated sign-in and email delivery were not repeated for this domain change.
 
 ## 4. Verify and publish
 

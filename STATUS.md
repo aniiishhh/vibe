@@ -2,13 +2,13 @@
 
 Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementation`.
 
-## Custom domain AWS setup completed, DNS cutover pending
+## Custom domain deployed and public DNS verified
 
 The user authorized connecting **vibe-chat.us** through Porkbun on November 15. The certificate validation CNAME is publicly visible and ACM reports **ISSUED** in us-east-1. The shared `Vibe-dev` stack reached **UPDATE_COMPLETE** and CloudFront `E2CC4LLGDDIPFE` reports **Deployed**, with `vibe-chat.us` attached and TLSv1.2_2025 configured. API `APP_URL` is now `https://vibe-chat.us` and its update succeeded. Persistent context in `infra/cdk.json` retains the domain/certificate on future deployments.
 
 Infrastructure typechecking, strict synthesis and reviewed CDK diff passed. Before DNS cutover, verified HTTPS using the custom hostname/SNI routed directly to the CloudFront endpoint. Certificate validation passed, homepage and invite SPA route returned 200 with identical app HTML, `/config.json` returned the shared settings with relative `/api`, and unauthenticated `/api/parties` returned the expected 401. Authenticated sign-in and actual email delivery were not repeated for this infrastructure change.
 
-**User action pending** — replace Porkbun root parking/routing with an ALIAS to `d1ia555vbcj8k2.cloudfront.net`. Public apex DNS still returned the parking addresses at the checkpoint. Public custom-domain access remains unverified until that change propagates. The existing CloudFront URL remains usable. See [exact DNS records and replication steps](docs/aws/custom-domain.md). After public HTTPS verification, update the README live link and the deployment summary below.
+The user replaced the Porkbun root parking ALIAS with `d1ia555vbcj8k2.cloudfront.net`. Both authoritative Porkbun DNS and public resolver 1.1.1.1 now return CloudFront addresses. Using a freshly published public address with the original hostname/SNI, HTTPS certificate verification passed, homepage and invite SPA returned 200 with matching app HTML, `/config.json` returned the shared configuration, and `/api/parties` returned expected unauthenticated 401. The local operating-system resolver still cached a parking address during verification, so ordinary access can vary until caches refresh. Canonical website is **https://vibe-chat.us**. The original CloudFront URL remains available. Authenticated sign-in and email delivery retain the prior checks. See [exact DNS records and replication steps](docs/aws/custom-domain.md).
 
 ## Milestone state
 
@@ -74,7 +74,7 @@ Read [the handoff](docs/milestone-3-handoff.md) and [implementation plan](docs/i
 
 ## Current shared deployment
 
-**https://d1ia555vbcj8k2.cloudfront.net** — stack `Vibe-dev`, account **851725603471**, **us-east-2**, **UPDATE_COMPLETE**. Latest deployment updated frontend assets only. API/dispatcher/memory/agent packages and scoped permissions retain Milestone 4, and the research package retains Milestone 3. All five functions are Active/Successful. Agent and memory workers use **us.anthropic.claude-haiku-4-5-20251001-v1:0**. Different-model fallback is disabled for evaluation. Anthropic first-use setup and a real READY invocation succeeded before the shared model switch.
+**https://vibe-chat.us** — stack `Vibe-dev`, account **851725603471**, **us-east-2**, **UPDATE_COMPLETE**. Latest deployment attached the custom domain/certificate to the existing CloudFront distribution and updated the API invitation URL. The preceding deployment updated frontend assets. API/dispatcher/memory/agent packages and scoped permissions retain Milestone 4, and the research package retains Milestone 3. All five functions are Active/Successful. Agent and memory workers use **us.anthropic.claude-haiku-4-5-20251001-v1:0**. Different-model fallback is disabled for evaluation. Anthropic first-use setup and a real READY invocation succeeded before the shared model switch.
 
 | Setting | Value |
 | --- | --- |

@@ -4,7 +4,7 @@ An AI teammate in your group chat. Bring classmates, friends or teammates into a
 
 Vibe combines persistent group conversations, permission-aware personal memory and sourced research. It helps a group take classes together, brainstorm a hackathon, plan a trip or organize a shared project.
 
-[Open Vibe](https://d1ia555vbcj8k2.cloudfront.net) · [Setup](#local-development) · [Architecture](#architecture) · [Deployment and handoff](STATUS.md)
+[Open Vibe](https://vibe-chat.us) · [Setup](#local-development) · [Architecture](#architecture) · [Deployment and handoff](STATUS.md)
 
 ![Vibe group chat with sourced class research and Pip, the contextual mascot](docs/assets/vibe-chat.png)
 
