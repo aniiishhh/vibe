@@ -115,6 +115,6 @@ Verify infrastructure costs against the selected region and actual usage. Budget
 
 ## Remaining readiness checks
 
-Scope and architecture approval is the remaining user decision before coding. The account, Ohio region, existing budget and selected operational model are recorded. Deployment checks must verify Lambda-role permissions and quotas. The memory milestone includes synthetic write/search/replacement/deletion tests, and the course milestone includes fresh ASU/RMP health checks. These integrations do not block scaffolding and the initial chat flow.
+The user approved Milestone 1 implementation on November 14, 2026. The account, Ohio region, existing budget and selected operational model are recorded. Deployment checks must verify Lambda-role permissions and quotas. The memory milestone includes synthetic write/search/replacement/deletion tests, and the course milestone includes fresh ASU/RMP health checks. These integrations do not block scaffolding and the initial chat flow.
 
 Application-sent email depends on an SES sender and delivery access. Link and QR joining cover the first milestone. The repository uses `https://github.com/aniiishhh/vibe.git` as origin. Preserve source provenance for reused tools and record any event-rule clarification for submission.

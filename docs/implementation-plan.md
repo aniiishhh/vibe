@@ -4,11 +4,11 @@ Prepared for review on November 14, 2026. Event notes record a November 15, 2026
 
 ## Review boundary
 
-Begin application implementation after scope and architecture approval. Deployment needs the chosen AWS account, region and allowance. Global tool installation needs approval. Configure credentials through ignored local files or provider consoles.
+The user approved Milestone 1 application implementation on November 14, 2026. Deployment needs the chosen AWS account, region and allowance. Global tool installation needs approval. Configure credentials through ignored local files or provider consoles.
 
 ## Milestone 0 — configuration
 
-- [ ] Approve or revise product and architecture.
+- [x] Approve product and architecture for Milestone 1 implementation (user authorized November 14, 2026).
 - [x] Confirm AWS account 851725603471 and us-east-2 with the user.
 - [x] Verify STS identity and existing Monthly Budget $50 with configured notifications.
 - [x] Audit all 84 text-model catalog entries returned for Ohio and query access metadata.
@@ -17,21 +17,23 @@ Begin application implementation after scope and architecture approval. Deployme
 - [x] Confirm provider keys exist and project `.env` is ignored.
 - [x] Verify Supermemory authenticated namespace read.
 - [x] Verify TinyFish Search/Fetch and the Supermemory docs MCP.
-- [ ] During deployment, verify the actual application execution roles and model quota.
+- [x] Verify actual Lambda execution-role access through a successful live DeepSeek run and deployed concurrency limits.
 
-This milestone is ready for implementation approval. Integration-specific checks live with the milestone that needs them. Catalog access and this user's credentials do not establish the permissions of the future Lambda roles.
+Milestone 1 is implemented and deployed from `anish/implementation`; remaining verification is recorded below and in `STATUS.md`. Integration-specific checks live with the milestone that needs them. Catalog access and this user's credentials do not establish the permissions of the future Lambda roles.
 
 ## Milestone 1 — two browsers and a real response
 
-- [ ] Scaffold `web/`, `backend/`, `research/`, `infra/` and shared contracts.
-- [ ] Lock dependencies and prepare ignored environment templates.
-- [ ] CDK defines identity, database, HTTP API, Events, queues, functions, secrets references and hosting.
+Milestone 1 is deployed at https://d1ia555vbcj8k2.cloudfront.net in account 851725603471, us-east-2. Local checks passed TypeScript, five targeted tests, production build and strict CDK synthesis. Live API checks passed two independent Cognito accounts, party/invite joining, persistent messages, author-scoped send idempotency, a real DeepSeek reply persisted exactly once and rejection of reads after member removal. An explicit queue redelivery retained one reply. Failed outbox records recovered after the DynamoDB attribute-alias fix, with zero pending records at the checkpoint. Live WebSocket checks passed member subscription and rejected wildcard subscriptions, client publishing and removed-member subscriptions. Two independent browsers connected live, exchanged messages and displayed the same real @Vibe reply. Browser reload and mobile chat checks were deferred at the user’s request to conserve usage. Temporary test users and their fixture records were removed after verification. Test accounts were provisioned administratively, so inbox delivery and user-entered email confirmation codes remain unverified.
+
+- [x] Scaffold `web/`, `backend/`, `infra/` and shared contracts. The Python research adapter follows in Milestone 3.
+- [x] Lock dependencies and prepare environment templates with local values ignored.
+- [x] CDK defines Milestone 1 identity, database, HTTP API, Events, agent queue, functions and hosting. Provider-secret access follows when those integrations use it.
 - [ ] Sign up, confirm email, sign in and retain identity across parties.
-- [ ] Create/list parties and join through link/QR.
-- [ ] Persist and paginate messages with author-scoped idempotency.
-- [ ] Deliver live refresh signals and repair state on reconnect.
-- [ ] Mention @Vibe and persist a real DeepSeek reply with working/error states.
-- [ ] Outbox recovery and queue redelivery preserve one logical reply.
+- [x] Create/list parties and join through link/QR.
+- [x] Persist and paginate messages with author-scoped idempotency.
+- [x] Deliver live refresh signals and repair state on reconnect.
+- [x] Mention @Vibe and persist a real DeepSeek reply with working/error states.
+- [x] Outbox recovery and queue redelivery preserve one logical reply.
 
 Acceptance requires two independent browsers in one party exchanging messages, receiving an AI reply, reloading history and rejecting non-member reads and subscriptions.
 

@@ -1,0 +1,20 @@
+{
+  "name": "@vibe/infra",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "synth": "cdk synth --strict",
+    "diff": "cdk diff Vibe-dev",
+    "deploy": "cdk deploy Vibe-dev",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.277.0",
+    "constructs": "^10.8.1"
+  },
+  "devDependencies": {
+    "aws-cdk": "^2.1148.1",
+    "esbuild": "^0.28.2"
+  }
+}

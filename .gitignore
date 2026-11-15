@@ -45,3 +45,8 @@ cdk.out/
 .codex/history.jsonl
 .codex/sessions/
 .codex/log/
+
+# Browser smoke artifacts and local public configuration
+.playwright-cli/
+output/playwright/
+web/public/config.json
