@@ -8,14 +8,16 @@ export interface SignedInUser {
   username: string;
 }
 
-interface AuthContextValue {
+export interface AuthContextValue {
   user: SignedInUser | null;
   ready: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
+  /** Present only in the local mock preview, where Cognito is not used. */
+  mockSignIn?: (email: string) => void;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SignedInUser | null>(null);
