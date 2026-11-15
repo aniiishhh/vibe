@@ -19,6 +19,16 @@ The user approved Milestone 1 application implementation on November 14, 2026. D
 
 Current app: https://d1ia555vbcj8k2.cloudfront.net, shared account 851725603471, Ohio, Haiku 4.5. Earlier 56 backend / 10 adapter checks plus the 25 focused 3B checks, typechecks, production build and strict synthesis passed. The authorized completion check exercised two users and two research requests. See the completion report for observed coverage. See [handoff](milestone-3-handoff.md) and [current status](../STATUS.md).
 
+## Additional requested party management and mascot update
+
+Implemented and deployed November 15 after the custom-domain setup. This follows the user’s new feature request and preserves the earlier deferred Milestone 5 tasks.
+
+- Per-user server-persisted archive/restore, Archived sidebar view and confirmed self-leave.
+- Multiple admins, promote/demote/remove controls and transaction-time backend admin guards. Existing owners remain admins. Populated parties require an admin successor. Empty parties close when their last member leaves.
+- Creation-time Focused/Friendly/Banter choice followed by optional link/QR/email setup with an invite-later action. Later mode changes and custom shared notes require admin membership. Subject-owned preference/participation corrections remain available.
+- Pip positioning after parent DOM attachment, enabled-state recovery, eager loading and reduced celebration hat scale within the existing design.
+- 83 backend checks, workspace types, build, strict synthesis, focused infrastructure diff and UI detector passed. Bounded deployed API-handler/DynamoDB scenario passed administration/archive/leave permissions and persistence. Local browser fixture passed mascot mount/remount/hide/show and themed rendering. The complete authenticated creation wizard and email delivery retain limited verification. See STATUS.md for exact coverage and deployment replication.
+
 ## Additional authorized domain setup
 
 Connect `vibe-chat.us` through Porkbun to the existing CloudFront distribution. Certificate issued, persistent CDK domain/certificate context configured, existing CloudFront alias/certificate and canonical invitation URL deployed. Stack UPDATE_COMPLETE and distribution Deployed. Direct custom-hostname HTTPS, SPA/config and API authentication-boundary checks passed. Porkbun apex ALIAS is configured. Authoritative/public DNS and HTTPS using freshly published addresses passed homepage, invite SPA, config and API authentication-boundary checks. Local resolver caches can temporarily retain parking addresses. See [setup steps](aws/custom-domain.md) and [current status](../STATUS.md).

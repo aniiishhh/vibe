@@ -12,12 +12,13 @@ Vibe combines persistent group conversations, permission-aware personal memory a
 
 | Capability | How it works |
 | --- | --- |
-| Group collaboration | Create parties around a goal, invite people by link or QR code, exchange live messages and reply to earlier proposals. |
+| Group collaboration | Create parties with a Vibe mode, invite people during setup or later by link, QR code or email, exchange live messages and reply to earlier proposals. Archive chats privately or leave a party. |
 | An agent in the conversation | Mention @Vibe for help. Choose Focused, Friendly or Banter for the party's conversational tone. |
 | Personal memory with consent | Add points manually or enable learning. Review private candidates, approve reusable points and choose which parties may use them. |
 | Contextual group memory | Retain attributed decisions, constraints and open questions. Short agreements become sourced participation records, with uncertainty and withdrawal represented explicitly. |
 | Class and professor research | Search real ASU offerings, inspect syllabus evidence, resolve professors, read bounded Rate My Professors samples and compare supplied meeting intervals. |
 | General web research | TinyFish Search and Fetch supply public evidence with source links and retrieval timestamps. |
+| Party administration | Appoint multiple admins and manage membership. Admins control the Vibe mode and custom shared notes. |
 | Shared tasks | Propose assignments, claim or accept your own work, decline and complete tasks. Revisions require renewed acceptance. The agent can propose tasks through typed tools. |
 | A contextual interface | Party names and goals select a matching chat background and Pip's accessories. Light/dark/system themes, highlighted mentions and mascot controls follow the same visual language. |
 

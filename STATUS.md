@@ -2,13 +2,17 @@
 
 Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementation`.
 
-## Party management and mascot update in progress
+## Party management and mascot update deployed
 
 November 15 user-requested update implements per-user archive/restore, self-leave, multiple admins with promote/demote/remove controls, admin-only Vibe mode changes and manual shared notes, creation-time mode selection and optional invitation setup. Existing owner memberships retain admin privileges. Membership-revision transactions prevent concurrent role/removal/join changes from abandoning a populated party. The last admin must appoint a successor before leaving a populated party. The last person leaving closes the empty party to old invitations. Personal preference/participation corrections remain subject-owned.
 
 Mascot positioning now runs after parent DOM refs attach, reruns when enabled and observes container size changes. Pip is bundled with the app to remove the deferred invisible loading boundary. The celebration hat is reduced to its original drawing scale. A local StrictMode browser fixture passed first mount, unmount/remount and hide/show, and celebration/study/travel rendering was visually checked. This adds roughly 14 KB gzip to the initial bundle compared with the preceding lazy build. Existing Vite bundle-size advisory remains.
 
-83 backend tests passed, workspace types and production build passed, and the UI detector reported no findings. AWS deployment and a bounded live membership verification are pending. No model/research regression was requested for this change.
+83 backend tests passed, workspace types, production build, strict synthesis and reviewed CDK diff passed, and the UI detector reported no findings. Deployed to shared account 851725603471 / us-east-2 using the verified `default` profile. `Vibe-dev` reached UPDATE_COMPLETE. API is Active/Successful and retains `APP_URL=https://vibe-chat.us`. Updated API/agent/dispatcher/memory code assets and frontend assets. Public homepage references the new bundle, and its downloaded bytes match the local production asset.
+
+A bounded direct invocation of the deployed API handler with three isolated synthetic user claims passed creation-time mode, invitation joins, non-admin rejection for role/mode/note/removal writes, multiple admins, shared-note correction by a second admin, per-user archive persistence and restoration, admin removal and removed-member rejection, creator self-leave with admin succession, last-admin demotion rejection, sole-member exit and closed-party invitation rejection. Sixteen temporary canonical rows were removed. No Cognito accounts, messages or provider memory were created, and no model calls were made. This check exercises real Lambda/DynamoDB transactions. Cognito/API Gateway login, the full creation wizard in an authenticated browser, and email delivery were not repeated. The browser fixture covers mascot rendering/recovery, with broader mascot-state/device coverage still limited.
+
+Code checkpoint is `a5f9a6c`. Future devices use the existing shared-account setup/deployment steps below. Archive flags live on membership rows, owner/admin roles are backward-compatible, and no database migration or new infrastructure resource is required.
 
 ## Custom domain deployed and public DNS verified
 
@@ -82,7 +86,7 @@ Read [the handoff](docs/milestone-3-handoff.md) and [implementation plan](docs/i
 
 ## Current shared deployment
 
-**https://vibe-chat.us** — stack `Vibe-dev`, account **851725603471**, **us-east-2**, **UPDATE_COMPLETE**. Latest deployment attached the custom domain/certificate to the existing CloudFront distribution and updated the API invitation URL. The preceding deployment updated frontend assets. API/dispatcher/memory/agent packages and scoped permissions retain Milestone 4, and the research package retains Milestone 3. All five functions are Active/Successful. Agent and memory workers use **us.anthropic.claude-haiku-4-5-20251001-v1:0**. Different-model fallback is disabled for evaluation. Anthropic first-use setup and a real READY invocation succeeded before the shared model switch.
+**https://vibe-chat.us** — stack `Vibe-dev`, account **851725603471**, **us-east-2**, **UPDATE_COMPLETE**. Latest deployment updated API/dispatcher/memory/agent code and frontend assets for chat organization, admin permissions and mascot fixes. The preceding domain update attached the certificate and set the canonical API invitation URL. Scoped runtime permissions retain Milestone 4 and the research package retains Milestone 3. All five functions are Active/Successful. Agent and memory workers use **us.anthropic.claude-haiku-4-5-20251001-v1:0**. Different-model fallback is disabled for evaluation. Anthropic first-use setup and a real READY invocation succeeded before the shared model switch.
 
 | Setting | Value |
 | --- | --- |
