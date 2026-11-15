@@ -463,6 +463,12 @@
       "skillPath": "skills/specialized-skills/analytics-skills/finding-data-lake-assets/SKILL.md",
       "computedHash": "37811ba457775cbd2718b84b8e387a86c59f5dda5b78c2ac83a3ddef66ae9f63"
     },
+    "impeccable": {
+      "source": "pbakaus/impeccable",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/impeccable/SKILL.md",
+      "computedHash": "ef491197f40a60e4e6b2ef7b71b7959bd919d9f173a4e591e6212b3ec8037b04"
+    },
     "ingesting-into-data-lake": {
       "source": "aws/agent-toolkit-for-aws",
       "sourceType": "github",
