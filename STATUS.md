@@ -2,6 +2,10 @@
 
 Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementation`.
 
+## Presentation videos and main-branch publication
+
+November 15. The user authorized committing/pushing the current `anish/video` branch and merging relevant changes into `main`. The video work was already committed as `70979be`. Four rendered MP4s, their capture/audio/composition source, the presentation scenarios and supporting skills are included. The README now links the canonical website, full demo and AWS/Supermemory/TinyFish spotlights with a preview frame extracted from the actual film. Videos use scripted sample data, as disclosed in the README and video-production notes. Playback metadata and referenced file paths were checked. No application code or AWS deployment changes are part of this publication step. Preserve the teammate’s `ea9d041` presentation-seeding work when merging.
+
 ## Semantic party-theme selection deployed
 
 The latest user request replaces keyword matching with semantic selection from the party name and goal. New parties make one bounded Haiku Converse request during creation and persist a validated theme ID plus model/fallback provenance. All members receive the same saved automatic theme for backgrounds and Pip. The API role gains the same scoped Haiku inference-profile/destination permissions used by the workers. Requests allow at most 32 output tokens, one SDK attempt and an eight-second abort signal. If classification fails, creation saves Everyday with visible fallback status. Admins can choose/retry a theme from Details for existing parties. An explicit reclassification failure preserves the previous saved selection.

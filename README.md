@@ -4,9 +4,25 @@ An AI teammate in your group chat. Bring classmates, friends or teammates into a
 
 Vibe combines persistent group conversations, permission-aware personal memory and sourced research. It helps a group take classes together, brainstorm a hackathon, plan a trip or organize a shared project.
 
-[Open Vibe](https://vibe-chat.us) · [Setup](#local-development) · [Architecture](#architecture) · [Deployment and handoff](STATUS.md)
+[Open Vibe](https://vibe-chat.us) · [Demo videos](#demo-videos) · [Setup](#local-development) · [Architecture](#architecture) · [Deployment and handoff](STATUS.md)
 
 ![Vibe group chat with sourced class research and Pip, the contextual mascot](docs/assets/vibe-chat.png)
+
+## Demo videos
+
+[![Watch the Vibe demo showing a group choosing classes with Pip](docs/assets/vibe-demo-preview.jpg)](https://github.com/aniiishhh/vibe/blob/main/demo-video/film/renders/vibe-demo.mp4)
+
+[Watch the full demo · 1 min 57 sec](https://github.com/aniiishhh/vibe/blob/main/demo-video/film/renders/vibe-demo.mp4) · [Try the live app](https://vibe-chat.us)
+
+| Video | Focus |
+| --- | --- |
+| [AWS spotlight](https://github.com/aniiishhh/vibe/blob/main/demo-video/film-aws/renders/vibe-aws.mp4) | Hosting, authentication, live chat and background AI architecture. |
+| [Supermemory spotlight](https://github.com/aniiishhh/vibe/blob/main/demo-video/film-supermemory/renders/vibe-supermemory.mp4) | Personal memory, approval and cross-party reuse. |
+| [TinyFish spotlight](https://github.com/aniiishhh/vibe/blob/main/demo-video/film-tinyfish/renders/vibe-tinyfish.mp4) | Web research and source-backed group planning. |
+
+The videos use scripted sample conversations and illustrative course, review and travel data. The deployed app runs its authenticated backend and research integrations. Click the preview or a video link to open the MP4 file on GitHub, where it can also be downloaded.
+
+[Video source and rebuild instructions](demo-video/README.md) · [Presentation scenarios](docs/demo-scenarios.md)
 
 ## Features
 
