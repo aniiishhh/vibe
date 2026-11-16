@@ -1,0 +1,8 @@
+{
+  "region": "us-east-2",
+  "userPoolId": "us-east-2_demo",
+  "userPoolClientId": "demo",
+  "apiUrl": "/api",
+  "eventsHttpEndpoint": "https://demo.appsync-api.us-east-2.amazonaws.com/event",
+  "eventsRealtimeEndpoint": "wss://demo.appsync-realtime-api.us-east-2.amazonaws.com/event/realtime"
+}

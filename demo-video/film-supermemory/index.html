@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-400.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-500.woff2') format('woff2'); font-weight: 500; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-600.woff2') format('woff2'); font-weight: 600; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-700.woff2') format('woff2'); font-weight: 700; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #fff; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #fff; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="64.99" data-width="1920" data-height="1080">
+      <div id="supermemory-1" data-composition-id="supermemory-1" data-composition-src="compositions/supermemory-1.html" data-start="0.00" data-duration="4.16" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:1"></div>
+      <div id="supermemory-2" data-composition-id="supermemory-2" data-composition-src="compositions/supermemory-2.html" data-start="4.16" data-duration="10.82" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:2"></div>
+      <div id="supermemory-3" data-composition-id="supermemory-3" data-composition-src="compositions/supermemory-3.html" data-start="14.98" data-duration="10.32" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:3"></div>
+      <div id="supermemory-4" data-composition-id="supermemory-4" data-composition-src="compositions/supermemory-4.html" data-start="25.30" data-duration="5.52" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:4"></div>
+      <div id="supermemory-5" data-composition-id="supermemory-5" data-composition-src="compositions/supermemory-5.html" data-start="30.82" data-duration="13.69" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:5"></div>
+      <div id="supermemory-6" data-composition-id="supermemory-6" data-composition-src="compositions/supermemory-6.html" data-start="44.51" data-duration="14.4" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:6"></div>
+      <div id="supermemory-7" data-composition-id="supermemory-7" data-composition-src="compositions/supermemory-7.html" data-start="58.91" data-duration="6.08" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:7"></div>
+      <audio id="music-bed" class="clip" src="assets/music/bed.mp3" data-start="0" data-duration="64.99" data-media-start="46" data-track-index="11" data-volume="0.14" data-fade-in="0.8" data-fade-out="2.0"></audio>
+      <audio id="vo-sm1" class="clip" src="assets/voice/sm1.norm.mp3" data-start="0.20" data-duration="3.709" data-track-index="10" data-volume="1"></audio>
+      <audio id="fx-0-0-sparkle" class="clip" src="assets/sfx/sparkle.norm.mp3" data-start="0.60" data-duration="1.045" data-track-index="12" data-volume="0.35"></audio>
+      <audio id="vo-sm2" class="clip" src="assets/voice/sm2.norm.mp3" data-start="4.36" data-duration="10.371" data-track-index="10" data-volume="1"></audio>
+      <audio id="fx-1-0-pop-1" class="clip" src="assets/sfx/pop-1.norm.mp3" data-start="4.28" data-duration="0.522" data-track-index="12" data-volume="0.3"></audio>
+      <audio id="fx-1-1-pop-2" class="clip" src="assets/sfx/pop-2.norm.mp3" data-start="5.13" data-duration="0.627" data-track-index="13" data-volume="0.3"></audio>
+      <audio id="fx-1-2-pop-1" class="clip" src="assets/sfx/pop-1.norm.mp3" data-start="5.99" data-duration="0.522" data-track-index="14" data-volume="0.3"></audio>
+      <audio id="fx-1-3-sparkle" class="clip" src="assets/sfx/sparkle.norm.mp3" data-start="8.01" data-duration="1.045" data-track-index="12" data-volume="0.35"></audio>
+      <audio id="fx-1-4-whoosh-2" class="clip" src="assets/sfx/whoosh-2.norm.mp3" data-start="10.76" data-duration="0.731" data-track-index="13" data-volume="0.2"></audio>
+      <audio id="fx-1-5-sparkle" class="clip" src="assets/sfx/sparkle.norm.mp3" data-start="11.46" data-duration="1.045" data-track-index="14" data-volume="0.3"></audio>
+      <audio id="vo-sm3" class="clip" src="assets/voice/sm3.norm.mp3" data-start="15.18" data-duration="9.874" data-track-index="10" data-volume="1"></audio>
+      <audio id="fx-2-0-pop-1" class="clip" src="assets/sfx/pop-1.norm.mp3" data-start="15.38" data-duration="0.522" data-track-index="12" data-volume="0.3"></audio>
+      <audio id="fx-2-1-whoosh-1" class="clip" src="assets/sfx/whoosh-1.norm.mp3" data-start="22.74" data-duration="0.836" data-track-index="13" data-volume="0.2"></audio>
+      <audio id="fx-2-2-pop-2" class="clip" src="assets/sfx/pop-2.norm.mp3" data-start="24.38" data-duration="0.627" data-track-index="14" data-volume="0.32"></audio>
+      <audio id="vo-sm4" class="clip" src="assets/voice/sm4.norm.mp3" data-start="25.50" data-duration="5.068" data-track-index="10" data-volume="1"></audio>
+      <audio id="fx-3-0-click" class="clip" src="assets/sfx/click.norm.mp3" data-start="27.07" data-duration="0.522" data-track-index="12" data-volume="0.4"></audio>
+      <audio id="fx-3-1-click" class="clip" src="assets/sfx/click.norm.mp3" data-start="29.75" data-duration="0.522" data-track-index="13" data-volume="0.4"></audio>
+      <audio id="vo-sm5" class="clip" src="assets/voice/sm5.norm.mp3" data-start="31.02" data-duration="13.244" data-track-index="10" data-volume="1"></audio>
+      <audio id="fx-4-0-pop-1" class="clip" src="assets/sfx/pop-1.norm.mp3" data-start="31.22" data-duration="0.522" data-track-index="12" data-volume="0.3"></audio>
+      <audio id="fx-4-1-pop-2" class="clip" src="assets/sfx/pop-2.norm.mp3" data-start="32.42" data-duration="0.627" data-track-index="13" data-volume="0.3"></audio>
+      <audio id="fx-4-2-pop-2" class="clip" src="assets/sfx/pop-2.norm.mp3" data-start="33.42" data-duration="0.627" data-track-index="14" data-volume="0.3"></audio>
+      <audio id="fx-4-3-pop-1" class="clip" src="assets/sfx/pop-1.norm.mp3" data-start="35.02" data-duration="0.522" data-track-index="12" data-volume="0.3"></audio>
+      <audio id="fx-4-4-whoosh-2" class="clip" src="assets/sfx/whoosh-2.norm.mp3" data-start="38.02" data-duration="0.731" data-track-index="13" data-volume="0.2"></audio>
+      <audio id="fx-4-5-confetti" class="clip" src="assets/sfx/confetti.norm.mp3" data-start="40.07" data-duration="1.228" data-track-index="14" data-volume="0.35"></audio>
+      <audio id="fx-4-6-sparkle" class="clip" src="assets/sfx/sparkle.norm.mp3" data-start="43.08" data-duration="1.045" data-track-index="12" data-volume="0.35"></audio>
+      <audio id="vo-sm6" class="clip" src="assets/voice/sm6.norm.mp3" data-start="44.71" data-duration="13.949" data-track-index="10" data-volume="1"></audio>
+      <audio id="fx-5-0-pop-1" class="clip" src="assets/sfx/pop-1.norm.mp3" data-start="45.01" data-duration="0.522" data-track-index="12" data-volume="0.3"></audio>
+      <audio id="fx-5-1-pop-2" class="clip" src="assets/sfx/pop-2.norm.mp3" data-start="45.91" data-duration="0.627" data-track-index="13" data-volume="0.3"></audio>
+      <audio id="fx-5-2-sparkle" class="clip" src="assets/sfx/sparkle.norm.mp3" data-start="47.11" data-duration="1.045" data-track-index="14" data-volume="0.35"></audio>
+      <audio id="fx-5-3-keys" class="clip" src="assets/sfx/keys.norm.mp3" data-start="48.81" data-duration="2.247" data-track-index="12" data-volume="0.25"></audio>
+      <audio id="fx-5-4-click" class="clip" src="assets/sfx/click.norm.mp3" data-start="51.50" data-duration="0.522" data-track-index="13" data-volume="0.4"></audio>
+      <audio id="fx-5-5-sparkle" class="clip" src="assets/sfx/sparkle.norm.mp3" data-start="51.86" data-duration="1.045" data-track-index="14" data-volume="0.3"></audio>
+      <audio id="fx-5-6-pop-1" class="clip" src="assets/sfx/pop-1.norm.mp3" data-start="52.78" data-duration="0.522" data-track-index="12" data-volume="0.3"></audio>
+      <audio id="fx-5-7-boing" class="clip" src="assets/sfx/boing.norm.mp3" data-start="56.39" data-duration="0.836" data-track-index="13" data-volume="0.3"></audio>
+      <audio id="vo-sm7" class="clip" src="assets/voice/sm7.norm.mp3" data-start="59.11" data-duration="4.676" data-track-index="10" data-volume="1"></audio>
+      <audio id="fx-6-0-riser" class="clip" src="assets/sfx/riser.norm.mp3" data-start="58.31" data-duration="2.508" data-track-index="12" data-volume="0.45"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

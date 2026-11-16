@@ -1,0 +1,22 @@
+[
+  {
+    "label": "start",
+    "t": 2.433
+  },
+  {
+    "label": "profile open",
+    "t": 2.676
+  },
+  {
+    "label": "edit",
+    "t": 6.905
+  },
+  {
+    "label": "typed",
+    "t": 10.221
+  },
+  {
+    "label": "saved",
+    "t": 10.891
+  }
+]

@@ -1,0 +1,70 @@
+[
+  {
+    "label": "start",
+    "t": 2.878
+  },
+  {
+    "label": "q1 sent",
+    "t": 7.837
+  },
+  {
+    "label": "q1 answered",
+    "t": 14.225
+  },
+  {
+    "label": "q2 sent",
+    "t": 20.229
+  },
+  {
+    "label": "q2 answered",
+    "t": 25.332
+  },
+  {
+    "label": "q3 sent",
+    "t": 28.835
+  },
+  {
+    "label": "q3 answered",
+    "t": 33.94
+  },
+  {
+    "label": "q4 sent",
+    "t": 40.444
+  },
+  {
+    "label": "q4 answered",
+    "t": 46.95
+  },
+  {
+    "label": "sources",
+    "t": 52.962
+  },
+  {
+    "label": "details open",
+    "t": 55.993
+  },
+  {
+    "label": "notes",
+    "t": 57.598
+  },
+  {
+    "label": "accepted",
+    "t": 61.612
+  },
+  {
+    "label": "mode focused",
+    "t": 63.27
+  },
+  {
+    "label": "mode banter",
+    "t": 63.976
+  },
+  {
+    "label": "invite open",
+    "t": 65.61
+  },
+  {
+    "label": "qr",
+    "t": 66.687
+  }
+]

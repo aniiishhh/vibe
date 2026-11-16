@@ -536,6 +536,13 @@
       "skillPath": "skills/specialized-skills/analytics-skills/migrating-to-amazon-redshift/SKILL.md",
       "computedHash": "cfbb932c26aaaf465fe3bd5f29d0ab6aff3a8722e3cab7ed388a6cefcca87cf0"
     },
+    "music": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "music/SKILL.md",
+      "computedHash": "526c5156d1c711c459c6ad8688a8bee245a6605545a59c0c46decc948337a701",
+      "installMode": "copy"
+    },
     "processing-s3-uploads-with-step-functions": {
       "source": "aws/agent-toolkit-for-aws",
       "sourceType": "github",
@@ -680,6 +687,13 @@
       "skillPath": "skills/specialized-skills/end-user-computing-skills/setting-up-workspaces-applications/SKILL.md",
       "computedHash": "7d51dd9a9437ed63f550dcfce3e7a3ca7e7b0d61aecefc5e95aeee1f635d120e"
     },
+    "setup-api-key": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "setup-api-key/SKILL.md",
+      "computedHash": "a7861a506946fe70b8026bb84c427399d440fe20a030ce96704bd4704f1304ba",
+      "installMode": "copy"
+    },
     "shieldadvanced": {
       "source": "aws/agent-toolkit-for-aws",
       "sourceType": "github",
@@ -698,6 +712,20 @@
       "skillPath": "skills/specialized-skills/networking-and-content-delivery-skills/sitetositevpn/SKILL.md",
       "computedHash": "624544675553233bec5261b39c4d9b64b047d636a97d16415b2331874d970afe"
     },
+    "sound-effects": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "sound-effects/SKILL.md",
+      "computedHash": "5c0a1d653194633986f9887c599f3f98c595bce0fcb0e16dc5d90935ec65a6df",
+      "installMode": "copy"
+    },
+    "speech-to-text": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "speech-to-text/SKILL.md",
+      "computedHash": "14e6d7fc6af68398e89a0a40a83b01e9a992e1d81815e63523a75848a9bccd5c",
+      "installMode": "copy"
+    },
     "storing-and-querying-vectors": {
       "source": "aws/agent-toolkit-for-aws",
       "sourceType": "github",
@@ -715,6 +743,13 @@
       "sourceType": "github",
       "skillPath": "skills/specialized-skills/analytics-skills/testing-mwaa-workflow/SKILL.md",
       "computedHash": "f78edf03416cab6854b28674416e72d60a31c30996099adea1f4c5bbd471a022"
+    },
+    "text-to-speech": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "text-to-speech/SKILL.md",
+      "computedHash": "fec523d1f12af3c06c94783129f2d556fafc9309ee3f13578170f7ef33c5f97e",
+      "installMode": "copy"
     },
     "timestream-influxdb": {
       "source": "aws/agent-toolkit-for-aws",

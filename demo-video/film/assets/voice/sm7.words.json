@@ -1,0 +1,40 @@
+{
+ "duration": 4.64,
+ "words": [
+  {
+   "word": "Memory",
+   "start": 0,
+   "end": 0.4
+  },
+  {
+   "word": "with",
+   "start": 0.56,
+   "end": 0.72
+  },
+  {
+   "word": "consent.",
+   "start": 0.8,
+   "end": 1.92
+  },
+  {
+   "word": "Vibe,",
+   "start": 2,
+   "end": 2.64
+  },
+  {
+   "word": "powered",
+   "start": 2.84,
+   "end": 3.04
+  },
+  {
+   "word": "by",
+   "start": 3.16,
+   "end": 3.28
+  },
+  {
+   "word": "Supermemory.",
+   "start": 3.44,
+   "end": 4.64
+  }
+ ]
+}

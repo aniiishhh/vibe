@@ -1,0 +1,110 @@
+{
+ "duration": 6.24,
+ "words": [
+  {
+   "word": "Every",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "word": "fact",
+   "start": 0.4,
+   "end": 0.72
+  },
+  {
+   "word": "comes",
+   "start": 0.88,
+   "end": 1.04
+  },
+  {
+   "word": "back",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "word": "with",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "word": "its",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "word": "source",
+   "start": 1.6,
+   "end": 2
+  },
+  {
+   "word": "and",
+   "start": 2.16,
+   "end": 2.32
+  },
+  {
+   "word": "the",
+   "start": 2.4,
+   "end": 2.48
+  },
+  {
+   "word": "moment",
+   "start": 2.64,
+   "end": 2.8
+  },
+  {
+   "word": "it",
+   "start": 2.84,
+   "end": 2.88
+  },
+  {
+   "word": "was",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "word": "retrieved,",
+   "start": 3.12,
+   "end": 3.92
+  },
+  {
+   "word": "so",
+   "start": 4,
+   "end": 4.24
+  },
+  {
+   "word": "anyone",
+   "start": 4.32,
+   "end": 4.64
+  },
+  {
+   "word": "in",
+   "start": 4.68,
+   "end": 4.72
+  },
+  {
+   "word": "the",
+   "start": 4.8,
+   "end": 4.88
+  },
+  {
+   "word": "chat",
+   "start": 5,
+   "end": 5.12
+  },
+  {
+   "word": "can",
+   "start": 5.2,
+   "end": 5.28
+  },
+  {
+   "word": "check",
+   "start": 5.4,
+   "end": 5.52
+  },
+  {
+   "word": "it.",
+   "start": 5.6,
+   "end": 6.24
+  }
+ ]
+}

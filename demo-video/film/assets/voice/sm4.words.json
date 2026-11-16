@@ -1,0 +1,80 @@
+{
+ "duration": 5.12,
+ "words": [
+  {
+   "word": "Nothing",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "word": "is",
+   "start": 0.4,
+   "end": 0.56
+  },
+  {
+   "word": "shared",
+   "start": 0.72,
+   "end": 0.88
+  },
+  {
+   "word": "until",
+   "start": 0.96,
+   "end": 1.28
+  },
+  {
+   "word": "Maya",
+   "start": 1.4,
+   "end": 1.6
+  },
+  {
+   "word": "approves",
+   "start": 1.76,
+   "end": 2.08
+  },
+  {
+   "word": "it,",
+   "start": 2.16,
+   "end": 2.533
+  },
+  {
+   "word": "and",
+   "start": 2.587,
+   "end": 2.64
+  },
+  {
+   "word": "switches",
+   "start": 2.76,
+   "end": 2.96
+  },
+  {
+   "word": "it",
+   "start": 3,
+   "end": 3.04
+  },
+  {
+   "word": "on",
+   "start": 3.2,
+   "end": 3.36
+  },
+  {
+   "word": "for",
+   "start": 3.4,
+   "end": 3.44
+  },
+  {
+   "word": "a",
+   "start": 3.52,
+   "end": 3.6
+  },
+  {
+   "word": "specific",
+   "start": 3.68,
+   "end": 4.16
+  },
+  {
+   "word": "party.",
+   "start": 4.6,
+   "end": 5.12
+  }
+ ]
+}

@@ -1,0 +1,64 @@
+<template>
+  <style>
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-400.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-500.woff2') format('woff2'); font-weight: 500; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-600.woff2') format('woff2'); font-weight: 600; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-700.woff2') format('woff2'); font-weight: 700; }
+#root { position: absolute; inset: 0; overflow: hidden; background: #ffffff; font-family: 'Geist', sans-serif; color: #1f1b27; }
+.cam { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.cam video, .cam img.still { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; display: block; }
+.tagwrap { position: absolute; left: 200px; bottom: 132px; z-index: 40; }
+.tag { display: flex; align-items: center; gap: 18px; padding: 18px 30px 18px 22px; background: #ffffff; border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(31,27,39,.18), 0 0 0 1px rgba(31,27,39,.06); font: 600 38px/1.1 'Geist', sans-serif; color: #1f1b27; white-space: nowrap; }
+.tag i { display: block; width: 8px; height: 46px; border-radius: 4px; background: #ec5a44; }
+.tag small { font-weight: 500; color: #6b6677; font-size: 30px; }
+#end-lock { position: absolute; left: 0; top: 0; width: 1920px; display: flex; justify-content: center; align-items: center; gap: 28px; top: 250px; }
+#end-mark { width: 230px; height: 230px; }
+#end-word { font: 700 190px/1 'Geist'; letter-spacing: -0.04em; color: #1f1b27; clip-path: inset(0 100% 0 0); }
+#end-tagline { position: absolute; left: 0; width: 1920px; top: 560px; text-align: center; font: 600 60px 'Geist'; letter-spacing: -0.02em; }
+#end-tagline span { display: inline-block; margin: 0 8px; }
+#end-url { position: absolute; left: 50%; top: 680px; transform: translateX(-50%); padding: 20px 44px; border-radius: 18px; background: #ec5a44; color: #fff; font: 600 52px 'Geist'; }
+#end-credit { position: absolute; left: 0; width: 1920px; top: 860px; text-align: center; font: 500 34px 'Geist'; color: #3b3646; }
+#end-note { position: absolute; left: 0; width: 1920px; top: 912px; text-align: center; font: 400 28px 'Geist'; color: #8a8594; }
+#end-pip { position: absolute; left: 0; top: 0; width: 340px; }</style>
+  <div id="root" data-composition-id="end" data-width="1920" data-height="1080" data-duration="7.1">
+
+<div id="end-lockwrap" class="clip" data-start="0" data-duration="7.1" data-track-index="1"><div id="end-lock"><div id="end-mark"><svg width="230" height="230" viewBox="0 0 24 24"><path d="M1.3 5.1Q12 8.9 22.7 5.1" fill="none" stroke="#3b3646" stroke-width="1.3" stroke-linecap="round"/><path d="M2.5 5.6Q4.5 6.2 6.5 6.6L5.05 11.9Q4.5 13.1 3.95 11.9Z" fill="#f2b33d"/><path d="M17.5 6.6Q19.5 6.2 21.5 5.6L20.05 11.9Q19.5 13.1 18.95 11.9Z" fill="#2fb3b8"/><path d="M7.3 6.75Q12 7.95 16.7 6.75L12.9 19.7Q12 21.3 11.1 19.7Z" fill="#ec5a44"/></svg></div><div id="end-word">vibe</div></div></div>
+<div id="end-tagwrap" class="clip" data-start="1.45" data-duration="5.65" data-track-index="2"><div id="end-tagline"><span>Your</span><span>group’s</span><span>AI</span><span>teammate</span></div></div>
+<div id="end-urlwrap" class="clip" data-start="3.35" data-duration="3.75" data-track-index="3"><div id="end-url">vibe-chat.us</div></div>
+<div id="end-creditwrap" class="clip" data-start="4.3" data-duration="2.8" data-track-index="4"><div id="end-credit">Built by Anish &amp; Bhavesh · SunHacks 2026</div><div id="end-note">Demo conversations use sample data.</div></div>
+<div id="end-pipwrap" class="clip" data-start="0" data-duration="7.1" data-track-index="5"><img id="end-pip" src="assets/pip/celebrate-present.png" alt="" /></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+const F = 0.6;
+function camState(s, cx, cy) {
+  let x = 960 - cx * F * s, y = 540 - cy * F * s;
+  x = Math.min(0, Math.max(1920 - 1920 * s, x));
+  y = Math.min(0, Math.max(1080 - 1080 * s, y));
+  return { scale: s, x, y };
+}
+function cam(tl, sel, t, d, s, cx, cy, ease) { tl.to(sel, { ...camState(s, cx, cy), duration: d, ease: ease || 'power3.inOut' }, t); }
+function camSet(tl, sel, t, s, cx, cy) { tl.set(sel, camState(s, cx, cy), t); }
+function tagIn(tl, sel, t, d) {
+  tl.fromTo(sel, { opacity: 0, filter: 'blur(8px)', x: -14 }, { opacity: 1, filter: 'blur(0px)', x: 0, duration: 0.2, ease: 'expo.out' }, t);
+  tl.to(sel, { opacity: 0, filter: 'blur(6px)', duration: 0.14, ease: 'power2.in' }, t + d - 0.16);
+}
+
+// Pip flies in carrying the mark; the mark lands in the lockup with the riser's hit.
+tl.fromTo('#end-pip', { x: 2000, y: 640, rotation: 16 }, { x: 1290, y: 140, rotation: 0, duration: 0.8, ease: 'power2.out' }, 0.0);
+tl.fromTo('#end-mark', { x: 640, y: -60, scale: 0.55, rotation: -12 }, { x: 0, y: 0, scale: 1, rotation: 0, duration: 0.55, ease: 'back.out(1.5)' }, 0.32);
+tl.fromTo('#end-word', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 0.45, ease: 'power3.out' }, 0.9);
+tl.to('#end-pip', { x: 1450, y: 520, rotation: -8, duration: 0.7, ease: 'back.out(1.4)' }, 1.0);
+['1','2','3','4'].forEach(() => {});
+tl.fromTo('#end-tagline span:nth-child(1)', { opacity: 0, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.14, ease: 'power2.out' }, 1.50);
+tl.fromTo('#end-tagline span:nth-child(2)', { opacity: 0, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.14, ease: 'power2.out' }, 1.59);
+tl.fromTo('#end-tagline span:nth-child(3)', { opacity: 0, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.14, ease: 'power2.out' }, 1.68);
+tl.fromTo('#end-tagline span:nth-child(4)', { opacity: 0, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.14, ease: 'power2.out' }, 1.77);
+tl.fromTo('#end-url', { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(1.8)' }, 3.4);
+tl.fromTo('#end-credit', { opacity: 0 }, { opacity: 1, duration: 0.35 }, 4.35);
+tl.fromTo('#end-note', { opacity: 0 }, { opacity: 1, duration: 0.35 }, 4.55);
+    window.__timelines["end"] = tl;
+  </script>
+</template>

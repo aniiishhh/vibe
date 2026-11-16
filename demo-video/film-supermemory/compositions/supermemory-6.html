@@ -1,0 +1,59 @@
+<template>
+  <style>@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-400.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-500.woff2') format('woff2'); font-weight: 500; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-600.woff2') format('woff2'); font-weight: 600; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-700.woff2') format('woff2'); font-weight: 700; }
+#root { position: absolute; inset: 0; overflow: hidden; background: #ffffff; font-family: 'Geist', sans-serif; color: #1f1b27; }
+.cam { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.cam video, .cam img.still { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; display: block; }
+.tagwrap { position: absolute; left: 200px; bottom: 132px; z-index: 40; }
+.tag { display: flex; align-items: center; gap: 18px; padding: 18px 30px 18px 22px; background: #fff; border-radius: 14px; box-shadow: 0 12px 30px rgba(31,27,39,.18), 0 0 0 1px rgba(31,27,39,.06); font: 600 38px/1.1 'Geist'; white-space: nowrap; }
+.tag i { display: block; width: 8px; height: 46px; border-radius: 4px; background: #ec5a44; }
+.tag small { font-weight: 500; color: #5d5868; font-size: 30px; }
+.world { position: absolute; inset: 0; background: #f6f6f8; }
+.card { position: absolute; background: #fff; border-radius: 22px; box-shadow: 0 10px 30px rgba(31,27,39,.10), 0 0 0 1px rgba(31,27,39,.06); }
+.row { position: absolute; left: 200px; width: 1000px; display: flex; gap: 30px; align-items: center; }
+.row .ic { flex: none; width: 96px; height: 96px; border-radius: 24px; background: #fde8e4; color: #ec5a44; display: grid; place-items: center; font: 700 46px 'Geist'; }
+.row b { display: block; font: 700 52px/1.1 'Geist'; letter-spacing: -0.02em; }
+.row span { display: block; margin-top: 8px; font: 400 34px/1.25 'Geist'; color: #5d5868; }
+.eyebrow { position: absolute; left: 200px; top: 150px; font: 600 34px 'Geist'; color: #ec5a44; }
+.chip { position: absolute; padding: 16px 26px; background: #fff; border-radius: 14px; font: 600 32px 'Geist'; box-shadow: 0 12px 26px rgba(31,27,39,.16), 0 0 0 1px rgba(31,27,39,.06); white-space: nowrap; }
+.mono { font-family: 'Geist', sans-serif; font-weight: 500; color: #3b3646; }
+#dg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+#dg img { position: absolute; left: 115.81256231306077px; top: 0; width: 1688.3748753738785px; height: 1080px; }
+#dg svg { position: absolute; left: 115.81256231306077px; top: 0; width: 1688.3748753738785px; height: 1080px; overflow: visible; }</style>
+  <div id="root" data-composition-id="supermemory-6" data-width="1920" data-height="1080" data-duration="14.4">
+<div class="clip" id="supermemory-6-w22" data-start="0" data-duration="4.1" data-track-index="2" style="position:absolute;inset:0;z-index:20"><div class="world" id="supermemory-6-w22g">
+<div class="eyebrow">Supermemory consolidates repeats</div>
+<div class="chip" id="supermemory-6-m1" style="left:300px;top:340px;background:hsl(220 90% 94%)">I’m vegetarian</div>
+<div class="chip" id="supermemory-6-m2" style="left:300px;top:520px;background:hsl(220 90% 94%)">veggie only for me lol</div>
+<div class="chip" id="supermemory-6-f" style="left:1150px;top:430px;font-size:40px"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ec5a44;margin-right:14px"></span>Vegetarian · 1 fact</div></div></div>
+<div class="cam" id="supermemory-6-c23"><video id="supermemory-6-c23v" class="clip" src="assets/clips/memory2.mp4" muted playsinline data-start="4.1" data-duration="4.07" data-media-start="8" data-playback-rate="1" data-track-index="1"></video><div id="supermemory-6-r" style="position:absolute;left:657px;top:519.6px;width:384px;height:44.4px;border:3px solid #ec5a44;border-radius:12px;box-shadow:0 0 0 6px rgba(236,90,68,.15);opacity:0"></div></div>
+<div class="clip tagwrap" id="supermemory-6-t24" data-start="4.4" data-duration="3.5699999999999994" data-track-index="5"><div class="tag" id="supermemory-6-t24i"><i></i><span>Edits apply on the next answer</span></div></div>
+<div class="clip" id="supermemory-6-w25" data-start="8.17" data-duration="6.23" data-track-index="2" style="position:absolute;inset:0;z-index:20"><div class="world" id="supermemory-6-w25g">
+<div class="eyebrow">DynamoDB is the source of truth</div>
+<div class="card" style="left:200px;top:280px;width:700px;height:400px;padding:30px"><b style="font:600 36px 'Geist'">Supermemory results</b>
+  <div class="chip" style="position:relative;margin-top:30px;display:inline-block">Vegan. No meat, dairy or eggs.</div><br/>
+  <div class="chip" id="supermemory-6-old" style="position:relative;margin-top:24px;display:inline-block;color:#8a8594">Vegetarian (deleted)<div id="supermemory-6-x" style="position:absolute;left:18px;right:18px;top:50%;height:4px;background:#ec5a44;transform-origin:0 50%;transform:scaleX(0)"></div></div></div>
+<div class="card" style="left:1050px;top:330px;width:660px;height:300px;padding:30px"><b style="font:600 36px 'Geist'">Re-checked in DynamoDB</b><span style="display:block;margin-top:14px;font:400 30px/1.35 'Geist';color:#5d5868">Ownership, approval, version, opt-in. Stale or deleted facts are dropped.</span></div></div></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+const F = 0.6;
+function camState(s, cx, cy) { let x = 960 - cx * F * s, y = 540 - cy * F * s; x = Math.min(0, Math.max(1920 - 1920 * s, x)); y = Math.min(0, Math.max(1080 - 1080 * s, y)); return { scale: s, x, y }; }
+function cam(tl, sel, t, d, s, cx, cy, ease) { tl.to(sel, { ...camState(s, cx, cy), duration: d, ease: ease || 'power3.inOut' }, t); }
+function camSet(tl, sel, t, s, cx, cy) { tl.set(sel, camState(s, cx, cy), t); }
+function tagIn(tl, sel, t, d) { tl.fromTo(sel, { opacity: 0, filter: 'blur(8px)', x: -14 }, { opacity: 1, filter: 'blur(0px)', x: 0, duration: 0.2, ease: 'expo.out' }, t); tl.to(sel, { opacity: 0, filter: 'blur(6px)', duration: 0.14, ease: 'power2.in' }, t + d - 0.16); }
+function pop(tl, sel, t) { tl.fromTo(sel, { opacity: 0, y: 24, filter: 'blur(6px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.45, ease: 'expo.out' }, t); }
+tl.fromTo('#supermemory-6-w22g', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.22, ease: 'expo.out' }, 0);
+pop(tl, '#supermemory-6-m1', 0.4); pop(tl, '#supermemory-6-m2', 0.9); tl.to(['#supermemory-6-m1', '#supermemory-6-m2'], { x: 700, y: (i) => (i ? -90 : 90), opacity: 0, scale: 0.8, duration: 0.6, ease: 'power2.in' }, 2.4); pop(tl, '#supermemory-6-f', 2.8);
+camSet(tl, '#supermemory-6-c23', 0, 1.6, 1850, 1250);
+cam(tl, '#supermemory-6-c23', 6.95, 0.5, 1.8, 1700, 900);
+tl.fromTo('#supermemory-6-r', { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.35, ease: 'expo.out' }, 7.35);
+tagIn(tl, '#supermemory-6-t24i', 4.4, 3.5699999999999994);
+tl.fromTo('#supermemory-6-w25g', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.22, ease: 'expo.out' }, 8.17);
+tl.fromTo('#supermemory-6-x', { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: 'power2.out' }, 11.88); tl.to('#supermemory-6-old', { opacity: 0.4, duration: 0.3 }, 12.08);
+    window.__timelines["supermemory-6"] = tl;
+  </script>
+</template>

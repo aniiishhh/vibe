@@ -1,0 +1,26 @@
+[
+  {
+    "label": "start",
+    "t": 2.237
+  },
+  {
+    "label": "candidate visible",
+    "t": 3.87
+  },
+  {
+    "label": "approved",
+    "t": 4.375
+  },
+  {
+    "label": "trip open",
+    "t": 7.226
+  },
+  {
+    "label": "details open",
+    "t": 9.658
+  },
+  {
+    "label": "sharing on",
+    "t": 11.661
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "label": "start",
+    "t": 3.201
+  },
+  {
+    "label": "weather sent",
+    "t": 3.206
+  },
+  {
+    "label": "weather answered",
+    "t": 9.112
+  },
+  {
+    "label": "weather sources",
+    "t": 13.858
+  },
+  {
+    "label": "park sent",
+    "t": 17.361
+  },
+  {
+    "label": "park answered",
+    "t": 23.465
+  },
+  {
+    "label": "park sources",
+    "t": 28.652
+  }
+]

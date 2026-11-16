@@ -1,0 +1,116 @@
+<template>
+  <style>
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-400.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-500.woff2') format('woff2'); font-weight: 500; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-600.woff2') format('woff2'); font-weight: 600; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-700.woff2') format('woff2'); font-weight: 700; }
+#root { position: absolute; inset: 0; overflow: hidden; background: #ffffff; font-family: 'Geist', sans-serif; color: #1f1b27; }
+.cam { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.cam video, .cam img.still { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; display: block; }
+.tagwrap { position: absolute; left: 200px; bottom: 132px; z-index: 40; }
+.tag { display: flex; align-items: center; gap: 18px; padding: 18px 30px 18px 22px; background: #ffffff; border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(31,27,39,.18), 0 0 0 1px rgba(31,27,39,.06); font: 600 38px/1.1 'Geist', sans-serif; color: #1f1b27; white-space: nowrap; }
+.tag i { display: block; width: 8px; height: 46px; border-radius: 4px; background: #ec5a44; }
+.tag small { font-weight: 500; color: #6b6677; font-size: 30px; }
+#aws-ground { position: absolute; inset: 0; background: #ffffff; }
+#aws-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+#aws-img { position: absolute; left: 115.81256231306077px; top: 0; width: 1688.3748753738785px; height: 1080px; }
+#aws-svg { position: absolute; left: 115.81256231306077px; top: 0; width: 1688.3748753738785px; height: 1080px; overflow: visible; }
+#aws-trip { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; z-index: 10; border-radius: 0; }
+#aws-trip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#aws-pip { position: absolute; left: 0; top: 0; width: 210px; z-index: 12; }
+#aws-white { position: absolute; inset: 0; background: #ffffff; z-index: 20; opacity: 0; }</style>
+  <div id="root" data-composition-id="aws" data-width="1920" data-height="1080" data-duration="25.6">
+
+<div id="aws-ground"></div>
+<div id="aws-stage" data-layout-allow-overflow>
+  <img id="aws-img" src="assets/stills/aws-architecture.png" alt="Vibe AWS architecture" />
+  <svg id="aws-svg" viewBox="0 0 1568 1003"><rect id="aws-h-cf" x="196" y="258" width="214" height="134" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-cog" x="300" y="418" width="92" height="112" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-apigw" x="288" y="540" width="96" height="122" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-lam" x="444" y="466" width="88" height="132" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-ddb" x="548" y="462" width="88" height="184" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-disp" x="696" y="462" width="88" height="138" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-sqs" x="850" y="372" width="86" height="136" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-work" x="992" y="372" width="82" height="130" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-bed" x="1170" y="444" width="98" height="150" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-res" x="1166" y="238" width="140" height="110" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-ext" x="1384" y="206" width="168" height="260" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-sync" x="530" y="662" width="90" height="124" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-evb" x="1086" y="822" width="218" height="80" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-h-sm" x="1386" y="504" width="168" height="102" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><circle id="aws-dot" cx="80" cy="418" r="11" fill="#ec5a44" stroke="#fff" stroke-width="4" opacity="0" /></svg>
+  <img id="aws-pip" src="assets/pip/build-zoom.png" alt="" />
+</div>
+<div id="aws-tripwrap" class="clip" data-start="0" data-duration="1.4" data-track-index="2"><div id="aws-trip"><img src="assets/stills/trip-end.png" alt="" /></div></div>
+<div id="aws-whitewrap" class="clip" data-start="24.5" data-duration="1.1" data-track-index="3"><div id="aws-white"></div></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+const F = 0.6;
+function camState(s, cx, cy) {
+  let x = 960 - cx * F * s, y = 540 - cy * F * s;
+  x = Math.min(0, Math.max(1920 - 1920 * s, x));
+  y = Math.min(0, Math.max(1080 - 1080 * s, y));
+  return { scale: s, x, y };
+}
+function cam(tl, sel, t, d, s, cx, cy, ease) { tl.to(sel, { ...camState(s, cx, cy), duration: d, ease: ease || 'power3.inOut' }, t); }
+function camSet(tl, sel, t, s, cx, cy) { tl.set(sel, camState(s, cx, cy), t); }
+function tagIn(tl, sel, t, d) {
+  tl.fromTo(sel, { opacity: 0, filter: 'blur(8px)', x: -14 }, { opacity: 1, filter: 'blur(0px)', x: 0, duration: 0.2, ease: 'expo.out' }, t);
+  tl.to(sel, { opacity: 0, filter: 'blur(6px)', duration: 0.14, ease: 'power2.in' }, t + d - 0.16);
+}
+
+// Carry: the trip chat shrinks onto the diagram's laptop while the diagram arrives.
+tl.set('#aws-stage', { scale: 1, x: 0, y: 0 }, 0);
+tl.fromTo('#aws-stage', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.25);
+tl.fromTo('#aws-trip', { scale: 1, x: 0, y: 0, opacity: 1 }, { scale: 0.03, x: 136.5, y: 433.9, duration: 0.95, ease: 'power3.inOut' }, 0.05);
+tl.to('#aws-trip', { opacity: 0, duration: 0.25 }, 1.05);
+tl.to('#aws-dot', { opacity: 1, duration: 0.2 }, 1.1);
+// Camera across the diagram, following the narration.
+tl.to('#aws-stage', { ...{scale:1.850,x:0.0,y:-236.9}, duration: 0.6, ease: 'power3.inOut' }, 1.55);
+tl.to('#aws-stage', { ...{scale:1.850,x:-320.0,y:-575.5}, duration: 0.6, ease: 'power3.inOut' }, 5.45);
+tl.to('#aws-stage', { ...{scale:1.600,x:-1152.0,y:-183.6}, duration: 0.65, ease: 'power3.inOut' }, 9.8);
+tl.to('#aws-stage', { ...{scale:1.850,x:-90.9,y:-685.1}, duration: 0.6, ease: 'power3.inOut' }, 19.2);
+tl.to('#aws-stage', { ...{scale:1.850,x:-1632.0,y:-918.0}, duration: 0.6, ease: 'power3.inOut' }, 21.95);
+tl.to('#aws-stage', { ...{scale:2.200,x:-2304.0,y:-786.6}, duration: 0.6, ease: 'power3.inOut' }, 23.55);
+// Zoom through the Supermemory box into the next scene.
+tl.to('#aws-stage', { scale: 9, x: -14328.0, y: -4838.5, duration: 0.75, ease: 'power3.in' }, 24.6);
+tl.fromTo('#aws-white', { opacity: 0 }, { opacity: 1, duration: 0.35, ease: 'power2.in' }, 25.0);
+tl.fromTo('#aws-h-cf', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 1.8);
+tl.to('#aws-h-cf', { opacity: 0, duration: 0.25 }, 5.5);
+tl.fromTo('#aws-h-cog', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 4.15);
+tl.to('#aws-h-cog', { opacity: 0, duration: 0.25 }, 5.5);
+tl.fromTo('#aws-h-apigw', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 5.8);
+tl.to('#aws-h-apigw', { opacity: 0, duration: 0.25 }, 9.9);
+tl.fromTo('#aws-h-lam', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 6.85);
+tl.to('#aws-h-lam', { opacity: 0, duration: 0.25 }, 9.9);
+tl.fromTo('#aws-h-ddb', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 8.6);
+tl.to('#aws-h-ddb', { opacity: 0, duration: 0.25 }, 9.9);
+tl.fromTo('#aws-h-disp', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 10);
+tl.to('#aws-h-disp', { opacity: 0, duration: 0.25 }, 19.2);
+tl.fromTo('#aws-h-sqs', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 12.3);
+tl.to('#aws-h-sqs', { opacity: 0, duration: 0.25 }, 19.2);
+tl.fromTo('#aws-h-work', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 13.4);
+tl.to('#aws-h-work', { opacity: 0, duration: 0.25 }, 19.2);
+tl.fromTo('#aws-h-bed', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 14.5);
+tl.to('#aws-h-bed', { opacity: 0, duration: 0.25 }, 19.2);
+tl.fromTo('#aws-h-res', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 17.8);
+tl.to('#aws-h-res', { opacity: 0, duration: 0.25 }, 19.2);
+tl.fromTo('#aws-h-ext', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 18);
+tl.to('#aws-h-ext', { opacity: 0, duration: 0.25 }, 19.2);
+tl.fromTo('#aws-h-sync', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 19.4);
+tl.to('#aws-h-sync', { opacity: 0, duration: 0.25 }, 22.1);
+tl.fromTo('#aws-h-evb', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 22.3);
+tl.to('#aws-h-evb', { opacity: 0, duration: 0.25 }, 23.8);
+tl.fromTo('#aws-h-sm', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 23.7);
+tl.to('#aws-h-sm', { opacity: 0, duration: 0.25 }, 25.6);
+tl.to('#aws-dot', { attr: { cx: 124, cy: 592 }, duration: 0.50, ease: 'power2.inOut' }, 5.40);
+tl.to('#aws-dot', { attr: { cx: 335, cy: 592 }, duration: 0.55, ease: 'power2.inOut' }, 5.95);
+tl.to('#aws-dot', { attr: { cx: 488, cy: 520 }, duration: 0.55, ease: 'power2.inOut' }, 6.55);
+tl.to('#aws-dot', { attr: { cx: 590, cy: 520 }, duration: 0.55, ease: 'power2.inOut' }, 8.15);
+tl.to('#aws-dot', { attr: { cx: 740, cy: 520 }, duration: 0.55, ease: 'power2.inOut' }, 9.75);
+tl.to('#aws-dot', { attr: { cx: 892, cy: 430 }, duration: 0.55, ease: 'power2.inOut' }, 11.95);
+tl.to('#aws-dot', { attr: { cx: 1033, cy: 430 }, duration: 0.55, ease: 'power2.inOut' }, 12.95);
+tl.to('#aws-dot', { attr: { cx: 1218, cy: 505 }, duration: 0.55, ease: 'power2.inOut' }, 14.15);
+tl.to('#aws-dot', { attr: { cx: 1468, cy: 421 }, duration: 0.55, ease: 'power2.inOut' }, 17.35);
+tl.to('#aws-dot', { attr: { cx: 1033, cy: 430 }, duration: 0.55, ease: 'power2.inOut' }, 18.90);
+tl.to('#aws-dot', { attr: { cx: 745, cy: 690 }, duration: 0.55, ease: 'power2.inOut' }, 19.45);
+tl.to('#aws-dot', { attr: { cx: 575, cy: 712 }, duration: 0.50, ease: 'power2.inOut' }, 20.00);
+tl.to('#aws-dot', { attr: { cx: 125, cy: 712 }, duration: 0.55, ease: 'power2.inOut' }, 20.65);
+tl.to('#aws-dot', { attr: { cx: 48, cy: 590 }, duration: 0.40, ease: 'power2.inOut' }, 21.20);
+tl.to('#aws-dot', { opacity: 0, duration: 0.2 }, 21.8);
+// Pip flies in from the right and lands beside the Supermemory box.
+tl.fromTo('#aws-pip', { x: 1946.321036889332, y: 323.0309072781655, rotation: -18, opacity: 1 }, { x: 1311.0269192422734, y: 662.2133599202393, rotation: 0, duration: 0.7, ease: 'back.out(1.6)' }, 23.75);
+tl.set('#aws-pip', { opacity: 0 }, 0);
+tl.set('#aws-pip', { opacity: 1 }, 23.75);
+    window.__timelines["aws"] = tl;
+  </script>
+</template>

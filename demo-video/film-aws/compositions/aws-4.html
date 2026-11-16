@@ -1,0 +1,54 @@
+<template>
+  <style>@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-400.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-500.woff2') format('woff2'); font-weight: 500; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-600.woff2') format('woff2'); font-weight: 600; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-700.woff2') format('woff2'); font-weight: 700; }
+#root { position: absolute; inset: 0; overflow: hidden; background: #ffffff; font-family: 'Geist', sans-serif; color: #1f1b27; }
+.cam { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.cam video, .cam img.still { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; display: block; }
+.tagwrap { position: absolute; left: 200px; bottom: 132px; z-index: 40; }
+.tag { display: flex; align-items: center; gap: 18px; padding: 18px 30px 18px 22px; background: #fff; border-radius: 14px; box-shadow: 0 12px 30px rgba(31,27,39,.18), 0 0 0 1px rgba(31,27,39,.06); font: 600 38px/1.1 'Geist'; white-space: nowrap; }
+.tag i { display: block; width: 8px; height: 46px; border-radius: 4px; background: #ec5a44; }
+.tag small { font-weight: 500; color: #5d5868; font-size: 30px; }
+.world { position: absolute; inset: 0; background: #f6f6f8; }
+.card { position: absolute; background: #fff; border-radius: 22px; box-shadow: 0 10px 30px rgba(31,27,39,.10), 0 0 0 1px rgba(31,27,39,.06); }
+.row { position: absolute; left: 200px; width: 1000px; display: flex; gap: 30px; align-items: center; }
+.row .ic { flex: none; width: 96px; height: 96px; border-radius: 24px; background: #fde8e4; color: #ec5a44; display: grid; place-items: center; font: 700 46px 'Geist'; }
+.row b { display: block; font: 700 52px/1.1 'Geist'; letter-spacing: -0.02em; }
+.row span { display: block; margin-top: 8px; font: 400 34px/1.25 'Geist'; color: #5d5868; }
+.eyebrow { position: absolute; left: 200px; top: 150px; font: 600 34px 'Geist'; color: #ec5a44; }
+.chip { position: absolute; padding: 16px 26px; background: #fff; border-radius: 14px; font: 600 32px 'Geist'; box-shadow: 0 12px 26px rgba(31,27,39,.16), 0 0 0 1px rgba(31,27,39,.06); white-space: nowrap; }
+.mono { font-family: 'Geist', sans-serif; font-weight: 500; color: #3b3646; }
+#dg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+#dg img { position: absolute; left: 115.81256231306077px; top: 0; width: 1688.3748753738785px; height: 1080px; }
+#dg svg { position: absolute; left: 115.81256231306077px; top: 0; width: 1688.3748753738785px; height: 1080px; overflow: visible; }</style>
+  <div id="root" data-composition-id="aws-4" data-width="1920" data-height="1080" data-duration="8.81">
+<div class="clip" id="aws-4-dgwrap" data-start="0" data-duration="8.81" data-track-index="1" style="position:absolute;inset:0;background:#fff"><div id="dg" data-layout-allow-overflow><img src="assets/stills/aws-architecture.png" alt="Vibe AWS architecture" /><svg viewBox="0 0 1568 1003"><rect id="aws-4-h-ddb" x="548" y="462" width="88" height="184" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-4-h-st" x="630" y="470" width="80" height="50" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-4-h-disp" x="696" y="462" width="88" height="138" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-4-h-sqs" x="850" y="372" width="86" height="136" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><rect id="aws-4-h-sqm" x="850" y="532" width="86" height="128" rx="12" pathLength="1" fill="rgba(236,90,68,.08)" stroke="#ec5a44" stroke-width="4" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" /><circle id="aws-4-dot" cx="590" cy="520" r="11" fill="#ec5a44" stroke="#fff" stroke-width="4" opacity="0" /></svg></div></div>
+<div class="clip tagwrap" id="aws-4-t29" data-start="5.16" data-duration="3.5500000000000007" data-track-index="5"><div class="tag" id="aws-4-t29i"><i></i><span>SQS FIFO <small>ordered per party</small></span></div></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+const F = 0.6;
+function camState(s, cx, cy) { let x = 960 - cx * F * s, y = 540 - cy * F * s; x = Math.min(0, Math.max(1920 - 1920 * s, x)); y = Math.min(0, Math.max(1080 - 1080 * s, y)); return { scale: s, x, y }; }
+function cam(tl, sel, t, d, s, cx, cy, ease) { tl.to(sel, { ...camState(s, cx, cy), duration: d, ease: ease || 'power3.inOut' }, t); }
+function camSet(tl, sel, t, s, cx, cy) { tl.set(sel, camState(s, cx, cy), t); }
+function tagIn(tl, sel, t, d) { tl.fromTo(sel, { opacity: 0, filter: 'blur(8px)', x: -14 }, { opacity: 1, filter: 'blur(0px)', x: 0, duration: 0.2, ease: 'expo.out' }, t); tl.to(sel, { opacity: 0, filter: 'blur(6px)', duration: 0.14, ease: 'power2.in' }, t + d - 0.16); }
+function pop(tl, sel, t) { tl.fromTo(sel, { opacity: 0, y: 24, filter: 'blur(6px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.45, ease: 'expo.out' }, t); }
+tl.set('#dg', { scale: 1.850, x: -320.0, y: -575.5 }, 0);
+tl.to('#dg', { ...{ scale: 1.850, x: -768.2, y: -456.0 }, duration: 0.6, ease: 'power3.inOut' }, 0.1);
+tl.fromTo('#aws-4-h-ddb', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 0.2);
+tl.to('#aws-4-h-ddb', { opacity: 0, duration: 0.25 }, 2.2);
+tl.fromTo('#aws-4-h-st', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 0.88);
+tl.fromTo('#aws-4-h-disp', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 2.2);
+tl.fromTo('#aws-4-h-sqs', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 4.4);
+tl.fromTo('#aws-4-h-sqm', { opacity: 0, attr: { 'stroke-dashoffset': 1 } }, { opacity: 1, attr: { 'stroke-dashoffset': 0 }, duration: 0.45, ease: 'power2.out' }, 4.7);
+tl.fromTo('#aws-4-dot', { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0);
+tl.to('#aws-4-dot', { attr: { cx: 740, cy: 520 }, duration: 0.55, ease: 'power2.inOut' }, 1.85);
+tl.to('#aws-4-dot', { attr: { cx: 892, cy: 430 }, duration: 0.55, ease: 'power2.inOut' }, 4.15);
+tl.to('#aws-4-dot', { attr: { cx: 892, cy: 600 }, duration: 0.55, ease: 'power2.inOut' }, 5.45);
+tl.to('#aws-4-dot', { attr: { cx: 1033, cy: 600 }, duration: 0.55, ease: 'power2.inOut' }, 6.25);
+tagIn(tl, '#aws-4-t29i', 5.16, 3.5500000000000007);
+    window.__timelines["aws-4"] = tl;
+  </script>
+</template>
