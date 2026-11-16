@@ -1,0 +1,115 @@
+{
+ "duration": 9.6,
+ "words": [
+  {
+   "word": "Lambda",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "word": "workers",
+   "start": 0.4,
+   "end": 0.8
+  },
+  {
+   "word": "call",
+   "start": 0.88,
+   "end": 1.04
+  },
+  {
+   "word": "Claude",
+   "start": 1.12,
+   "end": 1.44
+  },
+  {
+   "word": "Haiku",
+   "start": 1.48,
+   "end": 1.92
+  },
+  {
+   "word": "4.5",
+   "start": 2,
+   "end": 2.8
+  },
+  {
+   "word": "on",
+   "start": 2.88,
+   "end": 3.04
+  },
+  {
+   "word": "Amazon",
+   "start": 3.12,
+   "end": 3.52
+  },
+  {
+   "word": "Bedrock.",
+   "start": 3.64,
+   "end": 4.52
+  },
+  {
+   "word": "It",
+   "start": 4.56,
+   "end": 4.64
+  },
+  {
+   "word": "powers",
+   "start": 4.8,
+   "end": 4.96
+  },
+  {
+   "word": "the",
+   "start": 5.04,
+   "end": 5.08
+  },
+  {
+   "word": "replies,",
+   "start": 5.12,
+   "end": 5.88
+  },
+  {
+   "word": "the",
+   "start": 5.92,
+   "end": 6
+  },
+  {
+   "word": "memory",
+   "start": 6.16,
+   "end": 6.32
+  },
+  {
+   "word": "extraction,",
+   "start": 6.4,
+   "end": 7.16
+  },
+  {
+   "word": "and",
+   "start": 7.2,
+   "end": 7.44
+  },
+  {
+   "word": "even",
+   "start": 7.52,
+   "end": 7.76
+  },
+  {
+   "word": "picks",
+   "start": 7.8,
+   "end": 8
+  },
+  {
+   "word": "each",
+   "start": 8.08,
+   "end": 8.16
+  },
+  {
+   "word": "party's",
+   "start": 8.24,
+   "end": 8.56
+  },
+  {
+   "word": "theme.",
+   "start": 9.04,
+   "end": 9.6
+  }
+ ]
+}

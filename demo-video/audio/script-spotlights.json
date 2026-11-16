@@ -1,0 +1,30 @@
+{
+  "voiceId": "cgSgspJ2msm6clMCkdW9",
+  "voiceName": "Jessica - Playful, Bright, Warm",
+  "model": "eleven_v4",
+  "scenes": [
+    { "id": "tf1", "text": "When your group asks about the real world, Vibe goes to the live web with TinyFish." },
+    { "id": "tf2", "text": "Ask about Saturday's weather, and Vibe runs a TinyFish search, then fetches the forecast pages as clean markdown, fresh every single time." },
+    { "id": "tf3", "text": "Every fact comes back with its source and the moment it was retrieved, so anyone in the chat can check it." },
+    { "id": "tf4", "text": "Follow-up questions work the same way: park hours, entry fees, straight from the official pages." },
+    { "id": "tf5", "text": "Vibe can only fetch pages its search actually found, so it can't invent a source. Each reply gets a tight budget of two searches and three fetches, so answers stay fast. And the TinyFish key never leaves our servers." },
+    { "id": "tf6", "text": "Live web research, right inside your group chat. Vibe, powered by TinyFish." },
+
+    { "id": "sm1", "text": "Vibe remembers people, and Supermemory is how." },
+    { "id": "sm2", "text": "Maya mentions she's vegetarian in the class chat. Nobody tags Vibe. A few minutes after the chat goes quiet, Vibe quietly learns it in the background." },
+    { "id": "sm3", "text": "Supermemory gives every party its own space, and every person two more: private, and approved. A new fact always starts private." },
+    { "id": "sm4", "text": "Nothing is shared until Maya approves it, and switches it on for a specific party." },
+    { "id": "sm5", "text": "When someone asks Vibe, it searches the party's history and each opted-in member's approved facts, putting schedules, diets and accessibility first. So the Sedona plan already knows Maya is vegetarian." },
+    { "id": "sm6", "text": "Say it twice, and Supermemory merges it into one fact. Change it to vegan, and the very next answer follows. Every result is double-checked against DynamoDB, so a deleted fact can never sneak back in." },
+    { "id": "sm7", "text": "Memory with consent. Vibe, powered by Supermemory." },
+
+    { "id": "aw1", "text": "Vibe runs entirely on AWS, built to be fast, reliable and secure from day one." },
+    { "id": "aw2", "text": "CloudFront and S3 serve the app on our own domain, and Amazon Cognito handles sign-in." },
+    { "id": "aw3", "text": "Every message goes through API Gateway to Lambda, and lands in DynamoDB in a single transaction, together with an outbox record, so no work is ever lost." },
+    { "id": "aw4", "text": "DynamoDB Streams wake a dispatcher, which queues AI work in SQS FIFO queues, keeping every party's work in order." },
+    { "id": "aw5", "text": "Lambda workers call Claude Haiku 4.5 on Amazon Bedrock. It powers the replies, the memory extraction, and even picks each party's theme." },
+    { "id": "aw6", "text": "AppSync Events pushes every update live to everyone in the party, and Amazon SES delivers the email invites." },
+    { "id": "aw7", "text": "EventBridge sweeps up stuck work every five minutes, secrets stay encrypted in Parameter Store with least-privilege IAM, CloudWatch keeps the logs, and the whole stack is defined in CDK." },
+    { "id": "aw8", "text": "Serverless, event-driven, and ready to scale. Vibe, built on AWS." }
+  ]
+}

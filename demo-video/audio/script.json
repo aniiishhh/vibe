@@ -1,0 +1,16 @@
+{
+  "voiceId": "cgSgspJ2msm6clMCkdW9",
+  "voiceName": "Jessica - Playful, Bright, Warm",
+  "model": "eleven_v4",
+  "scenes": [
+    { "id": "s1-hook", "text": "Four friends. One group chat. And a plan buried somewhere under all the messages." },
+    { "id": "s2-start", "text": "Meet Vibe: a group chat with an AI teammate built in. Give your party a goal, and Vibe picks a theme to match." },
+    { "id": "s3-class", "text": "Just tag at-Vibe, and it does the research. It checks ASU's live class catalog, reads the syllabus, samples Rate My Professors, and compares everyone's schedules to find the one section that works for all four. Every answer shows its sources." },
+    { "id": "s4-team", "text": "Decisions turn into party notes, tasks only count once someone accepts them, and inviting friends takes a link or a QR code." },
+    { "id": "s5-trip", "text": "And it's not just for classes. Planning a Saturday in Sedona? Vibe checks the weather, builds the day, and remembers that Maya is vegetarian." },
+    { "id": "s6-aws", "text": "Here's how it works. CloudFront and S3 serve the app, and Cognito signs you in. API Gateway and Lambda save every message to DynamoDB. A stream dispatcher queues the AI work in SQS, where Lambda workers call Claude Haiku 4.5 on Amazon Bedrock, plus our research tools. AppSync Events streams the answer back live, and EventBridge sweeps up anything that slipped through." },
+    { "id": "s7-memory", "text": "So how did Vibe know? Supermemory picked it up from the class chat, without anyone tagging Vibe. It keeps every party, private note and approved fact in its own space, and nothing crosses over until Maya approves it and switches it on for that party. She can edit or delete it any time." },
+    { "id": "s8-pip", "text": "And this is Pip! Pip peeks over your message while you type, reacts to the mood of the chat, delivers Vibe's answers in person, gets a little dizzy when you drag it around, and naps when things go quiet. Every theme even comes with its own outfit." },
+    { "id": "s9-end", "text": "Vibe. Your group's AI teammate. Try it at vibe chat dot U S." }
+  ]
+}

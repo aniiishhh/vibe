@@ -2,6 +2,10 @@
 
 Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementation`.
 
+## Presentation videos and main-branch publication
+
+November 15. The user authorized committing/pushing the current `anish/video` branch and merging relevant changes into `main`. The video work was already committed as `70979be`. Four rendered MP4s, their capture/audio/composition source, the presentation scenarios and supporting skills are included. The README now links the canonical website, full demo and AWS/Supermemory/TinyFish spotlights with a preview frame extracted from the actual film. Videos use scripted sample data, as disclosed in the README and video-production notes. Playback metadata and referenced file paths were checked. This publication updates repository media and documentation. The merge includes the teammate’s `ea9d041` presentation-seeding work and its handoff guide.
+
 ## Presentation demo conversations — November 15
 
 Prepared on `bhavesh/implementation`, based on latest `origin/anish/implementation` at `8d3cea4`, in isolated `.worktrees/bhavesh-implementation`. The user explicitly authorized online population and pushing this branch, superseding the earlier local-only restriction. Root submission drafts were preserved. No application source or deployed infrastructure changed.

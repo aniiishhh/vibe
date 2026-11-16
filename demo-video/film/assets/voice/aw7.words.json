@@ -1,0 +1,150 @@
+{
+ "duration": 12.56,
+ "words": [
+  {
+   "word": "EventBridge",
+   "start": 0,
+   "end": 0.72
+  },
+  {
+   "word": "sweeps",
+   "start": 0.8,
+   "end": 1.12
+  },
+  {
+   "word": "up",
+   "start": 1.24,
+   "end": 1.36
+  },
+  {
+   "word": "stuck",
+   "start": 1.44,
+   "end": 1.68
+  },
+  {
+   "word": "work",
+   "start": 1.84,
+   "end": 2
+  },
+  {
+   "word": "every",
+   "start": 2.08,
+   "end": 2.4
+  },
+  {
+   "word": "five",
+   "start": 2.48,
+   "end": 2.72
+  },
+  {
+   "word": "minutes,",
+   "start": 2.8,
+   "end": 3.6
+  },
+  {
+   "word": "secrets",
+   "start": 3.68,
+   "end": 4.08
+  },
+  {
+   "word": "stay",
+   "start": 4.16,
+   "end": 4.24
+  },
+  {
+   "word": "encrypted",
+   "start": 4.32,
+   "end": 4.8
+  },
+  {
+   "word": "in",
+   "start": 4.88,
+   "end": 4.96
+  },
+  {
+   "word": "Parameter",
+   "start": 5.2,
+   "end": 5.44
+  },
+  {
+   "word": "Store",
+   "start": 5.52,
+   "end": 5.84
+  },
+  {
+   "word": "with",
+   "start": 5.92,
+   "end": 6.08
+  },
+  {
+   "word": "least-privilege",
+   "start": 6.16,
+   "end": 6.88
+  },
+  {
+   "word": "IAM,",
+   "start": 7.04,
+   "end": 7.88
+  },
+  {
+   "word": "CloudWatch",
+   "start": 7.92,
+   "end": 8.4
+  },
+  {
+   "word": "keeps",
+   "start": 8.48,
+   "end": 8.72
+  },
+  {
+   "word": "the",
+   "start": 8.76,
+   "end": 8.8
+  },
+  {
+   "word": "logs,",
+   "start": 9.16,
+   "end": 9.547
+  },
+  {
+   "word": "and",
+   "start": 9.573,
+   "end": 9.6
+  },
+  {
+   "word": "the",
+   "start": 9.68,
+   "end": 9.84
+  },
+  {
+   "word": "whole",
+   "start": 9.96,
+   "end": 10.08
+  },
+  {
+   "word": "stack",
+   "start": 10.16,
+   "end": 10.48
+  },
+  {
+   "word": "is",
+   "start": 10.56,
+   "end": 10.64
+  },
+  {
+   "word": "defined",
+   "start": 10.72,
+   "end": 11.12
+  },
+  {
+   "word": "in",
+   "start": 11.2,
+   "end": 11.36
+  },
+  {
+   "word": "CDK.",
+   "start": 11.44,
+   "end": 12.56
+  }
+ ]
+}

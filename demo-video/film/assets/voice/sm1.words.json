@@ -1,0 +1,40 @@
+{
+ "duration": 3.76,
+ "words": [
+  {
+   "word": "Vibe",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "word": "remembers",
+   "start": 0.44,
+   "end": 0.8
+  },
+  {
+   "word": "people,",
+   "start": 0.88,
+   "end": 1.6
+  },
+  {
+   "word": "and",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "word": "Supermemory",
+   "start": 1.84,
+   "end": 2.56
+  },
+  {
+   "word": "is",
+   "start": 2.64,
+   "end": 2.8
+  },
+  {
+   "word": "how.",
+   "start": 2.88,
+   "end": 3.76
+  }
+ ]
+}

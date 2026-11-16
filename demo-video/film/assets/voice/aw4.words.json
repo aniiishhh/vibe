@@ -1,0 +1,100 @@
+{
+ "duration": 8.4,
+ "words": [
+  {
+   "word": "DynamoDB",
+   "start": 0,
+   "end": 0.8
+  },
+  {
+   "word": "Streams",
+   "start": 0.88,
+   "end": 1.36
+  },
+  {
+   "word": "wake",
+   "start": 1.48,
+   "end": 1.6
+  },
+  {
+   "word": "a",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "word": "dispatcher,",
+   "start": 2.2,
+   "end": 2.68
+  },
+  {
+   "word": "which",
+   "start": 2.72,
+   "end": 2.88
+  },
+  {
+   "word": "queues",
+   "start": 2.96,
+   "end": 3.28
+  },
+  {
+   "word": "AI",
+   "start": 3.44,
+   "end": 3.68
+  },
+  {
+   "word": "work",
+   "start": 3.84,
+   "end": 4
+  },
+  {
+   "word": "in",
+   "start": 4.08,
+   "end": 4.16
+  },
+  {
+   "word": "SQS",
+   "start": 4.4,
+   "end": 4.88
+  },
+  {
+   "word": "FIFO",
+   "start": 4.96,
+   "end": 5.28
+  },
+  {
+   "word": "queues,",
+   "start": 5.36,
+   "end": 5.96
+  },
+  {
+   "word": "keeping",
+   "start": 6,
+   "end": 6.4
+  },
+  {
+   "word": "every",
+   "start": 6.48,
+   "end": 6.72
+  },
+  {
+   "word": "party's",
+   "start": 6.84,
+   "end": 7.12
+  },
+  {
+   "word": "work",
+   "start": 7.24,
+   "end": 7.36
+  },
+  {
+   "word": "in",
+   "start": 7.44,
+   "end": 7.52
+  },
+  {
+   "word": "order.",
+   "start": 7.6,
+   "end": 8.4
+  }
+ ]
+}

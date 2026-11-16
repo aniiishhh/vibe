@@ -1,0 +1,22 @@
+[
+  {
+    "label": "start",
+    "t": 2.721
+  },
+  {
+    "label": "weather sent",
+    "t": 2.724
+  },
+  {
+    "label": "weather answered",
+    "t": 8.633
+  },
+  {
+    "label": "plan sent",
+    "t": 26.74
+  },
+  {
+    "label": "plan answered",
+    "t": 33.534
+  }
+]

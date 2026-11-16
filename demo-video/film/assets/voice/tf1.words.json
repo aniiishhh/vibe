@@ -1,0 +1,85 @@
+{
+ "duration": 5.2,
+ "words": [
+  {
+   "word": "When",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "word": "your",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "word": "group",
+   "start": 0.44,
+   "end": 0.56
+  },
+  {
+   "word": "asks",
+   "start": 0.64,
+   "end": 0.88
+  },
+  {
+   "word": "about",
+   "start": 0.96,
+   "end": 1.2
+  },
+  {
+   "word": "the",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "word": "real",
+   "start": 1.36,
+   "end": 1.6
+  },
+  {
+   "word": "world,",
+   "start": 1.68,
+   "end": 2.4
+  },
+  {
+   "word": "Vibe",
+   "start": 2.48,
+   "end": 2.72
+  },
+  {
+   "word": "goes",
+   "start": 2.8,
+   "end": 3.04
+  },
+  {
+   "word": "to",
+   "start": 3.08,
+   "end": 3.12
+  },
+  {
+   "word": "the",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "word": "live",
+   "start": 3.44,
+   "end": 3.6
+  },
+  {
+   "word": "web",
+   "start": 3.72,
+   "end": 3.84
+  },
+  {
+   "word": "with",
+   "start": 3.92,
+   "end": 4.08
+  },
+  {
+   "word": "TinyFish.",
+   "start": 4.28,
+   "end": 5.2
+  }
+ ]
+}

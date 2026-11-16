@@ -1,0 +1,38 @@
+[
+  {
+    "label": "start",
+    "t": 3.423
+  },
+  {
+    "label": "typing",
+    "t": 3.455
+  },
+  {
+    "label": "typed lol",
+    "t": 5.397
+  },
+  {
+    "label": "love",
+    "t": 9.084
+  },
+  {
+    "label": "sad",
+    "t": 12.088
+  },
+  {
+    "label": "grab",
+    "t": 15.768
+  },
+  {
+    "label": "drop",
+    "t": 17.292
+  },
+  {
+    "label": "asleep",
+    "t": 26.917
+  },
+  {
+    "label": "poke",
+    "t": 29.883
+  }
+]

@@ -1,0 +1,65 @@
+{
+ "duration": 6.24,
+ "words": [
+  {
+   "word": "Live",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "word": "web",
+   "start": 0.4,
+   "end": 0.64
+  },
+  {
+   "word": "research,",
+   "start": 0.72,
+   "end": 1.52
+  },
+  {
+   "word": "right",
+   "start": 1.6,
+   "end": 1.84
+  },
+  {
+   "word": "inside",
+   "start": 2.04,
+   "end": 2.24
+  },
+  {
+   "word": "your",
+   "start": 2.32,
+   "end": 2.4
+  },
+  {
+   "word": "group",
+   "start": 2.48,
+   "end": 2.64
+  },
+  {
+   "word": "chat.",
+   "start": 2.72,
+   "end": 3.52
+  },
+  {
+   "word": "Vibe,",
+   "start": 3.6,
+   "end": 4.32
+  },
+  {
+   "word": "powered",
+   "start": 4.52,
+   "end": 4.72
+  },
+  {
+   "word": "by",
+   "start": 4.8,
+   "end": 4.96
+  },
+  {
+   "word": "TinyFish.",
+   "start": 5.16,
+   "end": 6.24
+  }
+ ]
+}

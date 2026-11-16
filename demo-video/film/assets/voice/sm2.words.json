@@ -1,0 +1,135 @@
+{
+ "duration": 10.4,
+ "words": [
+  {
+   "word": "Maya",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "word": "mentions",
+   "start": 0.56,
+   "end": 0.8
+  },
+  {
+   "word": "she's",
+   "start": 0.88,
+   "end": 1.04
+  },
+  {
+   "word": "vegetarian",
+   "start": 1.24,
+   "end": 1.84
+  },
+  {
+   "word": "in",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "word": "the",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "word": "class",
+   "start": 2.24,
+   "end": 2.4
+  },
+  {
+   "word": "chat.",
+   "start": 2.48,
+   "end": 3.44
+  },
+  {
+   "word": "Nobody",
+   "start": 3.52,
+   "end": 3.92
+  },
+  {
+   "word": "tags",
+   "start": 4.12,
+   "end": 4.32
+  },
+  {
+   "word": "Vibe.",
+   "start": 4.36,
+   "end": 5.28
+  },
+  {
+   "word": "A",
+   "start": 5.36,
+   "end": 5.413
+  },
+  {
+   "word": "few",
+   "start": 5.467,
+   "end": 5.52
+  },
+  {
+   "word": "minutes",
+   "start": 5.68,
+   "end": 5.84
+  },
+  {
+   "word": "after",
+   "start": 5.92,
+   "end": 6.16
+  },
+  {
+   "word": "the",
+   "start": 6.2,
+   "end": 6.24
+  },
+  {
+   "word": "chat",
+   "start": 6.32,
+   "end": 6.48
+  },
+  {
+   "word": "goes",
+   "start": 6.56,
+   "end": 6.8
+  },
+  {
+   "word": "quiet,",
+   "start": 6.88,
+   "end": 7.64
+  },
+  {
+   "word": "Vibe",
+   "start": 7.68,
+   "end": 8
+  },
+  {
+   "word": "quietly",
+   "start": 8.16,
+   "end": 8.64
+  },
+  {
+   "word": "learns",
+   "start": 8.72,
+   "end": 8.96
+  },
+  {
+   "word": "it",
+   "start": 9.04,
+   "end": 9.12
+  },
+  {
+   "word": "in",
+   "start": 9.16,
+   "end": 9.2
+  },
+  {
+   "word": "the",
+   "start": 9.24,
+   "end": 9.28
+  },
+  {
+   "word": "background.",
+   "start": 9.36,
+   "end": 10.4
+  }
+ ]
+}

@@ -1,0 +1,52 @@
+<template>
+  <style>
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-400.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-500.woff2') format('woff2'); font-weight: 500; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-600.woff2') format('woff2'); font-weight: 600; }
+@font-face { font-family: 'Geist'; src: url('assets/fonts/geist-700.woff2') format('woff2'); font-weight: 700; }
+#root { position: absolute; inset: 0; overflow: hidden; background: #ffffff; font-family: 'Geist', sans-serif; color: #1f1b27; }
+.cam { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.cam video, .cam img.still { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; display: block; }
+.tagwrap { position: absolute; left: 200px; bottom: 132px; z-index: 40; }
+.tag { display: flex; align-items: center; gap: 18px; padding: 18px 30px 18px 22px; background: #ffffff; border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(31,27,39,.18), 0 0 0 1px rgba(31,27,39,.06); font: 600 38px/1.1 'Geist', sans-serif; color: #1f1b27; white-space: nowrap; }
+.tag i { display: block; width: 8px; height: 46px; border-radius: 4px; background: #ec5a44; }
+.tag small { font-weight: 500; color: #6b6677; font-size: 30px; }#team-flood { position: absolute; inset: 0; background: #e8f5e6; z-index: 60; clip-path: circle(0px at 78px 248px); }</style>
+  <div id="root" data-composition-id="team" data-width="1920" data-height="1080" data-duration="8.4">
+<div class="cam" id="team-camA" style="z-index:1"><video id="team-vA" class="clip" src="assets/clips/class.mp4" muted playsinline data-start="0" data-duration="4.4" data-media-start="55.6" data-playback-rate="1.5" data-track-index="1"></video></div>
+<div class="cam" id="team-camB" style="z-index:2"><video id="team-vB" class="clip" src="assets/clips/class.mp4" muted playsinline data-start="4.4" data-duration="4" data-media-start="64.4" data-playback-rate="1" data-track-index="1"></video><div id="team-linkfix" style="position:absolute;left:722.4px;top:742.8px;width:354px;height:37.199999999999996px;background:#fff;display:flex;align-items:center;padding-left:8.4px;font:400 18px 'Geist',sans-serif;color:#1f1b27;white-space:nowrap;opacity:0">https://vibe-chat.us/invite/cse-511-q8m2</div></div>
+<div class="clip tagwrap" id="team-tag1" data-start="0.8" data-duration="1.7" data-track-index="5"><div class="tag" id="team-tag1i"><i></i><span>Decisions saved as party notes</span></div></div>
+<div class="clip tagwrap" id="team-tag2" data-start="2.65" data-duration="1.7" data-track-index="5"><div class="tag" id="team-tag2i"><i></i><span>Tasks need the assignee’s yes</span></div></div>
+<div class="clip tagwrap" id="team-tag3" data-start="5.9" data-duration="2" data-track-index="5" style="left:1300px;top:190px;bottom:auto"><div class="tag" id="team-tag3i"><i></i><span>Invite by link, QR or email</span></div></div>
+<div id="team-floodwrap" class="clip" data-start="7.9" data-duration="0.5" data-track-index="6" data-layout-ignore><div id="team-flood"></div></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+const F = 0.6;
+function camState(s, cx, cy) {
+  let x = 960 - cx * F * s, y = 540 - cy * F * s;
+  x = Math.min(0, Math.max(1920 - 1920 * s, x));
+  y = Math.min(0, Math.max(1080 - 1080 * s, y));
+  return { scale: s, x, y };
+}
+function cam(tl, sel, t, d, s, cx, cy, ease) { tl.to(sel, { ...camState(s, cx, cy), duration: d, ease: ease || 'power3.inOut' }, t); }
+function camSet(tl, sel, t, s, cx, cy) { tl.set(sel, camState(s, cx, cy), t); }
+function tagIn(tl, sel, t, d) {
+  tl.fromTo(sel, { opacity: 0, filter: 'blur(8px)', x: -14 }, { opacity: 1, filter: 'blur(0px)', x: 0, duration: 0.2, ease: 'expo.out' }, t);
+  tl.to(sel, { opacity: 0, filter: 'blur(6px)', duration: 0.14, ease: 'power2.in' }, t + d - 0.16);
+}
+
+camSet(tl, '#team-camA', 0, 1.0, 1600, 900);
+cam(tl, '#team-camA', 0.45, 0.5, 1.75, 2860, 480);
+cam(tl, '#team-camA', 2.55, 0.45, 1.9, 2860, 420);
+camSet(tl, '#team-camB', 0, 1.0, 1600, 900);
+cam(tl, '#team-camB', 5.75, 0.5, 1.5, 1600, 880);
+tl.set('#team-linkfix', { opacity: 1 }, 7.0);
+tagIn(tl, '#team-tag1i', 0.8, 1.7);
+tagIn(tl, '#team-tag2i', 2.65, 1.7);
+tagIn(tl, '#team-tag3i', 5.9, 2);
+tl.fromTo('#team-flood', { clipPath: 'circle(0px at 78px 248px)' }, { clipPath: 'circle(2300px at 78px 248px)', duration: 0.42, ease: 'power2.inOut' }, 7.95);
+    window.__timelines["team"] = tl;
+  </script>
+</template>

@@ -1,0 +1,55 @@
+{
+ "duration": 6,
+ "words": [
+  {
+   "word": "Serverless,",
+   "start": 0,
+   "end": 0.88
+  },
+  {
+   "word": "event-driven,",
+   "start": 1.04,
+   "end": 1.76
+  },
+  {
+   "word": "and",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "word": "ready",
+   "start": 2.08,
+   "end": 2.32
+  },
+  {
+   "word": "to",
+   "start": 2.36,
+   "end": 2.4
+  },
+  {
+   "word": "scale.",
+   "start": 2.48,
+   "end": 3.44
+  },
+  {
+   "word": "Vibe,",
+   "start": 3.52,
+   "end": 4.16
+  },
+  {
+   "word": "built",
+   "start": 4.24,
+   "end": 4.48
+  },
+  {
+   "word": "on",
+   "start": 4.56,
+   "end": 4.72
+  },
+  {
+   "word": "AWS.",
+   "start": 4.8,
+   "end": 6
+  }
+ ]
+}
