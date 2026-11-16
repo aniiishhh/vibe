@@ -1,5 +1,7 @@
 # Presentation conversations
 
+**Deployment retired November 15, 2026.** The shared AWS backend, persisted demo conversations and synthetic Cognito accounts were deleted at the user’s request. The party links and observed results below are historical. The committed seeder can prepare new fixtures after an authorized redeployment. See [STATUS.md](../../STATUS.md#aws-teardown-completed--november-15-2026).
+
 Prepared November 15 on `bhavesh/implementation`, based on `origin/anish/implementation` at `8d3cea4`. Online demo population and pushing this branch were explicitly authorized by the user. No application code was deployed. Root submission drafts remain untouched.
 
 ## Open the saved chats

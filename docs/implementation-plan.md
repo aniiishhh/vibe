@@ -2,6 +2,10 @@
 
 Prepared for review on November 14, 2026. Event notes record a November 15, 2026, 11 AM America/Phoenix deadline. Product requirements, architecture and evidence are in the other three Vibe documents.
 
+## Deployment retirement
+
+On November 15, 2026 the user authorized full shared-account AWS teardown and revocation of Bhavesh’s access. `Vibe-dev` and `CDKToolkit` reached DELETE_COMPLETE. Retained data/storage/logs, provider parameters, the custom-domain certificate and project access resources were explicitly removed and verified. The hosted app is offline. The milestone entries below preserve implementation history. A future deployment requires new infrastructure and public identifiers, a fresh bootstrap and recreated provider/sender parameters. See [the teardown and recreation record](../STATUS.md#aws-teardown-completed--november-15-2026).
+
 ## Review boundary
 
 The user approved Milestone 1 application implementation on November 14, 2026. Deployment needs the chosen AWS account, region and allowance. Global tool installation needs approval. Configure credentials through ignored local files or provider consoles.
@@ -17,7 +21,7 @@ The user approved Milestone 1 application implementation on November 14, 2026. D
 | 3C owner profiles and memory selection | Implemented and deployed | Canonical/privacy/correction checks passed; derived provider prose remains withheld when unverifiable, broad semantic quality remains unevaluated. |
 | 3D research | Implemented and deployed | Class/RMP/web source probes and focused regressions passed; latest expanded filters/syllabus/review behavior awaits manual acceptance. Interactive TinyAgent work is conditional on a demonstrated need. |
 
-Current app: https://d1ia555vbcj8k2.cloudfront.net, shared account 851725603471, Ohio, Haiku 4.5. Earlier 56 backend / 10 adapter checks plus the 25 focused 3B checks, typechecks, production build and strict synthesis passed. The authorized completion check exercised two users and two research requests. See the completion report for observed coverage. See [handoff](milestone-3-handoff.md) and [current status](../STATUS.md).
+Historical app before teardown: https://d1ia555vbcj8k2.cloudfront.net, shared account 851725603471, Ohio, Haiku 4.5. Earlier 56 backend / 10 adapter checks plus the 25 focused 3B checks, typechecks, production build and strict synthesis passed. The authorized completion check exercised two users and two research requests. See the completion report for observed coverage. See [handoff](milestone-3-handoff.md) and [current status](../STATUS.md).
 
 ## Additional requested semantic party themes
 

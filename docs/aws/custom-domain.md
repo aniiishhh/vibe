@@ -1,6 +1,10 @@
 # Vibe custom domain setup
 
-## Current state
+## Retired November 15, 2026
+
+The user authorized AWS teardown. The CloudFront distribution, ACM certificate and shared backend described below were deleted. Paired custom-domain context entries were removed from `infra/cdk.json`. Reusing this domain requires a fresh certificate, deployment and DNS records. Remove the old root ALIAS and verification CNAME in Porkbun as registrar-side housekeeping. See [the teardown record](../../STATUS.md#aws-teardown-completed--november-15-2026).
+
+## Historical setup
 
 November 15, 2026. The user authorized connecting `vibe-chat.us`, managed through Porkbun, to the shared Vibe deployment. The Porkbun validation CNAME is publicly visible and ACM reports `ISSUED`. Persistent domain/certificate context is configured. The shared stack reached `UPDATE_COMPLETE` and CloudFront reports `Deployed`. API invitation URLs now use `https://vibe-chat.us`. Porkbun root ALIAS now points to the distribution. The canonical app is https://vibe-chat.us, with the original CloudFront hostname also available.
 

@@ -4,7 +4,9 @@ An AI teammate in your group chat. Bring classmates, friends or teammates into a
 
 Vibe combines persistent group conversations, permission-aware personal memory and sourced research. It helps a group take classes together, brainstorm a hackathon, plan a trip or organize a shared project.
 
-[Open Vibe](https://vibe-chat.us) · [Demo videos](#demo-videos) · [Setup](#local-development) · [Architecture](#architecture) · [Deployment and handoff](STATUS.md)
+**Deployment status — retired November 15, 2026.** The AWS-hosted application at `vibe-chat.us` has been taken down to stop Vibe infrastructure usage. The source code, presentation videos and deployment instructions are available below. See [the teardown record](STATUS.md#aws-teardown-completed--november-15-2026).
+
+[Demo videos](#demo-videos) · [Setup](#local-development) · [Architecture](#architecture) · [Deployment and handoff](STATUS.md)
 
 ![Vibe group chat with sourced class research and Pip, the contextual mascot](docs/assets/vibe-chat.png)
 
@@ -12,7 +14,7 @@ Vibe combines persistent group conversations, permission-aware personal memory a
 
 [![Watch the Vibe demo showing a group choosing classes with Pip](docs/assets/vibe-demo-preview.jpg)](https://github.com/aniiishhh/vibe/blob/main/demo-video/film/renders/vibe-demo.mp4)
 
-[Watch the full demo · 1 min 57 sec](https://github.com/aniiishhh/vibe/blob/main/demo-video/film/renders/vibe-demo.mp4) · [Try the live app](https://vibe-chat.us)
+[Watch the full demo · 1 min 57 sec](https://github.com/aniiishhh/vibe/blob/main/demo-video/film/renders/vibe-demo.mp4) · [Deployment status](STATUS.md#aws-teardown-completed--november-15-2026)
 
 | Video | Focus |
 | --- | --- |
@@ -20,7 +22,7 @@ Vibe combines persistent group conversations, permission-aware personal memory a
 | [Supermemory spotlight](https://github.com/aniiishhh/vibe/blob/main/demo-video/film-supermemory/renders/vibe-supermemory.mp4) | Personal memory, approval and cross-party reuse. |
 | [TinyFish spotlight](https://github.com/aniiishhh/vibe/blob/main/demo-video/film-tinyfish/renders/vibe-tinyfish.mp4) | Web research and source-backed group planning. |
 
-The videos use scripted sample conversations and illustrative course, review and travel data. The deployed app runs its authenticated backend and research integrations. Click the preview or a video link to open the MP4 file on GitHub, where it can also be downloaded.
+The videos use scripted sample conversations and illustrative course, review and travel data. The application code integrates authenticated AWS services and live research tools. Click the preview or a video link to open the MP4 file on GitHub, where it can also be downloaded.
 
 [Video source and rebuild instructions](demo-video/README.md) · [Presentation scenarios](docs/demo-scenarios.md)
 
@@ -100,13 +102,13 @@ The selected model is `us.anthropic.claude-haiku-4-5-20251001-v1:0`. The shared 
 ### Run the web app
 
 ```sh
-git clone --branch anish/implementation https://github.com/aniiishhh/vibe.git
+git clone --branch main https://github.com/aniiishhh/vibe.git
 cd vibe
 npm ci
 cp web/.env.example web/.env.local
 ```
 
-Fill `web/.env.local` with the deployment's public identifiers. The current shared values are recorded in [STATUS.md](STATUS.md).
+Fill `web/.env.local` with the identifiers from a newly authorized deployment. The former shared backend has been deleted. [STATUS.md](STATUS.md) records historical identifiers and the rebuild steps.
 
 | Variable | Value to supply |
 | --- | --- |
@@ -147,7 +149,7 @@ npm run test:research
 
 ## AWS deployment
 
-Select your authorized AWS profile and verify its identity before deploying. The CDK application defaults to the project's shared account; set the target account explicitly when reproducing the stack.
+Recreating the retired deployment provisions billable AWS resources. Select your authorized AWS profile and verify its identity before deploying. The CDK application defaults to the project's shared account; set the target account explicitly when reproducing the stack.
 
 ```sh
 export AWS_PROFILE=your-authorized-profile
@@ -165,7 +167,7 @@ Prepare these parameters in the target account and region before deployment.
 | `/vibe/dev/tinyfish-api-key` | `SecureString` | TinyFish server credential |
 | `/vibe/dev/invite-sender` | `String` | SES-verified sender email address used by the invitation API |
 
-Verify the SES sender in Ohio and enable account access to the selected Bedrock model/profile. In a fresh account, bootstrap CDK once with an authorized deployment role.
+Verify the SES sender in Ohio and enable account access to the selected Bedrock model/profile. The previous CDK bootstrap was deleted. Bootstrap the selected account/region with an authorized deployment role before recreating the stack.
 
 ```sh
 npm exec -w infra -- cdk bootstrap "aws://$VIBE_AWS_ACCOUNT/$VIBE_AWS_REGION"
@@ -181,11 +183,11 @@ npm run diff -w infra
 npm run deploy -w infra
 ```
 
-The stack outputs the website URL and public service identifiers. Production configuration is deployed with the frontend. Persistent resources have retention policies. The latest stack state, deployment replication details and verification evidence are maintained in [STATUS.md](STATUS.md).
+The stack outputs the website URL and public service identifiers. Production configuration is deployed with the frontend. Persistent resources have retention policies. The teardown record, historical verification evidence and recreation steps are maintained in [STATUS.md](STATUS.md). For a custom domain, request and validate a fresh ACM certificate in us-east-1, then configure the paired domain/certificate CDK context values.
 
 ## Current service boundaries
 
-- **Email invitations** use SES. The shared account is sandboxed, so delivery is available to verified addresses, the mailbox simulator and addresses at verified domains. Arbitrary-recipient delivery requires AWS production access.
+- **Email invitations** use SES. A sandboxed SES account permits delivery to verified addresses, the mailbox simulator and addresses at verified domains. Arbitrary-recipient delivery requires AWS production access.
 - **Research evidence** has explicit time, result and context budgets. ASU/RMP interfaces are unofficial, professor reviews are samples, and syllabi or meeting details can be missing. Answers retain source/coverage uncertainty.
 - **Memory processing** is asynchronous. Idle discovery normally occurs roughly two to seven minutes after the final message, followed by queue/provider processing. Approval, membership and canonical versions govern reuse.
 

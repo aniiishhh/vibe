@@ -2,6 +2,35 @@
 
 Updated November 15, 2026, America/Phoenix. Handoff target: `anish/implementation`.
 
+## AWS teardown completed — November 15, 2026
+
+The user explicitly authorized removal of Vibe’s AWS deployment and Bhavesh’s account access. Verified the active identity as `anishk` in account **851725603471** before mutations. The shared hosted application is **offline**. This section supersedes the deployment and access states recorded below.
+
+### Removed resources
+
+- CloudFormation stacks **Vibe-dev** and **CDKToolkit** both reached **DELETE_COMPLETE** in us-east-2.
+- API Gateway HTTP API, AppSync Events API/namespaces, six runtime Lambda functions, deployment helper/layer, event-source mappings, EventBridge recovery rule, CloudFront distribution `E2CC4LLGDDIPFE`, rewrite function and origin access control were removed.
+- Explicitly deleted retained DynamoDB table `vibe-dev` and its stored application data, after disabling PITR. The final backup listing was empty.
+- Explicitly deleted the retained Cognito user pool and accounts, four FIFO queues, eight Vibe log groups and the Vibe website S3 bucket. Removed seven website object versions.
+- Emptied/deleted the bootstrap asset bucket, including **75 object versions / 86,117,700 bytes**, and removed the bootstrap ECR repository and roles.
+- Deleted all three `/vibe/dev/` SSM parameters, the Vibe SES sender identity and the us-east-1 ACM certificate for `vibe-chat.us`.
+
+### Access revocation
+
+Deleted IAM user **bhavesh**, its console login profile and its membership in **VibeDeployers**, then removed that group and its administrator/local-development grants and inline policy. Credential inventory found zero access keys, service-specific credentials, signing certificates, SSH keys or MFA devices for this user. Applied older-session revocation to all four CDK assumable roles before removing those roles. Final IAM inventory lists only `anishk` and the pre-existing `AthenaTableau` user, with zero Vibe deployment groups or project/bootstrap roles. IAM Identity Center instance checks returned empty in all 17 enabled regions.
+
+### Final verification and billing scope
+
+Direct AWS service listings confirmed zero Vibe tables/backups, functions/layers, queues, log groups, user pools, HTTP APIs, AppSync APIs, recovery rules, provider parameters, ECR repositories, CloudFront distributions/functions, ACM certificates and SES identities in their deployment regions. The initial project-tag inventory across all 17 enabled regions located Vibe resources only in Ohio and the global/us-east-1 CloudFront/ACM surfaces.
+
+Pre-existing account workloads include the four tennis/Glue S3 buckets, two Tennis Lambda functions, a tennis layer and eight Glue/Tennis/older log groups. These resources have their own billing exposure. AWS can post usage incurred before shutdown after the teardown date. Porkbun/domain registration and external provider billing follow their own accounts and subscriptions. Vibe’s removed AWS runtime/storage resources have no continuing deployment to generate new workload charges.
+
+Porkbun DNS still requires registrar-side housekeeping for the retired domain. Remove the root ALIAS to `d1ia555vbcj8k2.cloudfront.net` and the old ACM verification CNAME when retiring this hostname. The certificate and distribution they referenced have been deleted.
+
+### Recreate on another device
+
+Clone `main`, install dependencies and build research/frontend assets using the README. Use your own currently authorized AWS credentials. Bootstrap the selected account/region again, verify a new SES sender and recreate the three SSM parameters with current provider credentials. The retired domain/certificate context entries were removed from `infra/cdk.json`, so a new deployment starts with its generated CloudFront hostname. Request a new us-east-1 certificate and configure fresh context/DNS values if reusing a custom domain. Capture the new Cognito/API/AppSync output values for frontend configuration. Historical chats, demo accounts and AWS credentials were deleted with the shared deployment. Deployment follows the repository’s existing authorization guidance.
+
 ## Presentation videos and main-branch publication
 
 November 15. The user authorized committing/pushing the current `anish/video` branch and merging relevant changes into `main`. The video work was already committed as `70979be`. Four rendered MP4s, their capture/audio/composition source, the presentation scenarios and supporting skills are included. The README now links the canonical website, full demo and AWS/Supermemory/TinyFish spotlights with a preview frame extracted from the actual film. Videos use scripted sample data, as disclosed in the README and video-production notes. Playback metadata and referenced file paths were checked. This publication updates repository media and documentation. The merge includes the teammate’s `ea9d041` presentation-seeding work and its handoff guide.
@@ -106,7 +135,7 @@ Completion cleanup succeeded. Both temporary Cognito users, 87 canonical fixture
 
 Read [the handoff](docs/milestone-3-handoff.md) and [implementation plan](docs/implementation-plan.md) before continuing. Milestone 4 builds on those 3B cursors. The requested UI/README integration is complete. Other Milestone 5 work requires a new user request.
 
-## Current shared deployment
+## Historical shared deployment before teardown
 
 **https://vibe-chat.us** — stack `Vibe-dev`, account **851725603471**, **us-east-2**, **UPDATE_COMPLETE**. Latest deployment updated API/dispatcher/memory/agent code and frontend assets for chat organization, admin permissions and mascot fixes. The preceding domain update attached the certificate and set the canonical API invitation URL. Scoped runtime permissions retain Milestone 4 and the research package retains Milestone 3. All five functions are Active/Successful. Agent and memory workers use **us.anthropic.claude-haiku-4-5-20251001-v1:0**. Different-model fallback is disabled for evaluation. Anthropic first-use setup and a real READY invocation succeeded before the shared model switch.
 
@@ -124,7 +153,7 @@ Read [the handoff](docs/milestone-3-handoff.md) and [implementation plan](docs/i
 | Invitation sender | SSM String /vibe/dev/invite-sender, verified SES identity in Ohio, sandbox sending |
 | Background discovery | Enabled rate(5 minutes), 120-second idle threshold, at most one party batch per 300 seconds |
 
-Bhavesh's local AWS profile `vibe-team` is IAM user bhavesh; its VibeDeployers group currently has AdministratorAccess and SignInLocalDevelopmentAccess. On another machine use the developer's own authorized profile and verify STS account before AWS mutations. The earlier scoped policy example in docs/aws/ is not required while admin access is effective. Runtime roles independently use scoped permissions, including the Haiku profile and its verified US destination-model ARNs.
+Bhavesh’s former IAM user and VibeDeployers group were deleted during the teardown above. Future setup uses each developer’s own currently authorized identity and newly provisioned resources.
 
 The existing **Monthly Budget $50** was confirmed; it notifies rather than enforcing a hard cap and includes other account workloads. Provider billing is separate. Actual costs have not been measured. Preserve existing provider values; no keys belong in Git or frontend configuration.
 
@@ -158,7 +187,7 @@ Evidence:
 - [Earlier integration/browser checkpoint](docs/results/milestone-3-integration-2026-11-15.md)
 - [Original 3A live checkpoint](docs/results/milestone-3a-live-2026-11-14.md)
 
-## Setup and future deployment
+## Historical setup and deployment details
 
 Use Node 24+, npm and Python 3.12/pip. `npm ci`; prepare a local `.venv` and install research/requirements.txt plus pytest; build the research asset with `npm run build:research`; run tests/typechecks and `npm run build`. See [research setup/provenance](research/README.md). The vendored clients are sufficient to build; the ignored SameClass reference checkout is optional.
 

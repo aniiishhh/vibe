@@ -7,8 +7,6 @@
     "@aws-cdk/core:target-partitions": [
       "aws",
       "aws-us-gov"
-    ],
-    "vibe:domainName": "vibe-chat.us",
-    "vibe:certificateArn": "arn:aws:acm:us-east-1:851725603471:certificate/d99e921e-40fb-47f7-bb87-2907a98dae20"
+    ]
   }
 }
