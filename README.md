@@ -12,17 +12,17 @@ Vibe combines persistent group conversations, permission-aware personal memory a
 
 ## Demo videos
 
-[![Watch the Vibe demo showing a group choosing classes with Pip](docs/assets/vibe-demo-preview.jpg)](https://github.com/aniiishhh/vibe/blob/main/demo-video/film/renders/vibe-demo.mp4)
+[![Watch the Vibe demo showing a group choosing classes with Pip](docs/assets/vibe-demo-preview.jpg)](https://youtu.be/tV7dPiA0akw)
 
-[Watch the full demo · 1 min 57 sec](https://github.com/aniiishhh/vibe/blob/main/demo-video/film/renders/vibe-demo.mp4) · [Deployment status](STATUS.md#aws-teardown-completed--november-15-2026)
+[Watch the full demo · 1 min 57 sec](https://youtu.be/tV7dPiA0akw) · [Deployment status](STATUS.md#aws-teardown-completed--november-15-2026)
 
 | Video | Focus |
 | --- | --- |
-| [AWS spotlight](https://github.com/aniiishhh/vibe/blob/main/demo-video/film-aws/renders/vibe-aws.mp4) | Hosting, authentication, live chat and background AI architecture. |
-| [Supermemory spotlight](https://github.com/aniiishhh/vibe/blob/main/demo-video/film-supermemory/renders/vibe-supermemory.mp4) | Personal memory, approval and cross-party reuse. |
-| [TinyFish spotlight](https://github.com/aniiishhh/vibe/blob/main/demo-video/film-tinyfish/renders/vibe-tinyfish.mp4) | Web research and source-backed group planning. |
+| [AWS spotlight](https://youtu.be/t-21eITwB5o) | Hosting, authentication, live chat and background AI architecture. |
+| [Supermemory spotlight](https://youtu.be/vvnaL_6-wSY) | Personal memory, approval and cross-party reuse. |
+| [TinyFish spotlight](https://youtu.be/OTJo8PUmfK0) | Web research and source-backed group planning. |
 
-The videos use scripted sample conversations and illustrative course, review and travel data. The application code integrates authenticated AWS services and live research tools. Click the preview or a video link to open the MP4 file on GitHub, where it can also be downloaded.
+The videos use scripted sample conversations and illustrative course, review and travel data. The application code integrates authenticated AWS services and live research tools. Click the preview or a video link to watch on YouTube.
 
 [Video source and rebuild instructions](demo-video/README.md) · [Presentation scenarios](docs/demo-scenarios.md)
 
